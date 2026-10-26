@@ -1,0 +1,8 @@
+$ pip install -q -r requirements.txt
+$ python -m explore.udf_speed
+WARNING: Using incubator modules: jdk.incubator.vector
+rows: 3104600
+Python UDFs travel as Arrow batches: true
+built-in rlike   249000 bots    1.5 s
+pandas UDF       249000 bots    2.8 s
+Python UDF       249000 bots    2.7 s

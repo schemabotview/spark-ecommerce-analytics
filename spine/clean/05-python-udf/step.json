@@ -1,0 +1,1 @@
+{"from": "clean/04-timezones", "changes": ["shopwave/silver.py", "explore/bots.py"], "venv": true, "setup": ["python -m shopwave.bronze"]}

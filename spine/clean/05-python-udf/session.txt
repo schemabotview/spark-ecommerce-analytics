@@ -1,0 +1,10 @@
+$ python -m explore.bots
+WARNING: Using incubator modules: jdk.incubator.vector
+is_bot=False   28424 events
+is_bot=True     2477 events
+  anon-bot-7f3a   bot=True   2477 events
+  1               bot=False   247 events
+  2               bot=False   112 events
+its user agent: Mozilla/5.0 (compatible; ShopwaveScraper/1.0)
+plan steps that call Python: 2
+  BatchEvalPython  → is_bot(context.user_agent)

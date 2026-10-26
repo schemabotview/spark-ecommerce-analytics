@@ -24,7 +24,8 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 | 1 | `intro` | 3 | not started |
 | 2 | `start` | 6 | pilot: authored, replayed, rendered, looked at; no audio |
 | 3 | `ingest` | 8 | authored, replayed, rendered, looked at; no audio |
-| 4–11 | | 65 | not started |
+| 4 | `clean` | 8 | authored, replayed, rendered, looked at; no audio |
+| 5–11 | | 57 | not started |
 
 The owner reviews everything at the end (2026-10-26: "do course by course till end").
 

@@ -1,0 +1,1 @@
+{"from": "model/02-join-types", "changes": ["shopwave/metrics.py", "explore/sort_merge.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver"]}

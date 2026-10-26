@@ -1,0 +1,3 @@
+{"from": "ingest/08-bronze", "changes": ["shopwave/silver.py", "explore/columns.py"], "venv": true,
+ "generated": {"sf": 0.01, "from": "2026-10-02", "to": "2026-10-31", "only": ["clickstream"]},
+ "setup": ["python -m shopwave.bronze"]}

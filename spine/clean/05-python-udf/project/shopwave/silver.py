@@ -1,0 +1,60 @@
+"""Silver: bronze made clean and consistent, ready to model and query."""
+import re
+
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
+from pyspark.sql.types import BooleanType
+
+BOT = re.compile(r"bot|crawl|spider|scraper", re.IGNORECASE)
+
+
+@F.udf(BooleanType())
+def is_bot(user_agent):
+    """A Python function Spark calls once for every row."""
+    return bool(user_agent and BOT.search(user_agent))
+
+# Timestamps are stored in UTC; a customer's day is their own country's.
+TIMEZONES = {
+    "AT": "Europe/Vienna", "BE": "Europe/Brussels", "DE": "Europe/Berlin",
+    "ES": "Europe/Madrid", "FR": "Europe/Paris", "GB": "Europe/London",
+    "IE": "Europe/Dublin", "IN": "Asia/Kolkata", "IT": "Europe/Rome",
+    "NL": "Europe/Amsterdam", "PL": "Europe/Warsaw", "SE": "Europe/Stockholm",
+    "US": "America/New_York",
+}
+
+
+def clicks(events: DataFrame) -> DataFrame:
+    """One row per event, flat: each nested field a column of its own.
+    The tracker sends some events twice: the first copy of each is kept."""
+    return events.dropDuplicates(["event_id"]).select(
+        "event_id",
+        "event_ts",
+        F.to_date("event_ts").alias("event_date"),
+        "event_type",
+        "user_id",
+        "anon_id",
+        # who: the customer when logged in, else the browser's anonymous id
+        F.coalesce(F.col("user_id").cast("string"), "anon_id").alias("visitor"),
+        F.when(F.col("user_id").isNotNull(), "customer")
+        .otherwise("anonymous").alias("visitor_type"),
+        F.col("context.device").alias("device"),
+        F.col("context.browser").alias("browser"),
+        F.col("context.user_agent").alias("user_agent"),
+        is_bot("context.user_agent").alias("is_bot"),
+        F.col("context.campaign").alias("campaign"),
+        "items",
+        "consent",
+        "_source_file",
+    )
+
+
+def orders(orders: DataFrame) -> DataFrame:
+    """Orders with the day they were placed: in UTC, and the customer's."""
+    zones = F.create_map(*[F.lit(x) for kv in TIMEZONES.items() for x in kv])
+    local = F.from_utc_timestamp("order_ts", zones[F.col("country")])
+    return orders.select(
+        "order_id", "order_ts", "customer_id", "country", "status", "total",
+        F.to_date("order_ts").alias("order_date"),  # the UTC day
+        F.to_date(local).alias("local_date"),  # the customer's own day
+        "_source_file",
+    )

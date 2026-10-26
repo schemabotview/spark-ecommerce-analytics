@@ -1,0 +1,41 @@
+$ python -m explore.catalyst
+WARNING: Using incubator modules: jdk.incubator.vector
+== Parsed Logical Plan ==
+'Aggregate ['country], ['country, 'sum('cents) AS cents#10]
++- Filter (country#3 = DE)
+   +- Project [country#3, status#4, cents#9]
+      +- Filter (status#4 = paid)
+         +- Project [order_id#0L, order_ts#1, customer_id#2L, country#3, status#4, total#5, _source_file#6, _file_date#7, (total#5 * cast((10 * 10) as decimal(10,0))) AS cents#9]
+            +- Relation [order_id#0L,order_ts#1,customer_id#2L,country#3,status#4,total#5,_source_file#6,_file_date#7] parquet
+
+== Analyzed Logical Plan ==
+country: string, cents: decimal(31,2)
+Aggregate [country#3], [country#3, sum(cents#9) AS cents#10]
++- Filter (country#3 = DE)
+   +- Project [country#3, status#4, cents#9]
+      +- Filter (status#4 = paid)
+         +- Project [order_id#0L, order_ts#1, customer_id#2L, country#3, status#4, total#5, _source_file#6, _file_date#7, (total#5 * cast((10 * 10) as decimal(10,0))) AS cents#9]
+            +- Relation [order_id#0L,order_ts#1,customer_id#2L,country#3,status#4,total#5,_source_file#6,_file_date#7] parquet
+
+== Optimized Logical Plan ==
+Aggregate [country#3], [country#3, sum(cents#9) AS cents#10]
++- Project [country#3, (total#5 * 100) AS cents#9]
+   +- Filter ((isnotnull(status#4) AND isnotnull(country#3)) AND ((status#4 = paid) AND (country#3 = DE)))
+      +- Relation [order_id#0L,order_ts#1,customer_id#2L,country#3,status#4,total#5,_source_file#6,_file_date#7] parquet
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- HashAggregate(keys=[country#3], functions=[sum(cents#9)], output=[country#3, cents#10])
+   +- Exchange hashpartitioning(country#3, 200), ENSURE_REQUIREMENTS, [plan_id=15]
+      +- HashAggregate(keys=[country#3], functions=[partial_sum(cents#9)], output=[country#3, sum#17, isEmpty#18])
+         +- Project [country#3, (total#5 * 100) AS cents#9]
+            +- Filter (((isnotnull(status#4) AND isnotnull(country#3)) AND (status#4 = paid)) AND (country#3 = DE))
+               +- FileScan parquet [country#3,status#4,total#5,_file_date#7] Batched: true, DataFilters: [isnotnull(status#4), isnotnull(country#3), (status#4 = paid), (country#3 = DE)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/ana/shopwave/lake/bronze/orders], PartitionFilters: [], PushedFilters: [IsNotNull(status), IsNotNull(country), EqualTo(status,paid), EqualTo(country,DE)], ReadSchema: struct<country:string,status:string,total:decimal(10,2)>
+
+answer: 4648346.00
+== Optimizer rules that changed the plan ==
+ColumnPruning                  ran 4x
+PushDownPredicates             ran 4x
+CollapseProject                ran 4x
+ConstantFolding                ran 2x
+InferFiltersFromConstraints    ran 2x

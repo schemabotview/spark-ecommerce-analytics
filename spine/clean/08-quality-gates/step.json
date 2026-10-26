@@ -1,0 +1,1 @@
+{"from": "clean/06-udf-speed", "changes": ["shopwave/quality.py", "shopwave/silver.py"], "venv": true, "setup": ["python -m shopwave.bronze"]}

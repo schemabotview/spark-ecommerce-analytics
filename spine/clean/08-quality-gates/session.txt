@@ -1,0 +1,11 @@
+$ python -m shopwave.silver
+WARNING: Using incubator modules: jdk.incubator.vector
+✓ orders     1546 →   1546 rows (0.00% dropped, max 2.00%)
+✓ clicks    31046 →  30901 rows (0.47% dropped, max 2.00%)
+silver: written orders, clicks, payments, returns, customers, products
+$ SHOPWAVE_MAX_LOSS=0.001 python -m shopwave.silver; echo "exit code $?"
+WARNING: Using incubator modules: jdk.incubator.vector
+✓ orders     1546 →   1546 rows (0.00% dropped, max 0.10%)
+✗ clicks    31046 →  30901 rows (0.47% dropped, max 0.10%)
+silver: a gate failed, nothing written
+exit code 1

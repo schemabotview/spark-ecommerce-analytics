@@ -242,6 +242,8 @@ class World:
         device, browser = r.choices(DEVICES, [60, 33, 7])[0], r.choice(BROWSERS)
         anon = None if uid else f'anon-{r.getrandbits(40):010x}'
         campaign = r.choice([None, None, None, 'spring-sale', 'newsletter', 'black-friday', 'retarget'])
+        if campaign and not active(campaign, ts.date()):  # one draw either way: other streams unchanged
+            campaign = None
         t = ts - timedelta(minutes=r.randrange(3, 25)) if buys else ts
         out = [self._event(r, t, uid, 'page_view', [], device, browser, anon, campaign)]
         for l in lines:
@@ -302,6 +304,11 @@ class World:
                 rate[cur] = (rate[cur] * Decimal(str(1 + r.uniform(-0.004, 0.004)))).quantize(Decimal('0.0001'))
                 out.append({'date': d.isoformat(), 'currency': cur, 'per_eur': rate[cur]})
         return out
+
+
+def active(campaign: str, d: date) -> bool:
+    c = next(c for c in CAMPAIGNS if c['campaign_id'] == campaign)
+    return c['start'] <= d.isoformat() <= c['end']
 
 
 CAMPAIGNS = [

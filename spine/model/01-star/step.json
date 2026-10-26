@@ -1,0 +1,3 @@
+{"from": "clean/08-quality-gates", "changes": ["shopwave/gold.py", "explore/star.py"], "venv": true,
+ "generated": {"sf": 0.01, "from": "2026-11-01", "to": "2026-11-30", "only": ["orders", "order_items", "payments", "returns"]},
+ "setup": ["python -m shopwave.bronze", "python -m shopwave.silver"]}

@@ -1,0 +1,1 @@
+{"from": "clean/01-columns", "changes": ["shopwave/silver.py", "explore/nulls.py"], "venv": true, "setup": ["python -m shopwave.bronze"]}

@@ -1,0 +1,1 @@
+{"from": "clean/05-python-udf", "changes": ["requirements.txt", "shopwave/silver.py", "explore/udf_speed.py"], "venv": true, "volatile": ["digits"], "setup": ["python -m shopwave.bronze"]}

@@ -1,0 +1,1 @@
+{"lab": true, "venv": true, "volatile": ["digits"], "generated": [{"sf": 0.01, "from": "2026-10-01", "to": "2026-10-31", "only": ["orders", "customers", "products", "product_prices", "fx_rates", "campaigns", "order_items", "payments", "returns"]}, {"sf": 0.01, "from": "2026-10-01", "to": "2026-10-01", "only": ["clickstream"]}], "setup": ["python -m shopwave.bronze"]}

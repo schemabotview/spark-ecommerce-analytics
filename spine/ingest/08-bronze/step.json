@@ -1,1 +1,1 @@
-{"from": "ingest/06-jdbc", "changes": ["shopwave/bronze.py"], "venv": true}
+{"from": "ingest/06-jdbc", "changes": ["shopwave/bronze.py", "shopwave/schemas.py"], "venv": true}

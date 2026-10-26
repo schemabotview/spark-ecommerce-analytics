@@ -1,0 +1,1 @@
+{"from": "model/08-aqe", "changes": ["explore/salting.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

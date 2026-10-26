@@ -14,6 +14,14 @@ ORDERS = StructType([
     StructField("total", MONEY),
 ])
 
+ORDER_ITEMS = StructType([  # one line of an order: a product, how many
+    StructField("order_id", LongType(), nullable=False),
+    StructField("line", IntegerType()),
+    StructField("product_id", LongType()),
+    StructField("qty", IntegerType()),
+    StructField("unit_price", MONEY),  # the price on the day it was ordered
+])
+
 RETURNS = StructType([
     StructField("return_id", StringType()),
     StructField("order_id", LongType()),

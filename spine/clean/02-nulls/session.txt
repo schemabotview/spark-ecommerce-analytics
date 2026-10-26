@@ -1,0 +1,9 @@
+$ python -m explore.nulls
+WARNING: Using incubator modules: jdk.incubator.vector
+events:                 31046
+user_id is null:        11397
+user_id == 239:         21
+user_id != 239:         19628
+NOT (user_id <=> 239):  31025
+visitor_type anonymous 11397
+visitor_type customer  19649

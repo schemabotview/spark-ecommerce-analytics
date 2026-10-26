@@ -174,14 +174,14 @@ replayable like everything else.
 
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | Column expressions | `select`, `withColumn`, `cast`; `col` vs strings | an expression tree per column |
-| 2 | Nulls and conditions | `when`/`otherwise`, `coalesce`; `NULL` in a filter drops rows | three-valued logic table |
-| 3 | Deduplication | `dropDuplicates(["event_id"])`: the tracker sends twice | duplicates collapsing |
-| 4 | Timestamps and time zones | UTC events vs store-local days; Black Friday at midnight where? | one instant, three local dates |
-| 5 | A Python UDF | bot detection on the user agent | rows crossing JVM → Python → JVM |
-| 6 | Built-ins vs pandas UDF vs Python UDF | the same rule three ways, measured | plot: time per variant |
-| 7 | ◆ full scene: Catalyst | concept + lab (`explain(mode="extended")`) | parsed → analyzed → optimized → physical; the rules that fired |
-| 8 | Quality gates | counts in / out, null rates, fail the run over a threshold | the gate: pass / fail with numbers |
+| 1 | Column expressions | `silver.clicks`: one `select`, the context struct flattened (10 → 13 columns) | one column as an expression; three ways to name a column |
+| 2 | Nulls and conditions | `== 239` 21, `!= 239` 19,628 of 31,046: the 11,397 nulls in neither; `coalesce` → `visitor`, `when` → `visitor_type` | NULL compared with 239; the counts; visitor never null |
+| 3 | Deduplication | `dropDuplicates(["event_id"])`: 145 ids sent twice | the shuffle that dedupes; which tool when copies differ |
+| 4 | Timestamps and time zones | `silver.orders`: UTC `order_date` and the customer's `local_date`; 93 orders change day | one instant, two days; country → zone |
+| 5 | A Python UDF | `is_bot`: 2,477 events (8%) from one scraper | rows crossing JVM → Python → JVM; the busiest visitors |
+| 6 | Built-ins vs pandas UDF vs Python UDF | 3.1 M user agents timed; Spark 4.2 sends Python UDFs as Arrow batches, so pandas no longer wins; silver moves to `rlike` | plot: seconds per rule |
+| 7 | ◆ full scene: Catalyst | concept + lab (`explain(mode="extended")`, RuleExecutor metrics) | analyzed → optimized → physical; the five rules that fired |
+| 8 | Quality gates | `quality.gate`; `python -m shopwave.silver` writes 6 tables; `SHOPWAVE_MAX_LOSS=0.001` fails, exit code 1 | build → gate → write; both runs' gates |
 
 **5. `model` · A star schema, and Black Friday (gold) · 9**
 

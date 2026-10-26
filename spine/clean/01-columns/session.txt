@@ -1,0 +1,12 @@
+$ python -m explore.columns
+WARNING: Using incubator modules: jdk.incubator.vector
+bronze: 10 columns · silver: 13
+Column<'isNull(context.campaign)'>
++----------+------------+-------+----------+
+|event_date|  event_type| device|  campaign|
++----------+------------+-------+----------+
+|2026-05-29|product_view|desktop|  retarget|
+|2026-05-30| add_to_cart| mobile|  retarget|
+|2026-05-31|   page_view| mobile|newsletter|
++----------+------------+-------+----------+
+only showing top 3 rows

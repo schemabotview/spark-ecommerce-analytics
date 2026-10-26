@@ -39,6 +39,12 @@ def orders(spark: SparkSession) -> DataFrame:
     )
 
 
+def order_items(spark: SparkSession) -> DataFrame:
+    """The same export's order lines: one CSV per day."""
+    return from_files(spark.read.csv(f"{RAW}/order_items/", header=True,
+                                     schema=schemas.ORDER_ITEMS))
+
+
 def payments(spark: SparkSession) -> DataFrame:
     """The payment provider's daily drop: Parquet, with its own schema."""
     return from_files(spark.read.parquet(f"{RAW}/payments/"))
@@ -99,8 +105,8 @@ def table(
 def main() -> None:
     spark = spark_session()
     good, bad = returns(spark)
-    daily = {"orders": orders(spark), "payments": payments(spark),
-             "clicks": clicks(spark)}
+    daily = {"orders": orders(spark), "order_items": order_items(spark),
+             "payments": payments(spark), "clicks": clicks(spark)}
     for name, df in daily.items():  # a folder per day: _file_date=2026-10-01
         out = df.write.mode("overwrite").partitionBy("_file_date")
         out.parquet(f"{LAKE}/bronze/{name}")

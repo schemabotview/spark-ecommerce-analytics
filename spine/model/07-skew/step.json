@@ -1,0 +1,1 @@
+{"from": "model/06-partitions", "changes": ["explore/skew.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}
