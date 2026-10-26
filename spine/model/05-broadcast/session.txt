@@ -1,1 +1,6 @@
 $ python -m explore.broadcast
+WARNING: Using incubator modules: jdk.incubator.vector
+payments: 4068 · fx rates: 1095
+shuffle both SortMergeJoin     4068 rows ·  39517 B shuffled
+broadcast    BroadcastHashJoin 4068 rows ·    236 B shuffled
+gold.fact_payments: total € 488388.65

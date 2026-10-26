@@ -11,13 +11,10 @@ items = spark.read.parquet("lake/silver/order_items")
 joined = items.join(orders, "order_id")
 
 rows, stages = metrics.run(spark, "smj", joined.count)
-print("joined rows:", rows)
-for s in stages:
-    print(f"stage {s.stageId()}: {s.numCompleteTasks():3} tasks · "
-          f"shuffle write {s.shuffleWriteBytes():6} B · "
-          f"shuffle read {s.shuffleReadBytes():6} B")
+moved = sum(s.shuffleWriteBytes() for s in stages)
+print("joined rows:", rows, "· bytes shuffled:", moved)
 plan = joined._jdf.queryExecution().executedPlan().toString()
 for line in plan.splitlines():
     if any(op in line for op in ("Join", "Sort [", "Exchange", "Scan")):
-        print(line.split("[")[0].rstrip() if "Scan" not in line
-              else line.split(" [")[0].replace("FileScan", "Scan"))
+        op = line.split("[")[0].split("(")[0].rstrip()  # the operator only
+        print(op.replace("FileScan", "Scan"), "on order_id" * ("Exch" in op))

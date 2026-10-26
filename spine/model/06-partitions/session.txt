@@ -1,1 +1,6 @@
 $ python -m explore.partitions
+WARNING: Using incubator modules: jdk.incubator.vector
+shuffle.partitions=200: 61 days · 200 tasks,  55 with any rows
+shuffle.partitions=  8: 61 days ·   8 tasks,   8 with any rows
+coalesce(1)     → 1 file(s)
+repartition(4)  → 4 file(s)

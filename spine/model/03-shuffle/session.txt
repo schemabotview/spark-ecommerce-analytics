@@ -1,1 +1,23 @@
 $ python -m explore.shuffle
+WARNING: Using incubator modules: jdk.incubator.vector
+fact_sales: 7389 rows in 4 partitions
+spark.sql.shuffle.partitions = 200
+countries: 13
+stage 4:   4 tasks · read  7389 rows from files · shuffle write  52 rows   4780 B · shuffle read   0 rows
+stage 6:   1 tasks · read     0 rows from files · shuffle write   0 rows      0 B · shuffle read  52 rows
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=true
++- == Final Plan ==
+   ResultQueryStage 1
+   +- *(2) HashAggregate(keys=[country#9], functions=[sum(revenue#11)])
+      +- AQEShuffleRead coalesced
+         +- ShuffleQueryStage 0
+            +- Exchange hashpartitioning(country#9, 200), ENSURE_REQUIREMENTS, [plan_id=68]
+               +- *(1) HashAggregate(keys=[country#9], functions=[partial_sum(revenue#11)])
+                  +- *(1) ColumnarToRow
+                     +- FileScan parquet [country#9,revenue#11] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/ana/shopwave/lake/gold/fact_sales], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<country:string,revenue:decimal(21,2)>
++- == Initial Plan ==
+   HashAggregate(keys=[country#9], functions=[sum(revenue#11)])
+   +- Exchange hashpartitioning(country#9, 200), ENSURE_REQUIREMENTS, [plan_id=54]
+      +- HashAggregate(keys=[country#9], functions=[partial_sum(revenue#11)])
+         +- FileScan parquet [country#9,revenue#11] Batched: true, DataFilters: [], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/ana/shopwave/lake/gold/fact_sales], PartitionFilters: [], PushedFilters: [], ReadSchema: struct<country:string,revenue:decimal(21,2)>

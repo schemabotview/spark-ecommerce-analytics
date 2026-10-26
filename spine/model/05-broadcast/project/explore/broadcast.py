@@ -19,7 +19,7 @@ for name, joined in joins.items():
     moved = sum(s.shuffleWriteBytes() for s in stages)
     plan = joined._jdf.queryExecution().executedPlan().toString()
     join = next(l for l in plan.splitlines() if "Join" in l)
-    print(f"{name:12} {join.split('(')[0].strip(' +-*'):22} "
+    print(f"{name:12} {join.strip(' +-*').split()[0]:17} "
           f"{count} rows · {moved:6} B shuffled")
 
 eur = gold.fact_payments(payments, fx)

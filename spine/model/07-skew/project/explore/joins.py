@@ -16,5 +16,5 @@ for how in ["inner", "left", "left_semi", "left_anti"]:
 unpaid = orders.join(payments, "order_id", "left_anti")
 twice = payments.groupBy("order_id").count().filter(F.col("count") > 1)
 print("never paid:", unpaid.count(), "· paid twice:", twice.count())
-unpaid.select("order_id", "order_ts", "country", "total").orderBy(
-    "order_id").show(3)
+first = unpaid.orderBy("order_id").limit(3).collect()
+print("first unpaid:", ", ".join(f"{o.order_id} ({o.total} €)" for o in first))

@@ -1,1 +1,4 @@
 $ python -m explore.aqe
+WARNING: Using incubator modules: jdk.incubator.vector
+AQE off: join stage 200 tasks · largest 1154 rows · median   84 · read 7439 rows
+AQE on : join stage  13 tasks · largest  819 rows · median  613 · read 7441 rows

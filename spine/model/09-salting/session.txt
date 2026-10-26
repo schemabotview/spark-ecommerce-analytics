@@ -1,1 +1,4 @@
 $ python -m explore.salting
+WARNING: Using incubator modules: jdk.incubator.vector
+plain :  44 busy tasks · largest 1154 rows · median   84
+salted: 179 busy tasks · largest  329 rows · median   21

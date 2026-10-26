@@ -17,7 +17,8 @@ sys.path.insert(0, str(ROOT.parent / 'scripts'))
 from spine import lineage_of  # noqa: E402  (a step's ancestors, oldest first)
 
 for other in sorted(ROOT.glob(f'*/*/project/{rel}')):
-    later = ROOT / step in lineage_of(other.parent.parent)[:-1]
+    other_step = next(p.parent for p in other.parents if p.name == 'project')
+    later = ROOT / step in lineage_of(other_step)[:-1]
     if later and other.read_bytes() == old:
         other.write_bytes(new)
         print('updated', other.relative_to(ROOT))

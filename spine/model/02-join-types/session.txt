@@ -1,1 +1,9 @@
 $ python -m explore.joins
+WARNING: Using incubator modules: jdk.incubator.vector
+orders: 4100 · payments: 4068
+inner       4068 rows
+left        4112 rows
+left_semi   4056 rows
+left_anti     44 rows
+never paid: 44 · paid twice: 12
+first unpaid: 13824 (121.75 €), 13833 (58.69 €), 13879 (139.30 €)

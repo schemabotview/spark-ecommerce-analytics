@@ -9,10 +9,11 @@ from shopwave.session import spark_session
 spark = spark_session()
 spark.conf.set("spark.sql.adaptive.enabled", False)  # Spark as it was, unhelped
 sales = spark.read.parquet("lake/gold/fact_sales")
-daily = sales.groupBy("order_date").agg(F.sum("revenue").alias("revenue"))
+by_day = lambda: sales.groupBy("order_date").agg(F.sum("revenue").alias("r"))
 
 for n in [200, 8]:
     spark.conf.set("spark.sql.shuffle.partitions", n)
+    daily = by_day()  # a DataFrame keeps the plan it first made: build anew
     days, stages = metrics.run(spark, f"p{n}", lambda: daily.collect())
     reduce = stages[-1]
     rows = metrics.task_records(spark, reduce)

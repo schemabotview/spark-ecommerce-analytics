@@ -185,17 +185,21 @@ replayable like everything else.
 
 **5. `model` · A star schema, and Black Friday (gold) · 9**
 
+The chain's data runs through November from here (Black Friday). Skew and AQE are measured in ROWS
+PER TASK from the task metrics (deterministic), never seconds; a `noop` write makes every column
+count (a `count()` lets Spark prune all but the join key, and the shuffle carries almost nothing).
+
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | Facts and dimensions | `fact_orders`, `dim_customer`, `dim_product` | the star |
-| 2 | Join types | inner, left, semi, **anti**: orders never paid | which rows each join keeps |
-| 3 | ◆ full scene: the shuffle | concept + lab (stage metrics: shuffle write / read) | map tasks → shuffle files → reduce tasks; a stage boundary |
-| 4 | Sort-merge join | the plan's `Exchange` + `Sort` on both sides | two exchanges feeding one join |
-| 5 | Broadcast join | `fx_rates` and `dim_product`: no shuffle | plot: sort-merge vs broadcast time |
-| 6 | Partitions | `spark.sql.shuffle.partitions` = 200 at SF 0.001; `repartition` vs `coalesce` | task durations: 200 tiny tasks |
-| 7 | Skew | Black Friday + the bestseller → one straggler task | plot: task time distribution, one outlier |
-| 8 | Adaptive Query Execution | coalesce partitions, split skewed ones, switch to broadcast at runtime | plan before vs after AQE |
-| 9 | Salting | the bot's aggregation, which AQE cannot split | one hot key → N salted keys → merged |
+| 1 | Facts and dimensions | `gold.fact_sales` (7,389 lines), `dim_customer`, `dim_product`; revenue from lines = from orders, to the cent | the star; the two sums; revenue by category |
+| 2 | Join types | inner / left / semi / anti: 44 orders never paid, 12 paid twice | what each join keeps; SQL equivalents |
+| 3 | ◆ full scene: the shuffle | concept + lab (status store: stages, rows, shuffle bytes) | map tasks → shuffle files → reduce (200 partitions, AQE-coalesced to 1) |
+| 4 | Sort-merge join | broadcasting off: Exchange + Sort on both sides, 160,716 B shuffled | the plan drawn; join strategies |
+| 5 | Broadcast join | `fx_rates` lands in bronze; `gold.fact_payments` in EUR: 39,517 B vs 236 B shuffled | the broadcast; plot: bytes shuffled |
+| 6 | Partitions | 200 tasks, 55 busy → 8 tasks; `coalesce(1)` 1 file, `repartition(4)` 4 | tasks per setting; files per write |
+| 7 | Skew | product 1 is 16% of lines: largest task 1,154 rows, median 84 | plot: rows per task |
+| 8 | Adaptive Query Execution | thresholds scaled to KB: 200 → 13 tasks, largest 819; 2 extra rows read = the split | AQE's steps; off vs on; its thresholds |
+| 9 | Salting | 8 salts: busy tasks 44 → 179, largest 1,154 → 329 | one hot key → 8; what to try, in order |
 
 **6. `analytics` · Answer the business · 9**
 

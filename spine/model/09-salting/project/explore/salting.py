@@ -20,7 +20,9 @@ copies = products.crossJoin(spark.range(SALTS).withColumnRenamed("id", "salt"))
 plans = {"plain": sales.join(products, "product_id"),
          "salted": salted.join(copies, ["product_id", "salt"])}
 for name, joined in plans.items():
-    count, stages = metrics.run(spark, name, joined.count)
-    rows = [r for r in metrics.task_records(spark, stages[-1]) if r]
-    print(f"{name:6}: {count} rows · {len(rows):3} busy tasks · largest "
+    write = joined.write.format("noop").mode("overwrite")  # every column
+    _, stages = metrics.run(spark, name, write.save)
+    join = max(stages, key=lambda s: s.shuffleReadRecords())  # the join
+    rows = [r for r in metrics.task_records(spark, join) if r]
+    print(f"{name:6}: {len(rows):3} busy tasks · largest "
           f"{max(rows):4} rows · median {median(rows):4.0f}")

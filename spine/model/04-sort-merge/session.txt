@@ -1,1 +1,10 @@
 $ python -m explore.sort_merge
+WARNING: Using incubator modules: jdk.incubator.vector
+joined rows: 7389 · bytes shuffled: 160716
+   +- SortMergeJoin 
+      :- Sort 
+      :  +- Exchange hashpartitioning on order_id
+      :        +- Scan parquet 
+      +- Sort 
+         +- Exchange hashpartitioning on order_id
+               +- Scan parquet 

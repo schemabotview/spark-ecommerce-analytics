@@ -1,1 +1,6 @@
 $ python -m explore.skew
+WARNING: Using incubator modules: jdk.incubator.vector
+product 1: 1153 of 7389 lines (16%)
+join stage: 200 tasks, 44 with rows
+rows per task, largest first: [1154, 1132, 649, 452, 355, 281] …
+largest task 1154 rows · median task 84 rows

@@ -4,11 +4,6 @@ fact_sales      7389 rows  12 columns
 dim_customer    2000 rows   3 columns
 dim_product       50 rows   5 columns
 paid revenue: lines 458388.89 · orders 458388.89
-+-----------+---------+
-|   category|  revenue|
-+-----------+---------+
-|electronics|156268.20|
-|     beauty|146804.71|
-|    fashion| 61622.69|
-+-----------+---------+
-only showing top 3 rows
+  electronics   156268.20
+  beauty        146804.71
+  fashion        61622.69

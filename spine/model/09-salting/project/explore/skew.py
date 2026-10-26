@@ -18,10 +18,14 @@ print(f"product {top.product_id}: {top['count']} of {sales.count()} lines "
       f"({share:.0%})")
 
 joined = sales.join(products, "product_id")
-_, stages = metrics.run(spark, "skew", joined.count)
-rows = sorted((r for r in metrics.task_records(spark, stages[-1]) if r),
+# A "noop" write computes every column of every row and writes nothing: a
+# count() would let Spark skip all but product_id, and measure nothing.
+write = joined.write.format("noop").mode("overwrite")
+_, stages = metrics.run(spark, "skew", write.save)
+join = max(stages, key=lambda s: s.shuffleReadRecords())  # the join stage
+rows = sorted((r for r in metrics.task_records(spark, join) if r),
               reverse=True)
-print(f"join stage: {stages[-1].numCompleteTasks()} tasks, "
+print(f"join stage: {join.numCompleteTasks()} tasks, "
       f"{len(rows)} with rows")
 print("rows per task, largest first:", rows[:6], "…")
 print(f"largest task {rows[0]} rows · median task {median(rows):.0f} rows")

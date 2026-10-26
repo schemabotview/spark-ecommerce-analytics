@@ -18,5 +18,7 @@ paid = F.col("status") == "paid"
 lines = sales.filter(paid).agg(F.sum("revenue")).first()[0]
 orders = silver["orders"].filter(paid).agg(F.sum("total")).first()[0]
 print("paid revenue: lines", lines, "· orders", orders)
-(sales.join(products, "product_id").groupBy("category")
- .agg(F.sum("revenue").alias("revenue")).orderBy(F.desc("revenue")).show(3))
+by_category = sales.join(products, "product_id").groupBy("category").agg(
+    F.sum("revenue").alias("revenue")).orderBy(F.desc("revenue"))
+for row in by_category.limit(3).collect():
+    print(f"  {row.category:12} {row.revenue:>10}")
