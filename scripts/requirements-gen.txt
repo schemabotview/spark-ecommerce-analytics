@@ -1,0 +1,2 @@
+# The generator (shopwave_gen) is standard library, except for Parquet: payments arrive as Parquet.
+pyarrow==26.0.0

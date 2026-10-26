@@ -1,6 +1,7 @@
 # Learn Apache Spark by building an e-commerce analytics platform: full course — plan
 
-**Status: v1 plan, awaiting owner review (2026-10-26).** Nothing is authored yet.
+**Status (2026-10-26):** plan approved; infra built; **Course 2 `start` (the pilot) authored, replayed and
+rendered, awaiting owner review**; no audio yet.
 
 ## The idea
 
@@ -43,14 +44,16 @@ Every output is run, so everything is pinned in one place and named in the plan 
 
 | What | Pin | Note |
 | --- | --- | --- |
-| Apache Spark / PySpark | latest 4.x release at infra time | one version for the whole video |
-| Delta Lake (`delta-spark`) | the release matching that Spark | checked against Delta's compatibility table |
-| Java | 21 (17 if the Spark pin requires it) | in the image, not on the host |
-| Python | the newest version the PySpark pin supports | **verify** at infra time; 3.15 may not be supported yet |
-| Kafka | KRaft, single broker | Course 9 |
-| PostgreSQL | one major version | the shop's OLTP database |
+| Apache Spark / PySpark | **4.2.0** | `pip install pyspark==4.2.0` brings all of Spark (277 jars, 485 MB) |
+| Delta Lake (`delta-spark`) | **4.4.1** | its PyPI metadata accepts `pyspark<=4.2.0`; the jar is checked in Course 7 |
+| Java | **21** | on the host, like Python: Spark is a JVM program and pip cannot bring it |
+| Python | **3.14.9** | PySpark 4.2.0 supports 3.10–3.14, so not the Python course's 3.15 |
+| Kafka | KRaft, single broker | Course 9, Docker |
+| PostgreSQL | one major version | Course 3, Docker: the shop's OLTP database |
 
-Decided at the infra step and written into this table; never changed after Course 2 is recorded.
+`scripts/install-toolchain.sh` installs Python and checks Java. Never changed after Course 2 is
+recorded. Docker arrives with the first service that needs it (PostgreSQL, Course 3); Course 2 is
+Spark on its own.
 
 ## The data: a seeded generator, owned
 
@@ -75,20 +78,21 @@ all order items. This is where the skew lessons come from.
 
 Three sizes:
 
-| SF | Clickstream / year | Used for |
-| --- | --- | --- |
-| 0.001 | ~50 k events | every spine step: correctness in seconds |
-| 0.1 | ~5 M events | sections that show plans, stages and task counts |
-| 1+ | ~50 M+ events (to be measured) | measured sections only (`scale`, skew, pandas vs Spark); generated, never committed |
+| SF | Orders / year | Click events / year | Used for |
+| --- | --- | --- | --- |
+| 0.01 | 20 k | 378 k (150 MB of JSON) | every spine step: the slices a step needs are committed, checked byte for byte against the generator |
+| 0.1 | 200 k | ~3.8 M | sections that show plans, stages and task counts |
+| 1+ | 2 M | ~38 M | measured sections only (`scale`, skew, pandas vs Spark); generated, never committed. The generator is pure Python (a year at SF 0.01 takes 9 s): SF 1 must be measured, and may need a faster writer |
 
 ## The platform: `shopwave`
 
 ```
 spark-ecommerce-analytics/
-  docker-compose.yml        spark (+ workers in 11), postgres, kafka               (2 → 11)
-  shopwave_gen/             the seeded generator                                    (infra)
+  docker-compose.yml        postgres, kafka, a standalone cluster                    (3 → 11)
+  shopwave_gen/             the seeded generator (in the course repo, not the project) (infra)
+  conf/log4j2.properties    Spark's log to logs/spark.log                            (2)
   shopwave/
-    session.py              one SparkSession builder, config in one place          (2)
+    session.py              one SparkSession builder (2, at the project root; moves in with 3)
     schemas.py              explicit StructTypes, DecimalType money                 (3)
     ingest/                 bronze: csv, json, jdbc, parquet readers                (3)
     clean/                  silver: dedupe, types, timezones, fx, quality gates     (4)
@@ -105,7 +109,7 @@ spark-ecommerce-analytics/
 
 | After course | The platform can… |
 | --- | --- |
-| 2 Start | compute yesterday's revenue from one CSV export |
+| 2 Start | compute October's revenue per day from the shop's daily exports |
 | 3 Ingest | land every source raw (bronze), schema-checked, bad rows quarantined |
 | 4 Clean | produce clean, deduplicated, typed, UTC-correct tables (silver), with quality gates |
 | 5 Model | build a star schema (gold) and survive Black Friday's skew |
@@ -146,12 +150,12 @@ replayable like everything else.
 
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | The project and Docker | `docker compose up`; pinned pyspark in a venv | containers: spark, postgres; what runs where |
-| 2 | `SparkSession` and a first DataFrame | read yesterday's orders CSV, `show()` | session → driver; the DataFrame as rows in partitions |
-| 3 | ◆ full scene: driver, executors, tasks | concept + lab (`defaultParallelism`, tasks per job) | driver → executors → tasks, `local[4]` = one JVM, four task slots |
-| 4 | Transformations and actions | `filter` returns instantly; `count()` runs a job | the plan growing; the job that an action triggers |
-| 5 | Daily revenue | `groupBy(date).sum`, write CSV → a folder of part files | one output file per partition |
-| 6 | Two kinds of error | `AnalysisException` (bad column, before running) vs a failure inside a task (the Py4J traceback, read) | where each is raised: driver plan vs executor task |
+| 1 | Java, a venv and PySpark | `pip install pyspark==4.2.0`; October's 31 daily order exports | what pip installed: the Python API, py4j, 277 jars of Spark; Java runs them |
+| 2 | `SparkSession` and a first DataFrame | `first_job.py`: `show(3)`; Spark's log to `logs/spark.log` | builder → read → DataFrame; `dtypes`: every column a string |
+| 3 | ◆ full scene: driver, executors, tasks | concept + lab (`where_it_runs.py`: slots, partitions, jobs → stages → tasks) | program → driver → executor (4 slots) → 31 files as 4 partitions; count = 4 tasks, then 1 |
+| 4 | Transformations and actions | `session.py`; `lazy.py` counts jobs after each line | the plan growing with 0 new jobs; `count()` runs 2 |
+| 5 | Daily revenue | `groupBy(day)`, `cast("decimal(10,2)")`, write CSV → a folder | read → filter → groupBy (shuffle) → write; `_SUCCESS` + one part file |
+| 6 | Two kinds of error | `two_errors.py`: a misspelt column vs `cast("int")` on `20.67` | found building the plan vs in a task; error conditions; the rest in `logs/spark.log` |
 
 **3. `ingest` · Land every source (bronze) · 8**
 
@@ -294,10 +298,11 @@ Spark output is noisier than Python's, so the spine fixes these up front:
 ## Build order
 
 1. Owner review of this plan.
-2. Infra: pin the versions table; `shopwave-gen` and its planted problems (each one verified by a
-   query); Docker Compose; port the frame template (`ide.ts`), `spine.py`, checks, registry and
-   shots from python-expense-tracker; extend `spine.py` for Spark's volatile output; a platform-map
-   scene; an event-log → stage-table scene.
+2. Infra (done 2026-10-26): the versions pinned; `shopwave_gen` and `verify` for every planted
+   problem; the frame template (`ide.ts`), `spine.py`, checks, registry and shots ported from
+   python-expense-tracker, `spine.py` extended for Spark (a shared venv, the JVM's environment,
+   UUID masking, data checked against the generator). Still to build with the course that first
+   needs it: Docker Compose (3), the platform-map scene (1), an event-log → stage-table scene (5).
 3. Course 2 as the pilot → owner review.
 4. Courses 1, 3–11 one at a time, each reviewed on its rendered routes, then narrated.
 5. Record all 11 courses → assemble and publish the one video.
@@ -308,8 +313,9 @@ Spark output is noisier than Python's, so the spine fixes these up front:
 2. Data: our own seeded generator with a scale factor; no public datasets.
 3. Table format: **Delta Lake**, from Course 7 (bronze/silver/gold start as Parquet so the move
    to Delta is motivated by a real failure).
-4. Infrastructure: **Docker Compose** (Spark, PostgreSQL, Kafka; standalone master + 2 workers in
-   Course 11). The spine needs Docker.
+4. Infrastructure: **Docker Compose** (PostgreSQL from Course 3, Kafka, a standalone master + 2
+   workers in Course 11). Spark itself runs from `pip install pyspark` on the host's Java 21; the
+   spine needs Docker from Course 3.
 5. One video, one continuous story: 11 courses, no parts or acts.
 6. Background is just-in-time (◆ detours), never a front-loaded course.
 7. Follow-up project videos (not this plan): retail bank fraud + AML (streaming, GraphFrames);

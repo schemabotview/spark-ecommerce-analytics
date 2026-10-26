@@ -1,0 +1,8 @@
+$ python where_it_runs.py
+WARNING: Using incubator modules: jdk.incubator.vector
+master local[4]: 1 executor, 4 task slots
+October: 31 files, read as 4 partitions
+paid orders: 1386
+job 0, stage 0: 1 task
+job 1, stage 1: 4 tasks
+job 2, stage 3: 1 task

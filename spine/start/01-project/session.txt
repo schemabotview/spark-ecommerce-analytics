@@ -1,0 +1,11 @@
+$ java -version 2>&1 | head -1
+openjdk version "21.0.12.1" 2026-08-18
+$ python -m venv .venv
+$ source .venv/bin/activate
+$ pip install -q -r requirements.txt
+$ python -c "import pyspark; print(pyspark.__version__)"
+4.2.0
+$ ls .venv/lib/python3.14/site-packages/pyspark/jars | wc -l
+277
+$ du -sh .venv/lib/python3.14/site-packages/pyspark
+485M	.venv/lib/python3.14/site-packages/pyspark

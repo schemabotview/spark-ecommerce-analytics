@@ -1,0 +1,1 @@
+{"from": "start/01-project", "changes": ["conf/log4j2.properties", "first_job.py"], "venv": true}

@@ -1,0 +1,13 @@
+$ python daily_revenue.py
+WARNING: Using incubator modules: jdk.incubator.vector
++----------+------+-------+
+|       day|orders|revenue|
++----------+------+-------+
+|2026-10-01|    44|5151.34|
+|2026-10-02|    47|4535.97|
+|2026-10-03|    55|7755.16|
++----------+------+-------+
+only showing top 3 rows
+$ ls out/daily_revenue
+_SUCCESS
+part-00000-96bb0a07-e4bb-463d-a1bc-27b1a8f73a4c-c000.csv

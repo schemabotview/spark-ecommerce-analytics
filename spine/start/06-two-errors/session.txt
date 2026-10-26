@@ -1,0 +1,11 @@
+$ python two_errors.py
+WARNING: Using incubator modules: jdk.incubator.vector
+1. select: AnalysisException UNRESOLVED_COLUMN.WITH_SUGGESTION
+   did you mean: `total`, `status`, `country`, `order_ts`, `order_id`
+2. select: no error
+   show: NumberFormatException CAST_INVALID_INPUT
+   value: '20.67'
+$ grep -c ERROR logs/spark.log
+2
+$ grep -m1 "ERROR Executor" logs/spark.log
+21:49:47 ERROR Executor: Exception in task 0.0 in stage 1.0 (TID 1)

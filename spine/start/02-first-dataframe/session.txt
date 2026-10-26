@@ -1,0 +1,11 @@
+$ python first_job.py
+WARNING: Using incubator modules: jdk.incubator.vector
++--------+-------------------+-----------+-------+------+------+
+|order_id|           order_ts|customer_id|country|status| total|
++--------+-------------------+-----------+-------+------+------+
+|   13705|2026-10-01 00:22:03|        372|     FR|  paid|144.64|
+|   13706|2026-10-01 03:14:40|        357|     GB|  paid|119.98|
+|   13707|2026-10-01 03:29:17|       1018|     GB|  paid| 35.81|
++--------+-------------------+-----------+-------+------+------+
+only showing top 3 rows
+[('order_id', 'string'), ('order_ts', 'string'), ('customer_id', 'string'), ('country', 'string'), ('status', 'string'), ('total', 'string')]

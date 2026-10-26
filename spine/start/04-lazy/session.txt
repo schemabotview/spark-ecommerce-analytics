@@ -1,0 +1,7 @@
+$ python lazy.py
+WARNING: Using incubator modules: jdk.incubator.vector
+read October:       1 job
+kept paid orders:   1 job
+kept German ones:   1 job
+count(): 375
+after count():      3 jobs
