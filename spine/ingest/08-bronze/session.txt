@@ -1,9 +1,9 @@
 $ python -m shopwave.bronze
 WARNING: Using incubator modules: jdk.incubator.vector
-bronze/orders       1546 rows   bronze/payments     1484 rows
-bronze/clicks       2700 rows   bronze/returns        58 rows
-bronze/customers    2000 rows   bronze/products       50 rows
-quarantine/returns     3 rows
+bronze/orders       1546 rows   bronze/order_items  2748 rows
+bronze/payments     1484 rows   bronze/clicks       2700 rows
+bronze/returns        58 rows   bronze/customers    2000 rows
+bronze/products       50 rows   quarantine/returns     3 rows
 $ ls lake/bronze/clicks
 _SUCCESS
 _file_date=2026-05-31

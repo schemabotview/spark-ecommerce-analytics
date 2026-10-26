@@ -14,7 +14,7 @@ const n = (p: string) => counts[p]
 
 export const ingestBronze: SceneModel = ideFrame({
   tree: ingestTree(['db/', 'jars/', 'lake/bronze/', 'lake/quarantine/', 'shopwave/bronze.py', 'shopwave/schemas.py', 'shopwave/session.py', 'explore/', 'compose.yaml'],
-    'shopwave/bronze.py', ['lake/bronze/', 'lake/quarantine/'], { 'lake/bronze/': '6 tables' }),
+    'shopwave/bronze.py', ['lake/bronze/', 'lake/quarantine/'], { 'lake/bronze/': '7 tables' }),
   editor: { file: 'shopwave/bronze.py', code, ...view(code, 'def main(', undefined, 0), highlight: [...linesFrom(code, 'for name, df in daily.items()', 'out.parquet('), ...linesFrom(code, 'bad.drop("_file_date")', 'quarantine/returns')] },
   session,
   side: [
@@ -30,7 +30,7 @@ export const ingestBronze: SceneModel = ideFrame({
           type: 'group', id: 'bronze', title: 'lake/bronze', sub: 'Parquet, + _source_file', icon: 'database', tone: 'infra', children: [
             {
               type: 'table', id: 'tables', columns: ['table', 'rows'], rows: [
-                ...['orders', 'payments', 'clicks', 'returns', 'customers', 'products'].map((t) => ({ id: `t-${t}`, cells: [t, n(`bronze/${t}`)] })),
+                ...['orders', 'order_items', 'payments', 'clicks', 'returns', 'customers', 'products'].map((t) => ({ id: `t-${t}`, cells: [t, n(`bronze/${t}`)] })),
                 { id: 't-quarantine', cells: ['quarantine/returns', n('quarantine/returns')], tone: 'consume' as const },
               ],
             },
