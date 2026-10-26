@@ -22,9 +22,12 @@ Ported from python-expense-tracker's spine.py; what differs is Spark's:
   container's hostname resolves to loopback, which Spark warns about on every start; a learner's
   laptop does not.
 - `volatile` also masks UUIDs (Spark names every part file with one).
-- {"generated": {...}} on a step: every file under project/data/raw must be byte-identical to what
-  `python -m shopwave_gen` writes with those arguments — the spine's data is the generator's, never
-  hand-edited.
+- DATA IS GENERATED, NOT COMMITTED. {"generated": {...}} (or a list of them) on a step names
+  `python -m shopwave_gen` arguments; the step and every step after it on the chain replay with that
+  data in data/raw. A scene that shows a data file captures it (`capture`). jars/ likewise: a
+  project's jars.txt lists Maven Central URLs, fetched once and cached.
+- A project with a compose.yaml gets its services restarted from scratch before the step
+  (`docker compose down -v`, then `up -d --wait` unless {"services": false}).
 
 Each step is replayed by ONE bash process, so `cd` and `source .venv/bin/activate` carry from command
 to command as they do in a real terminal. A command followed by `>>> ` lines is an interactive session:
@@ -50,6 +53,8 @@ step.json (other keys, all optional):
                                 to mask, e.g. ["uuid"] (a part file's name) or ["digits"]
   {"setup": ["cmd", ...]}       run silently before the transcript (after the venv)
   {"generated": {"sf": 0.01, "from": "2026-10-01", "to": "2026-10-31", "only": ["orders"]}}
+                                data this step adds to its chain's (see above)
+  {"services": false}           do not start compose.yaml's services: the session starts them
 """
 import hashlib
 import json
@@ -72,7 +77,8 @@ PINNED = 'Python 3.14.9'
 INTERPRETERS = ('python', 'python3.14')
 PREFIX = '/usr/local'
 JAVA = 'version "21.'
-IGNORED = {'__pycache__', '.venv', 'logs', 'out', 'spark-warehouse'}
+# Run outputs, the venv, and what materialize() puts in: never part of a step's snapshot.
+IGNORED = {'__pycache__', '.venv', 'logs', 'out', 'spark-warehouse', 'lake', 'checkpoints', 'jars', 'data', 'metastore_db'}
 SHOWN_HOME = '/home/ana'
 PROJECT = 'shopwave'
 SPINE_ROOT = Path(os.environ.get('SPINE_ROOT', '/tmp/shopwave-spine'))
@@ -161,6 +167,7 @@ def replay(step: Path) -> tuple[str, dict[str, str]]:
     else:
         project.mkdir()
     env = environment(home)
+    materialize(step, project)
     parked = None
     if config.get('venv'):
         parked = SPINE_ROOT / 'venvs' / venv_key(project)
@@ -172,8 +179,16 @@ def replay(step: Path) -> tuple[str, dict[str, str]]:
         env['PATH'] = f"{project / '.venv' / 'bin'}:{env['PATH']}"
         env['VIRTUAL_ENV'] = str(project / '.venv')
     try:
+        if (project / 'compose.yaml').exists():
+            # Every step starts its services from scratch: a database initialised from this step's data.
+            compose = ['docker', 'compose', '--progress', 'quiet']
+            subprocess.run([*compose, 'down', '-v', '--remove-orphans'], cwd=project, env=env, check=True, capture_output=True)
+            if config.get('services', True):
+                subprocess.run([*compose, 'up', '-d', '--wait'], cwd=project, env=env, check=True, capture_output=True)
         for cmd in config.get('setup', []):
-            subprocess.run(['bash', '-c', cmd], cwd=project, env=env, check=True, capture_output=True)
+            r = subprocess.run(['bash', '-c', cmd], cwd=project, env=env, capture_output=True, text=True)
+            if r.returncode:
+                sys.exit(f'✗ {step.relative_to(ROOT)}: setup `{cmd}` failed:\n{r.stdout}{r.stderr}')
         cwd = project
         blocks: list[str] = []
         state = SPINE_ROOT / '.spine-state'
@@ -261,25 +276,53 @@ def lineage(step: Path) -> list[str]:
     return out
 
 
-def generated(step: Path) -> list[str]:
-    """Why the step's data/raw is not exactly the generator's output (empty when it is)."""
-    spec = config_of(step).get('generated')
-    if not spec:
-        return []
-    with tempfile.TemporaryDirectory() as tmp:
-        # The repo's own .venv carries the generator's one dependency (scripts/requirements-gen.txt).
-        gen = REPO / '.venv' / 'bin' / 'python'
-        args = [str(gen) if gen.exists() else sys.executable, '-m', 'shopwave_gen', '--sf', str(spec['sf']), '--out', tmp,
-                '--from', spec['from'], '--to', spec['to'], *(a for t in spec.get('only', []) for a in ('--only', t))]
-        subprocess.run(args, cwd=REPO, check=True)
-        want = {p.relative_to(tmp).as_posix(): p.read_bytes() for p in Path(tmp).rglob('*') if p.is_file()}
-    raw = step / 'project' / 'data' / 'raw'
-    have = {p.relative_to(raw).as_posix(): p.read_bytes() for p in raw.rglob('*') if p.is_file()} if raw.exists() else {}
-    name = step.relative_to(ROOT)
-    out = [f'{name}: data/raw/{p} is not what shopwave_gen writes' for p in sorted(want.keys() & have.keys()) if want[p] != have[p]]
-    out += [f'{name}: data/raw/{p} is missing (shopwave_gen writes it)' for p in sorted(want.keys() - have.keys())]
-    out += [f'{name}: data/raw/{p} is not written by shopwave_gen {spec}' for p in sorted(have.keys() - want.keys())]
+def lineage_of(step: Path) -> list[Path]:
+    """The step and every ancestor through `from`, oldest first."""
+    chain = [step]
+    while config_of(chain[0]).get('from'):
+        chain.insert(0, ROOT / config_of(chain[0])['from'])
+    return chain
+
+
+def data_specs(step: Path) -> list[dict]:
+    """Every `generated` spec on the step's chain: data is inherited like code."""
+    out = []
+    for s in lineage_of(step):
+        spec = config_of(s).get('generated')
+        out += spec if isinstance(spec, list) else [spec] if spec else []
     return out
+
+
+def run_logged(args: list[str], **kw) -> None:
+    r = subprocess.run(args, capture_output=True, text=True, **kw)
+    if r.returncode:
+        sys.exit(f'✗ `{" ".join(args)}` failed:\n{r.stdout}{r.stderr}')
+
+
+def materialize(step: Path, project: Path) -> None:
+    """Put the step's data and jars into the replay project. Neither is committed: data/raw is
+    exactly what shopwave_gen writes for the chain's specs (generated once, cached by spec), and
+    jars/ is what jars.txt names (downloaded once, cached by file name)."""
+    for spec in data_specs(step):
+        key = hashlib.sha256(json.dumps(spec, sort_keys=True).encode()).hexdigest()[:16]
+        cache = SPINE_ROOT / 'data' / key
+        if not cache.exists():
+            # The repo's own .venv carries the generator's one dependency (scripts/requirements-gen.txt).
+            gen = REPO / '.venv' / 'bin' / 'python'
+            tmp = cache.with_suffix('.tmp')
+            shutil.rmtree(tmp, ignore_errors=True)
+            run_logged([str(gen) if gen.exists() else sys.executable, '-m', 'shopwave_gen', '--sf', str(spec['sf']), '--out', str(tmp),
+                        '--from', spec['from'], '--to', spec['to'], *(a for t in spec.get('only', []) for a in ('--only', t))], cwd=REPO)
+            tmp.rename(cache)
+        shutil.copytree(cache, project / 'data' / 'raw', dirs_exist_ok=True)
+    if (project / 'jars.txt').exists():
+        (project / 'jars').mkdir(exist_ok=True)
+        for url in (project / 'jars.txt').read_text().split():
+            cached = SPINE_ROOT / 'jars' / url.rsplit('/', 1)[1]
+            if not cached.exists():
+                cached.parent.mkdir(parents=True, exist_ok=True)
+                run_logged(['curl', '-sSfL', '-o', str(cached), url])
+            shutil.copy(cached, project / 'jars' / cached.name)
 
 
 def preflight() -> str | None:
@@ -310,7 +353,7 @@ def main() -> int:
     problems = 0
     # The chain is checked over EVERY step, whatever was asked for: a filtered run must not hide a
     # parent edited out from under its children.
-    for problem in (p for s in every for p in [*lineage(s), *generated(s)]):
+    for problem in (p for s in every for p in lineage(s)):
         problems += 1
         print(f'✗ {problem}')
     if problems and write:

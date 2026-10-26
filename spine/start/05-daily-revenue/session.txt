@@ -10,4 +10,4 @@ WARNING: Using incubator modules: jdk.incubator.vector
 only showing top 3 rows
 $ ls out/daily_revenue
 _SUCCESS
-part-00000-96bb0a07-e4bb-463d-a1bc-27b1a8f73a4c-c000.csv
+part-00000-836d6378-c527-4563-bdd0-1703f9ad6697-c000.csv

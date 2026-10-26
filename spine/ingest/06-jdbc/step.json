@@ -1,0 +1,1 @@
+{"from": "ingest/05-schema-drift", "changes": [".gitignore", "compose.yaml", "db/init.sql", "jars.txt", "shopwave/session.py", "shopwave/bronze.py", "explore/jdbc.py"], "venv": true, "services": false}

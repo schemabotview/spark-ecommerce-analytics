@@ -1,0 +1,1 @@
+{"from": "ingest/01-schemas", "changes": ["shopwave/schemas.py", "shopwave/bronze.py", "explore/returns.py"], "venv": true}

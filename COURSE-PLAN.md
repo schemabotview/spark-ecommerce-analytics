@@ -161,14 +161,14 @@ replayable like everything else.
 
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | Schemas | `inferSchema` turns money into `double` and zip codes into ints → explicit `StructType`, `DecimalType` | inferred vs declared, column by column |
-| 2 | Corrupt records | PERMISSIVE + `_corrupt_record`, DROPMALFORMED, FAILFAST; quarantine table | rows tagged ok / quarantined with reason |
-| 3 | Clickstream JSON | nested `context`, `items[]` | the schema tree |
-| 4 | `explode` and flattening | one event → one row per item | one row fanning into many |
-| 5 | Schema drift | June files add one field and rename another; `mergeSchema`, rescued data | January schema vs June schema |
-| 6 | JDBC from PostgreSQL | `partitionColumn`, bounds, `numPartitions` | one query vs N parallel range queries |
-| 7 | ◆ full scene: row vs columnar files | concept + lab (`explain` `PushedFilters`, bytes read CSV vs Parquet) | Parquet: row groups, column chunks, min/max stats, pushdown |
-| 8 | Writing bronze | Parquet partitioned by ingest date; `_ingested_at`, `_source_file` | the `lake/bronze` folder tree |
+| 1 | Schemas | the `shopwave/` package; `schemas.ORDERS`; `inferSchema` costs 2 jobs and makes money a `double` (21 of 31 daily sums off by a hair) | guessed vs declared, column by column; one day's sum both ways |
+| 2 | Corrupt records | `bronze.returns`: Latin-1, PERMISSIVE, `_corrupt_record`; 58 good, 3 bad | the same bytes as UTF-8 and Latin-1; good / bad split; why each bad line is bad |
+| 3 | Clickstream JSON | `schemas.CLICKS`: a struct and an array of structs | one event's shape; guessed vs declared types; the day's events by type |
+| 4 | `explode` and flattening | 897 events → 718 item rows; `explode_outer` keeps the 259 empty ones | one purchase fanned into its items; which to use |
+| 5 | Schema drift | June 1 renames `device` → `device_type`, adds `consent`; `bronze.clicks` coalesces | what each day's file holds; the merge |
+| 6 | JDBC from PostgreSQL | `compose.yaml` (postgres:17), `jars.txt`, `bronze.table`: 4 range queries | 4 tasks → 4 queries; Spark's own WHERE clauses with row counts |
+| 7 | ◆ full scene: row vs columnar files | concept + lab (`explore.columnar`: bytes read from stage metrics) | CSV rows vs Parquet column chunks; 901,650 vs 73,036 bytes; pushed filters; min/max skipping (6,976 bytes) |
+| 8 | Writing bronze | `python -m shopwave.bronze`: Parquet by `_file_date`, `_source_file`, quarantine | sources → bronze tables with counts; one folder per day |
 
 **4. `clean` · Clean and conform (silver) · 8**
 

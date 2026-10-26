@@ -1,0 +1,8 @@
+$ python -m explore.infer
+WARNING: Using incubator modules: jdk.incubator.vector
+guessed:  jobs to read: 2
+declared: jobs to read: 0
+guessed   order_id int, total double
+declared  order_id bigint, total decimal(10,2)
+double sums that are not whole cents: 21 of 31 days
+2026-10-02: double 5656.129999999998, decimal 5656.13

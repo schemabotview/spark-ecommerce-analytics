@@ -22,8 +22,11 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 | # | Course | Sections | Status |
 | --- | --- | --- | --- |
 | 1 | `intro` | 3 | not started |
-| 2 | `start` | 6 | **pilot authored, replayed, rendered and looked at; awaiting owner review; no audio** |
-| 3–11 | | 73 | not started |
+| 2 | `start` | 6 | pilot: authored, replayed, rendered, looked at; no audio |
+| 3 | `ingest` | 8 | authored, replayed, rendered, looked at; no audio |
+| 4–11 | | 65 | not started |
+
+The owner reviews everything at the end (2026-10-26: "do course by course till end").
 
 ## Route contract
 
@@ -52,6 +55,13 @@ and every spine step's `generated` check green — a step's committed data is th
 replayed by `scripts/spine.py` exactly as in python-expense-tracker (`first` / `from` + `changes` /
 `lab`; one bash per step; paths shown as `/home/ana/shopwave`). What Spark changed:
 
+- **Data is generated, not committed.** A step's `generated` spec (inherited along `from`) names
+  `shopwave_gen` arguments; the replay writes that data into `data/raw`, cached by spec. A scene
+  that shows a data file captures it (`capture`). `jars.txt` (Maven Central URLs) works the same
+  way: fetched once, copied into `jars/`. A project with a `compose.yaml` has its services
+  restarted from scratch before each step (`"services": false` when the session starts them).
+- **Code is ≤ 79 columns** (the editor's 80, check-content fails a wider shown line). Long
+  `StructType`s are written by hand, one field a line: a formatter nests them unreadably.
 - **A fixed replay directory and a shared venv.** A PySpark venv is 500 MB; `"venv": true` reuses
   one per `requirements.txt`, parked between steps at `$SPINE_ROOT/venvs/` (default
   `/tmp/shopwave-spine`). Only 2.1 installs PySpark on screen.

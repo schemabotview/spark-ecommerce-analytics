@@ -1,0 +1,13 @@
+$ python -m explore.columnar
+WARNING: Using incubator modules: jdk.incubator.vector
+csv       365 files    901,650 bytes
+parquet     1 files    377,820 bytes
+German orders, 2 columns:  csv reads   901,650 bytes
+                       parquet reads    73,036 bytes
+order_id < 1000:           csv reads   901,650 bytes
+                       parquet reads     6,976 bytes
+== Physical Plan ==
+*(1) Project [order_id#13L, total#18]
++- *(1) Filter (isnotnull(country#16) AND (country#16 = DE))
+   +- *(1) ColumnarToRow
+      +- FileScan parquet [order_id#13L,country#16,total#18] Batched: true, DataFilters: [isnotnull(country#16), (country#16 = DE)], Format: Parquet, Location: InMemoryFileIndex(1 paths)[file:/home/ana/shopwave/out/orders.parquet], PartitionFilters: [], PushedFilters: [IsNotNull(country), EqualTo(country,DE)], ReadSchema: struct<order_id:bigint,country:string,total:decimal(10,2)>

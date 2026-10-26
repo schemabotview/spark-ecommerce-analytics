@@ -6,8 +6,7 @@ spark = spark_session()
 orders = spark.read.csv("data/raw/orders/", header=True)
 
 daily = (
-    orders
-    .filter(F.col("status") == "paid")
+    orders.filter(F.col("status") == "paid")
     .groupBy(F.to_date("order_ts").alias("day"))
     .agg(
         F.count("*").alias("orders"),

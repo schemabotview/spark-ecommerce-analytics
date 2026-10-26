@@ -1,0 +1,13 @@
+$ python -m explore.explode
+WARNING: Using incubator modules: jdk.incubator.vector
+events: 897 · with items: 638
+explode: 718 rows · explode_outer: 977 rows
++--------+----------+---+-----+
+|event_id|product_id|qty|price|
++--------+----------+---+-----+
+|0279c...|         4|  1|20.67|
+|0279c...|         5|  1|34.71|
+|0279c...|        28|  3|40.33|
+|02ad6...|         7|  3|75.59|
++--------+----------+---+-----+
+only showing top 4 rows

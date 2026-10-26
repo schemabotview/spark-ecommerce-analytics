@@ -1,0 +1,12 @@
+$ python -m explore.clicks
+WARNING: Using incubator modules: jdk.incubator.vector
+guessed: event_ts string
+  items array<struct<price:double,product_id:bigint,qty:bigint>>
+declared: event_ts timestamp
+  items array<struct<product_id:bigint,qty:int,price:decimal(10,2)>>
+events: 897
+  product_view  376
+  page_view     259
+  add_to_cart   168
+  checkout      47
+  purchase      47

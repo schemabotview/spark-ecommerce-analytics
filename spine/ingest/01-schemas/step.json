@@ -1,0 +1,4 @@
+{"from": "start/06-two-errors", "changes": ["first_job.py", "lazy.py", "two_errors.py", "daily_revenue.py", "session.py", "shopwave", "explore"], "venv": true,
+ "generated": [{"sf": 0.01, "from": "2026-10-01", "to": "2026-10-31", "only": ["customers", "products", "product_prices", "fx_rates", "campaigns", "order_items", "payments", "returns"]},
+               {"sf": 0.01, "from": "2026-05-31", "to": "2026-06-01", "only": ["clickstream"]},
+               {"sf": 0.01, "from": "2026-10-01", "to": "2026-10-01", "only": ["clickstream"]}]}

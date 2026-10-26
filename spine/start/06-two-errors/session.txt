@@ -8,4 +8,4 @@ WARNING: Using incubator modules: jdk.incubator.vector
 $ grep -c ERROR logs/spark.log
 2
 $ grep -m1 "ERROR Executor" logs/spark.log
-21:49:47 ERROR Executor: Exception in task 0.0 in stage 1.0 (TID 1)
+22:18:20 ERROR Executor: Exception in task 0.0 in stage 1.0 (TID 1)

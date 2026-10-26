@@ -1,0 +1,8 @@
+$ python -m explore.returns
+WARNING: Using incubator modules: jdk.incubator.vector
+read as UTF-8:   Gr��e falsch
+read as Latin-1: Größe falsch
+lines: 58 good, 3 bad
+  bad: R05477402,73674,Defekt
+  bad: R04575690,58503,61,"Größe falsch,2026-10-03
+  bad: R05124431,57589,0,Defekt,03/10/2026

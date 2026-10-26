@@ -1,0 +1,10 @@
+$ python -m explore.drift
+WARNING: Using incubator modules: jdk.incubator.vector
++----------+------+------+-----------+-------+
+|      file|events|device|device_type|consent|
++----------+------+------+-----------+-------+
+|2026-05-31|  1013|  1013|          0|      0|
+|2026-06-01|   790|     0|        790|    790|
++----------+------+------+-----------+-------+
+
+bronze: device known for 1803 of 1803 events

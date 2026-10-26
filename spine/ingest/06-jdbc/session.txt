@@ -1,0 +1,12 @@
+$ docker compose --progress quiet up -d --wait
+$ docker compose ps --format '{{.Service}}: {{.State}} ({{.Health}})'
+postgres: running (healthy)
+$ xargs -n1 curl -sSLO --output-dir jars < jars.txt
+$ python -m explore.jdbc
+WARNING: Using incubator modules: jdk.incubator.vector
+one query: 1 partition
+partition 0:  501 rows  where "customer_id" < 502 or "customer_id" is null
+partition 1:  499 rows  where "customer_id" >= 502 AND "customer_id" < 1001
+partition 2:  499 rows  where "customer_id" >= 1001 AND "customer_id" < 1500
+partition 3:  501 rows  where "customer_id" >= 1500
+[('customer_id', 'bigint'), ('country', 'string'), ('signup_date', 'date'), ('email', 'string')]

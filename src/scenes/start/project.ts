@@ -2,7 +2,7 @@ import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame } from '../ide'
 import { outputOf } from '../lab'
 import { explorer } from './tree'
-import csv from '../../../spine/start/01-project/project/data/raw/orders/orders-2026-10-01.csv?raw'
+import csv from '../../../spine/start/01-project/captured/data/raw/orders/orders-2026-10-01.csv?raw'
 import session from '../../../spine/start/01-project/session.txt?raw'
 
 // §1 — Java, a venv and PySpark. Every value in the side pane is read from the session: the Java
