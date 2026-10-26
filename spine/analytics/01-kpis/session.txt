@@ -1,0 +1,8 @@
+$ python -m explore.kpis
+WARNING: Using incubator modules: jdk.incubator.vector
+365 days · 18014 paid orders · GMV € 2178214.10
+average order value: € 120.92
+median day: 5459.66 €
+  2026-11-27:  837 orders · € 98089.62
+  2026-11-30:  333 orders · € 42134.61
+  2026-12-19:   81 orders · € 10753.22

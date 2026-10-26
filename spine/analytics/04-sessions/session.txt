@@ -1,0 +1,10 @@
+$ python -m explore.sessions
+WARNING: Using incubator modules: jdk.incubator.vector
+people    26762 events ·  4005 visitors ·  6170 sessions · 4.3 events each
+the bot    2329 events ·     1 visitors ·   401 sessions · 5.8 events each
+  visitor 1  2026-10-02 20:22:33  page_view    session 1
+  visitor 1  2026-10-02 20:22:49  product_view session 1
+  visitor 1  2026-10-02 20:23:30  add_to_cart  session 1
+  visitor 1  2026-10-02 20:23:45  product_view session 1
+  visitor 1  2026-10-03 13:06:20  page_view    session 2
+  visitor 1  2026-10-03 13:08:11  product_view session 2

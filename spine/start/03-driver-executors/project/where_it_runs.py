@@ -6,10 +6,8 @@ from pyspark.sql import SparkSession
 spark = (
     SparkSession.builder.master("local[4]")
     .appName("shopwave")
-    .config(
-        "spark.driver.extraJavaOptions",
-        "-Dlog4j2.configurationFile=conf/log4j2.properties",
-    )
+    .config("spark.driver.extraJavaOptions",
+            "-Dlog4j2.configurationFile=conf/log4j2.properties")
     .config("spark.ui.showConsoleProgress", "false")
     .getOrCreate()
 )

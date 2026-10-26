@@ -1,0 +1,29 @@
+"""Analytics: the business's questions, answered from gold and silver."""
+from pyspark.sql import DataFrame, Window
+from pyspark.sql import functions as F
+
+PAID = "status = 'paid'"  # a SQL condition: usable before Spark starts
+
+
+def daily_kpis(sales: DataFrame) -> DataFrame:
+    """Per day: orders, gross merchandise value (GMV) and average order
+    value (AOV), from paid orders' lines."""
+    return (
+        sales.filter(PAID)
+        .groupBy("order_date")
+        .agg(F.countDistinct("order_id").alias("orders"),
+             F.sum("revenue").alias("gmv"))
+        .withColumn("aov", F.round(F.col("gmv") / F.col("orders"), 2))
+        .orderBy("order_date")
+    )
+
+
+def top_products(sales: DataFrame, products: DataFrame,
+                 n: int = 3) -> DataFrame:
+    """The n best-selling products of each category, ranked by revenue."""
+    revenue = (sales.filter(PAID).groupBy("product_id")
+               .agg(F.sum("revenue").alias("revenue"))
+               .join(products, "product_id"))
+    in_category = Window.partitionBy("category").orderBy(F.desc("revenue"))
+    ranked = revenue.withColumn("rank", F.rank().over(in_category))
+    return ranked.filter(F.col("rank") <= n).orderBy("category", "rank")

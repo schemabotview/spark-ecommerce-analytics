@@ -1,0 +1,1 @@
+{"from": "lakehouse/05-merge", "changes": ["shopwave/lake.py", "explore/scd2.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

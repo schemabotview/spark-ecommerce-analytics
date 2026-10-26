@@ -1,0 +1,6 @@
+$ python -m explore.frames
+WARNING: Using incubator modules: jdk.incubator.vector
+Black Friday week, with 26 November missing:
+  2026-11-25  gmv   5320.50  rows:   5323.80  range:   5323.80
+  2026-11-27  gmv  98089.62  rows:  18738.79  range:  20862.32
+  2026-11-28  gmv   7186.59  rows:  18908.65  range:  20853.15

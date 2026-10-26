@@ -1,0 +1,2 @@
+{"from": "lakehouse/01-broken-overwrite", "changes": ["requirements.txt", "jars.txt", "shopwave/session.py", "shopwave/gold.py", "explore/overwrite.py", "explore/convert.py"], "venv": true,
+ "setup": ["python -m shopwave.bronze", "python -m shopwave.silver"]}

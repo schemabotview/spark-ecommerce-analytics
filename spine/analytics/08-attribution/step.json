@@ -1,0 +1,1 @@
+{"from": "analytics/07-rfm", "changes": ["shopwave/bronze.py", "shopwave/silver.py", "shopwave/analytics.py", "explore/attribution.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

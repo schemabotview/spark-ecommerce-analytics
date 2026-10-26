@@ -1,0 +1,3 @@
+$ python -m shopwave.lake orders --upto 2026-11-30
+$ python -m shopwave.lake orders
+$ python -m shopwave.lake orders

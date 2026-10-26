@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from functools import cache
+from itertools import accumulate
 
 YEAR = 2026
 FIRST, LAST = date(YEAR, 1, 1), date(YEAR, 12, 31)
@@ -183,6 +184,16 @@ class World:
     def _customer_weights(self) -> list[float]:
         return [1 / (i ** 0.6) for i in range(1, self.n_customers + 1)]
 
+    # random.choices(weights=w) sums w on every call; passing the same sums as cum_weights draws
+    # exactly the same values, once instead of millions of times.
+    @cache
+    def _customer_cum(self) -> list[float]:
+        return list(accumulate(self._customer_weights()))
+
+    @cache
+    def _product_cum(self) -> list[float]:
+        return list(accumulate(self._product_weights()))
+
     @cache
     def _product_weights(self) -> list[float]:
         # The bestseller takes BESTSELLER_SHARE; the rest share the remainder on a long tail.
@@ -205,10 +216,10 @@ class World:
         stamps = sorted(when() for _ in range(self.orders_on(d)))
         for k, ts in enumerate(stamps):
             oid = self.first_order_id(d) + k
-            c = customers[r.choices(range(self.n_customers), self._customer_weights())[0]]
+            c = customers[r.choices(range(self.n_customers), cum_weights=self._customer_cum())[0]]
             lines = []
             for line in range(1, r.choices([1, 2, 3, 4], [50, 30, 15, 5])[0] + 1):
-                pid = r.choices(product_ids, self._product_weights())[0]
+                pid = r.choices(product_ids, cum_weights=self._product_cum())[0]
                 lines.append({'order_id': oid, 'line': line, 'product_id': pid, 'qty': r.choices([1, 2, 3], [80, 15, 5])[0],
                               'unit_price': self.price_on(pid, d)})
             total = sum((l['qty'] * l['unit_price'] for l in lines), Decimal(0))
@@ -229,7 +240,7 @@ class World:
             events += self._session(r, ts, c['customer_id'], lines, buys=True)
         for _ in range(self.orders_on(d) * BROWSE_SESSIONS_PER_ORDER):
             uid = r.choice([None, r.randrange(1, self.n_customers + 1)])
-            pids = [r.choices(product_ids, self._product_weights())[0] for _ in range(r.randrange(1, 4))]
+            pids = [r.choices(product_ids, cum_weights=self._product_cum())[0] for _ in range(r.randrange(1, 4))]
             events += self._session(r, when(), uid, [{'product_id': p, 'qty': 1, 'unit_price': self.price_on(p, d)} for p in pids],
                                     buys=False)
         n_bot = round(len(events) * BOT_SHARE / (1 - BOT_SHARE))
@@ -281,6 +292,29 @@ class World:
                     if arrived.date() == d:
                         out.append((arrived, e))
         out.sort(key=lambda a: (a[0], a[1]['event_id']))
+        return out
+
+    def changes_on(self, d: date) -> list[dict]:
+        """The shop database's change feed for day d (CDC, Debezium-style): every status an order
+        moved to that day. Orders placed in the last week move on: paid → shipped → delivered.
+        Its own random stream, so no other table changes."""
+        r = rng(self.seed, 'changes', d.isoformat())
+        out = []
+        for back in range(1, 8):
+            placed = d - timedelta(days=back)
+            if placed < FIRST:
+                continue
+            for o in self.day(placed)['orders']:
+                if o['status'] != 'paid':
+                    continue
+                shipped = (o['order_id'] * 7) % 3 + 1  # a day per order, from its id: stable
+                delivered = shipped + (o['order_id'] * 11) % 4 + 1
+                for status, after in [('shipped', shipped), ('delivered', delivered)]:
+                    if back == after:
+                        at = datetime(d.year, d.month, d.day, tzinfo=timezone.utc) + timedelta(
+                            seconds=r.randrange(6 * 3600, 20 * 3600))
+                        out.append({'op': 'u', 'order_id': o['order_id'], 'status': status, 'changed_at': at})
+        out.sort(key=lambda c: (c['changed_at'], c['order_id']))
         return out
 
     @cache

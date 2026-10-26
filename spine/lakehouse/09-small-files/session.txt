@@ -1,0 +1,2 @@
+$ python -m explore.small_files
+$ ls out/daily_sales | grep -c parquet

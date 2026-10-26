@@ -1,0 +1,1 @@
+{"from": "analytics/06-cohorts", "changes": ["shopwave/analytics.py", "explore/rfm.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

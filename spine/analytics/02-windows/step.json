@@ -1,0 +1,1 @@
+{"from": "analytics/01-kpis", "changes": ["shopwave/analytics.py", "explore/windows.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

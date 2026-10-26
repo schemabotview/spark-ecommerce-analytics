@@ -1,0 +1,8 @@
+$ python -m explore.funnel
+WARNING: Using incubator modules: jdk.incubator.vector
+page_view       6166 sessions  100.0%
+product_view    6164 sessions  100.0%
+add_to_cart     3772 sessions   61.2%
+checkout        1541 sessions   25.0%
+purchase        1542 sessions   25.0%
+conversion: 25.0% of visits buy

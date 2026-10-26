@@ -1,0 +1,5 @@
+{"from": "model/09-salting", "changes": ["shopwave/analytics.py", "explore/kpis.py"], "venv": true,
+ "generated": [{"sf": 0.01, "from": "2026-01-01", "to": "2026-09-30", "only": ["orders", "order_items", "payments", "returns"]},
+               {"sf": 0.01, "from": "2026-12-01", "to": "2026-12-31", "only": ["orders", "order_items", "payments", "returns"]}],
+ "capture": ["out/daily_kpis.csv"],
+ "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

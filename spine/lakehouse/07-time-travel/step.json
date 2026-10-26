@@ -1,0 +1,1 @@
+{"from": "lakehouse/06-scd2", "changes": ["explore/time_travel.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold", "python -m shopwave.lake orders --upto 2026-11-30", "python -m shopwave.lake orders"]}

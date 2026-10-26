@@ -1,0 +1,1 @@
+{"from": "analytics/04-sessions", "changes": ["shopwave/analytics.py", "explore/funnel.py"], "venv": true, "capture": ["out/funnel.csv"], "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

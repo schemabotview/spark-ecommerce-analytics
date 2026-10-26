@@ -304,7 +304,8 @@ def materialize(step: Path, project: Path) -> None:
     exactly what shopwave_gen writes for the chain's specs (generated once, cached by spec), and
     jars/ is what jars.txt names (downloaded once, cached by file name)."""
     for spec in data_specs(step):
-        key = hashlib.sha256(json.dumps(spec, sort_keys=True).encode()).hexdigest()[:16]
+        gen = {k: v for k, v in spec.items() if k != 'dest'}  # the cache is per generated data
+        key = hashlib.sha256(json.dumps(gen, sort_keys=True).encode()).hexdigest()[:16]
         cache = SPINE_ROOT / 'data' / key
         if not cache.exists():
             # The repo's own .venv carries the generator's one dependency (scripts/requirements-gen.txt).
@@ -314,7 +315,9 @@ def materialize(step: Path, project: Path) -> None:
             run_logged([str(gen) if gen.exists() else sys.executable, '-m', 'shopwave_gen', '--sf', str(spec['sf']), '--out', str(tmp),
                         '--from', spec['from'], '--to', spec['to'], *(a for t in spec.get('only', []) for a in ('--only', t))], cwd=REPO)
             tmp.rename(cache)
-        shutil.copytree(cache, project / 'data' / 'raw', dirs_exist_ok=True)
+        # `dest`: where in the project the data lands (default data/raw), so a second scale
+        # factor can sit beside the first without mixing with it
+        shutil.copytree(cache, project / spec.get('dest', 'data/raw'), dirs_exist_ok=True)
     if (project / 'jars.txt').exists():
         (project / 'jars').mkdir(exist_ok=True)
         for url in (project / 'jars.txt').read_text().split():

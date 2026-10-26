@@ -12,6 +12,7 @@ Same seed and SF → byte-identical files. Layout under --out:
   payments/payments-<day>.parquet    the payment provider's daily drop (needs pyarrow)
   clickstream/<day>/events-<hh>.jsonl  by ARRIVAL hour: late and duplicate events included
   returns/returns-<yyyy-mm>.csv      the warehouse's monthly file: Latin-1, with malformed rows
+  order_changes/changes-<day>.jsonl  the shop database's change feed (CDC): shipped, delivered
 """
 from __future__ import annotations
 
@@ -26,7 +27,7 @@ from pathlib import Path
 from .model import CAMPAIGNS, FIRST, LAST, RETURNS_BAD_ROWS, SCHEMA_CHANGE, World, days, rng
 
 TABLES = ['customers', 'products', 'product_prices', 'fx_rates', 'campaigns', 'orders', 'order_items', 'payments',
-          'clickstream', 'returns']
+          'clickstream', 'returns', 'order_changes']
 
 
 def ts(t) -> str:
@@ -81,6 +82,11 @@ def write(world: World, out: Path, first: date, last: date, only: set[str]) -> N
             write_csv(out / 'order_items' / f'order_items-{d}.csv', day['order_items'])
         if want('payments'):
             write_payments(out / 'payments' / f'payments-{d}.parquet', day['payments'])
+        if want('order_changes'):
+            lines = [json.dumps({**c, 'changed_at': c['changed_at'].strftime('%Y-%m-%dT%H:%M:%SZ')}) for c in world.changes_on(d)]
+            path = out / 'order_changes' / f'changes-{d}.jsonl'
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('\n'.join(lines) + '\n' if lines else '')
         if want('clickstream'):
             hours: dict[int, list[str]] = {}
             for arrived, e in world.events_arriving(d):

@@ -1,0 +1,2 @@
+$ python -m explore.overwrite
+$ ls lake/gold/fact_sales

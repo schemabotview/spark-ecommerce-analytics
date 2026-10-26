@@ -1,0 +1,1 @@
+{"from": "analytics/09-sql", "changes": ["explore/overwrite.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

@@ -1,0 +1,9 @@
+$ python -m explore.windows
+WARNING: Using incubator modules: jdk.incubator.vector
+rows: 18 · columns: brand, category, rank
+beauty      1. Nordlys Perfume · 2. Arbo Shampoo · 3. Quill Perfume
+books       1. Tessel Thriller · 2. Kavo Notebook · 3. Ostra Travel Guide
+electronics 1. Quill Headphones · 2. Tessel Webcam · 3. Nordlys Keyboard
+fashion     1. Ostra Rain Jacket · 2. Merida Wool Scarf · 3. Nordlys Wool Scarf
+home        1. Merida Wall Clock · 2. Kavo Desk Lamp · 3. Merida Desk Lamp
+sports      1. Ostra Water Bottle · 2. Nordlys Running Socks · 3. Arbo Running Socks

@@ -1,0 +1,1 @@
+{"from": "analytics/08-attribution", "changes": ["sql/funnel.sql", "explore/sql.py"], "venv": true, "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

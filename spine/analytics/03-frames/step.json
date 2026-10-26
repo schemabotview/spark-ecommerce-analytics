@@ -1,0 +1,1 @@
+{"from": "analytics/02-windows", "changes": ["shopwave/analytics.py", "explore/frames.py"], "venv": true, "capture": ["out/moving_average.csv"], "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}
