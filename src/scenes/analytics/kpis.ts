@@ -22,15 +22,16 @@ export const analyticsKpis: SceneModel = ideFrame({
   session,
   side: [
     {
-      type: 'plot', id: 'gmv', title: `GMV per day, 2026 (€) · median € ${Math.round(+median)}`, compact: true,
+      type: 'plot', id: 'gmv', title: `GMV per day, 2026 (€): the spike is Black Friday`, compact: true,
       x: { min: 0, max: 366, step: 61, label: 'day of the year' }, y: { min: 0, max: Math.ceil(peak / 20000) * 20000, label: '€' },
-      series: [{ kind: 'line', points, tone: 'ingest', label: `Black Friday € ${Math.round(+top[0][2])}` }],
+      series: [{ kind: 'line', points, tone: 'ingest' }],
     },
     {
       type: 'table', id: 'year', title: `The year: ${days} days`, tone: 'store', columns: ['KPI', 'value'], rows: [
         { id: 'y-orders', cells: ['paid orders', orders] },
         { id: 'y-gmv', cells: ['GMV', `€ ${gmv}`], tone: 'store' },
         { id: 'y-aov', cells: ['average order value', `€ ${aov}`] },
+        { id: 'y-median', cells: ['median day', `€ ${median}`] },
       ],
     },
     {

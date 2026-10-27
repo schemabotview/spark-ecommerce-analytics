@@ -1,1 +1,8 @@
 $ python -m explore.rfm
+WARNING: Using incubator modules: jdk.incubator.vector
+customers scored: 1984
+loyal         768 customers · 10.2 orders · last   27 days ago · €   939,309
+champions     224 customers · 28.4 orders · last    6 days ago · €   778,218
+occasional    462 customers ·  4.2 orders · last   30 days ago · €   228,781
+lost          431 customers ·  3.5 orders · last  130 days ago · €   184,874
+new            99 customers ·  3.8 orders · last    7 days ago · €    47,032

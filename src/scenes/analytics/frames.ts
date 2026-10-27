@@ -21,9 +21,9 @@ export const analyticsFrames: SceneModel = ideFrame({
   session,
   side: [
     {
-      type: 'plot', id: 'avg', title: 'GMV per day and its 7-day average (€)', compact: true,
+      type: 'plot', id: 'avg', title: 'GMV per day (grey) and its 7-day average (blue), €', compact: true,
       x: { min: 0, max: 366, step: 61, label: 'day of the year' }, y: { min: 0, max: Math.ceil(peak / 20000) * 20000 },
-      series: [{ kind: 'line', points: at(2), tone: 'neutral', label: 'daily' }, { kind: 'line', points: at(4), tone: 'ingest', label: '7-day' }],
+      series: [{ kind: 'line', points: at(2), tone: 'neutral' }, { kind: 'line', points: at(4), tone: 'ingest' }],
     },
     {
       type: 'table', id: 'week', title: 'rows or range, with 26 Nov missing', tone: 'ingest', columns: ['day', 'GMV', 'rows: last 7 rows', 'range: last 7 days'],

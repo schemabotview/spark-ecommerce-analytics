@@ -1,1 +1,6 @@
 $ python -m explore.attribution
+WARNING: Using incubator modules: jdk.incubator.vector
+campaigns: newsletter (01-01→12-31), retarget (01-01→12-31), spring-sale (03-15→04-15), black-friday (11-20→11-30)
+(none)        direct   1117 sales  € 136436.07
+newsletter    email     222 sales  €  27167.65
+retarget      display   207 sales  €  24793.64

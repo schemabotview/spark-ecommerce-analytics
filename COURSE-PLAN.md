@@ -203,17 +203,20 @@ count (a `count()` lets Spark prune all but the join key, and the shuffle carrie
 
 **6. `analytics` · Answer the business · 9**
 
+The chain's data covers all of 2026 from here; the clickstream questions use October. Charts are
+drawn from small CSVs the scripts write (`capture`), so every point is real.
+
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | KPIs | GMV, AOV, orders per day in one `agg` | plot: daily GMV across the year |
-| 2 | Window functions | top 3 products per category | `partitionBy` / `orderBy`, rank inside each partition |
-| 3 | Frames | 7-day moving average; `rowsBetween` vs `rangeBetween` | the frame sliding over rows |
-| 4 | Sessionization | `lag`, a 30-minute gap, running sum → `session_id` | one user's events cut into sessions |
-| 5 | The funnel | view → cart → checkout → purchase | plot: funnel conversion |
-| 6 | Cohort retention | first-purchase month × months since; `pivot` | the cohort table |
-| 7 | RFM segments | recency, frequency, monetary with `ntile` | customers dropping into segments |
-| 8 | Attribution | last-touch campaign: a range join on time | event ← campaign window match |
-| 9 | Spark SQL | the funnel in SQL over temp views; the same plan | DataFrame plan = SQL plan |
+| 1 | KPIs | `analytics.daily_kpis`: 18,014 paid orders, GMV € 2.18 M, AOV € 120.92; Black Friday € 98,090 | plot: GMV per day, the year |
+| 2 | Window functions | `top_products`: `rank()` over `partitionBy(category)` | rank per category; rank / dense_rank / row_number on a tie |
+| 3 | Frames | `moving_average`: `rangeBetween(-6, 0)` over `unix_date`; rows vs range with a day missing | plot: daily and 7-day; the difference |
+| 4 | Sessionization | `sessions`: `lag`, a 30-minute gap, a running sum; 6,170 sessions, the bot's 401 | visitor 1's timeline; the rule |
+| 5 | The funnel | `funnel`: 25% of visits buy; the drop is view → cart | plot: sessions per step |
+| 6 | Cohort retention | `cohorts`: first-order month, `months_between`, `pivot` | the cohort grid |
+| 7 | RFM segments | `rfm`: `ntile(4)` on R, F, M → five segments | segments with their numbers; the rules |
+| 8 | Attribution | `campaigns` lands (multi-line JSON); last touch + a range join; `aggregate` over items | credited revenue; the campaigns' windows |
+| 9 | Spark SQL | `sql/funnel.sql` over a temp view: same answer, the same optimized plan | two ways in, one engine |
 
 **7. `lakehouse` · Delta Lake · 9**
 

@@ -26,7 +26,8 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 | 3 | `ingest` | 8 | authored, replayed, rendered, looked at; no audio |
 | 4 | `clean` | 8 | authored, replayed, rendered, looked at; no audio |
 | 5 | `model` | 9 | authored, replayed, rendered, looked at; no audio |
-| 6–11 | | 48 | not started |
+| 6 | `analytics` | 9 | authored, replayed, rendered, looked at; no audio |
+| 7–11 | | 39 | not started |
 
 The owner reviews everything at the end (2026-10-26: "do course by course till end").
 

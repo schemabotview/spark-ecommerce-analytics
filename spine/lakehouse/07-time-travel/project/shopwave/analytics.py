@@ -3,6 +3,7 @@ from pyspark.sql import DataFrame, Window
 from pyspark.sql import functions as F
 
 PAID = "status = 'paid'"  # a SQL condition: usable before Spark starts
+MONEY = "decimal(12,2)"  # a sum of prices: room for a large basket
 
 
 def daily_kpis(sales: DataFrame) -> DataFrame:
@@ -103,8 +104,9 @@ def attribution(visits: DataFrame, campaigns: DataFrame) -> DataFrame:
     touched = visits.withColumn(
         "touch", F.last("campaign", ignorenulls=True).over(so_far))
     bought = touched.filter(F.col("event_type") == "purchase").withColumn(
-        "revenue", F.aggregate("items", F.lit(0).cast("decimal(12,2)"),
-                               lambda acc, i: acc + i.qty * i.price))
+        "revenue", F.aggregate(
+            "items", F.lit(0).cast(MONEY),
+            lambda acc, i: (acc + i.qty * i.price).cast(MONEY)))
     running = (F.col("touch") == F.col("campaign_id")) & \
         F.col("event_date").between(F.col("start"), F.col("end"))  # a range
     return bought.join(campaigns, running, "left").select(

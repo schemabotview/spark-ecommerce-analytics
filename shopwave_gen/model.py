@@ -15,7 +15,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
-from functools import cache
+from functools import cache, lru_cache
 from itertools import accumulate
 
 YEAR = 2026
@@ -202,7 +202,9 @@ class World:
         return [BESTSELLER_SHARE] + [w / s * (1 - BESTSELLER_SHARE) for w in tail]
 
     # --- facts --------------------------------------------------------------------------------
-    @cache
+    # Bounded: a run walks day by day, and an SF 1 day holds ~80 k click events. Each day draws from
+    # its own stream, so recomputing an evicted day gives the same rows.
+    @lru_cache(maxsize=10)
     def day(self, d: date) -> dict[str, list[dict]]:
         """One day's orders, order items, payments and click events."""
         r = rng(self.seed, 'day', d.isoformat())

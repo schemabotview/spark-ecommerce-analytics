@@ -1,1 +1,5 @@
 $ python -m explore.sql
+WARNING: Using incubator modules: jdk.incubator.vector
+SQL:       {'page_view': 6166, 'product_view': 6164, 'add_to_cart': 3772, 'checkout': 1541, 'purchase': 1542}
+DataFrame: {'page_view': 6166, 'product_view': 6164, 'add_to_cart': 3772, 'checkout': 1541, 'purchase': 1542}
+same optimized plan: True

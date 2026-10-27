@@ -23,8 +23,15 @@ export const analyticsWindows: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'top', title: 'Top three per category, 2026', tone: 'store', columns: ['category', '1', '2', '3'],
-      rows: cats.map(([c, a, b, d]) => ({ id: `c-${c}`, cells: [c, a, b, d] })),
+      type: 'table', id: 'top', title: 'The top two per category, 2026', tone: 'store', columns: ['category', 'rank 1', 'rank 2'],
+      rows: cats.map(([c, a, b]) => ({ id: `c-${c}`, cells: [c, a, b] })),
+    },
+    {
+      type: 'table', id: 'ties', title: 'Three ways to number, on a tie', tone: 'neutral', columns: ['function', 'revenue 9, 7, 7, 5'], rows: [
+        { id: 'f-rank', cells: ['rank()', '1, 2, 2, 4'] },
+        { id: 'f-dense', cells: ['dense_rank()', '1, 2, 2, 3'] },
+        { id: 'f-row', cells: ['row_number()', '1, 2, 3, 4'] },
+      ],
     },
     { type: 'note', id: 'note', tone: 'ingest', text: 'A groupBy collapses each category to one row. A window keeps every row and computes over its neighbours: a rank, a running total, the row before.' },
   ],
