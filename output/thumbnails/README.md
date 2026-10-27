@@ -52,6 +52,26 @@ would have shown a balance the course never produced.
 The session reports how many stages ran, not what each one did, so no stage is named anywhere
 on the card — the count appears in the headline and nothing more is claimed.
 
+## The colours are the engine's
+
+Nothing on the card is painted with an invented colour. The boxes take their tones from
+`@graphlearning/graphl-flow`'s own palette — the same six the scenes use — copied into `TONE`
+in `scripts/thumb-film.mjs` (the dark row, since the card is dark in every theme):
+
+| Box | Tone | Accent | Tint |
+| --- | --- | --- | --- |
+| Driver Program | `infra` | `#f0902f` | `#241c12` |
+| Cluster Manager | `store` | `#37b877` | `#122419` |
+| Worker node | `serve` | `#c98bff` | `#1e1428` |
+| SparkContext, Executor, Cache, Task | `neutral` | `#9aa4b2` | `#181b20` |
+| the heavier executor's count | `consume` | `#f0656f` | — |
+
+Happily, `infra` / `store` / `serve` are orange, green and purple — the colours the canonical
+Spark diagram has always used — so the cover is simultaneously painted like the app and shaped
+like the picture a Spark user already knows. Boxes are drawn the way the engine draws a group:
+tint fill, accent border, accent label. The lopsided executor is marked in `consume`, the tone
+the scenes use for a warning, which is what a five-to-one skew is.
+
 `--source kpis` renders `spine/analytics/01-kpis/session.txt`: GMV €2,178,214 over 18,014 paid
 orders, with the busiest days as bars and Black Friday (2026-11-27) as the hero row.
 
