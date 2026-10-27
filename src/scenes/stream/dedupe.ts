@@ -31,6 +31,13 @@ export const streamDedupe: SceneModel = ideFrame({
         { type: 'item', id: 's-free', title: `${held} ids held at the end`, sub: 'older ones forgotten: state stays small', icon: 'disk' },
       ],
     },
+    {
+      type: 'table', id: 'which', title: 'Which dedupe', tone: 'neutral', columns: ['call', 'remembers'], rows: [
+        { id: 'w-batch', cells: ['dropDuplicates, batch', 'nothing: the table is all there'] },
+        { id: 'w-stream', cells: ['dropDuplicates, stream', 'every id, for ever'], tone: 'consume' },
+        { id: 'w-wm', cells: ['…WithinWatermark', 'recent ids only'], tone: 'store' },
+      ],
+    },
     { type: 'note', id: 'note', tone: 'consume', text: 'Plain dropDuplicates on a stream keeps every id for ever. Within a watermark, the state holds only the recent ones: a copy must arrive within the window to be caught.' },
   ],
   edges: [

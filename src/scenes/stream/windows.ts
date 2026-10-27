@@ -27,6 +27,13 @@ export const streamWindows: SceneModel = ideFrame({
         { type: 'item', id: 'w-state', title: 'the window’s sum, kept in state', sub: 'updated by every batch that adds to it', icon: 'memory', tone: 'store' },
       ],
     },
+    {
+      type: 'table', id: 'modes', title: 'Output modes', tone: 'neutral', columns: ['mode', 'writes after a batch'], rows: [
+        { id: 'o-complete', cells: ['complete', 'the whole result table'], tone: 'store' },
+        { id: 'o-update', cells: ['update', 'the rows that changed'] },
+        { id: 'o-append', cells: ['append', 'final rows only, once (§6)'] },
+      ],
+    },
     { type: 'note', id: 'note', tone: 'consume', text: 'Complete mode writes the whole result table after every batch, and keeps every window in state for ever. Fine for a day; §6 shows how to let windows close.' },
   ],
   edges: [

@@ -31,6 +31,13 @@ export const streamExactlyOnce: SceneModel = ideFrame({
         { type: 'item', id: 'e-delta', title: 'Delta knows batch 0 is in', sub: 'the table’s log records each batch id', icon: 'layers', tone: 'store' },
       ],
     },
+    {
+      type: 'table', id: 'kinds', title: 'Delivery guarantees', tone: 'neutral', columns: ['guarantee', 'after a crash'], rows: [
+        { id: 'g-most', cells: ['at most once', 'a batch may be lost'] },
+        { id: 'g-least', cells: ['at least once', 'a batch may be written twice'] },
+        { id: 'g-once', cells: ['exactly once', 'checkpoint + a Delta sink'], tone: 'store' },
+      ],
+    },
     { type: 'note', id: 'note', tone: 'consume', text: `${+rows - +distinct} ids still appear twice: the tracker sent them twice (Course 4). Exactly once is per Kafka record; duplicates in the source are §7’s job.` },
   ],
   edges: [

@@ -1,6 +1,7 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, linesFrom } from '../ide'
 import { outputOf } from '../lab'
+import { view } from '../fold'
 import { streamTree } from './tree'
 import code from '../../../spine/stream/01-kafka/project/shopwave/tracker.py?raw'
 import session from '../../../spine/stream/01-kafka/session.txt?raw'
@@ -11,7 +12,7 @@ const offsets = [...session.matchAll(/^clicks:(\d+):(\d+)$/gm)].map(([, p, n]) =
 
 export const streamKafka: SceneModel = ideFrame({
   tree: streamTree(['compose.yaml', 'shopwave/tracker.py'], 'shopwave/tracker.py', ['shopwave/tracker.py']),
-  editor: { file: 'shopwave/tracker.py', code, highlight: [...linesFrom(code, 'visitor = F.coalesce', 'records = lines.select'), ...linesFrom(code, '(records.write.format("kafka")', '.option("topic", TOPIC).save())')] },
+  editor: { file: 'shopwave/tracker.py', code, ...view(code, 'def main('), highlight: [...linesFrom(code, 'visitor = F.coalesce', 'records = lines.select'), ...linesFrom(code, '(records.write.format("kafka")', '.option("topic", TOPIC).save())')] },
   session,
   side: [
     {
@@ -29,6 +30,7 @@ export const streamKafka: SceneModel = ideFrame({
         { id: 't-ret', cells: ['retention', 'kept for days, read many times'] },
       ],
     },
+    { type: 'note', id: 'note', tone: 'ingest', text: 'Kafka keeps records after they are read: Spark, a fraud check and an archive can each read the same topic, at their own offsets.' },
   ],
   edges: [
     { from: 'k-producer', to: 'k-topic' },

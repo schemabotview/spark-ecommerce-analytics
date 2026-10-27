@@ -249,15 +249,15 @@ drawn from small CSVs the scripts write (`capture`), so every point is real.
 
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | Kafka | the tracker now publishes to a topic | producer → topic partitions → consumer |
-| 2 | `readStream` | bytes → `from_json` with our schema | a Kafka record → a row |
-| 3 | ◆ full scene: micro-batches | concept + lab (progress JSON: offsets, batch durations) | trigger → offsets → batch → sink → checkpoint |
-| 4 | Exactly once into Delta | kill the query mid-batch, restart: no duplicates | checkpoint + Delta commit = once |
-| 5 | Live revenue | tumbling 1-minute windows | events dropping into windows |
-| 6 | Watermarks | late events: accepted, then dropped; state cleaned | timeline: event time vs watermark |
-| 7 | Streaming deduplication | `dropDuplicatesWithinWatermark` | state store of seen ids |
-| 8 | Stream-static joins | enrich clicks with `dim_product` (Delta) | stream ← static table |
-| 9 | Cart abandonment | stateful processing: cart with no checkout in 30 min → alert | one user's state over time |
+| 1 | Kafka | `compose.yaml` + Kafka (KRaft); `shopwave.tracker` publishes a day in arrival order: 897 events over 4 partitions | producer → topic partitions → consumer; Kafka in four words |
+| 2 | `readStream` | `stream.kafka` + `stream.clicks`: bytes → `from_json` with bronze's schema; `availableNow` | a Kafka record → a row; read per partition |
+| 3 | ◆ full scene: micro-batches | concept + lab (`recentProgress`: 4 batches of ≤ 300, end offsets; the checkpoint's folders) | trigger → offsets → batch → sink → commits |
+| 4 | Exactly once into Delta | a bug at offset 120: `STREAM_FAILED` with 298 written; restarted: 897, 893 distinct (the tracker's own copies) | checkpoint + Delta commit = once; delivery guarantees |
+| 5 | Live revenue | `revenue_per`: tumbling 1-hour windows of event time, complete mode | one purchase into its window; the busiest hours; output modes |
+| 6 | Watermarks | 3 days, 2-hour watermark, append: 75 final hours, 8 late events dropped, 3 windows open | the watermark's rule; the run's counts |
+| 7 | Streaming deduplication | `dropDuplicatesWithinWatermark`: 3,034 read, 13 copies, 8 late, 3,013 kept, 65 ids in state | state store of seen ids; which dedupe |
+| 8 | Stream-static joins | `with_products`: items joined to gold `dim_product`; counted by category (pivoted after: a stream cannot) | stream → static table → by category |
+| 9 | Cart abandonment | `abandoned_carts`: `session_window` 30 min, carted and not bought: 61 alerts, 4 visits still open | one visitor's session window; three kinds of window |
 
 **10. `ml` · Recommendations · 6**
 

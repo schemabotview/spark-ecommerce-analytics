@@ -29,7 +29,8 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 | 6 | `analytics` | 9 | authored, replayed, rendered, looked at; no audio |
 | 7 | `lakehouse` | 9 | authored, replayed, rendered, looked at; no audio |
 | 8 | `scale` | 8 | authored, replayed, rendered, looked at; no audio |
-| 9–11 | | 22 | not started |
+| 9 | `stream` | 9 | authored, replayed, rendered, looked at; no audio |
+| 10–11 | | 13 | in progress |
 
 The owner reviews everything at the end (2026-10-26: "do course by course till end").
 
@@ -92,6 +93,10 @@ replayed by `scripts/spine.py` exactly as in python-expense-tracker (`first` / `
   turns them off); a Python UDF's scan bytes are not counted (its reader runs in another thread),
   so 8.6 counts rows; a scan's metrics fill only on the plan that ran (`collect()` on the same
   DataFrame, 8.7); the event log dir must exist before the session starts (8.1).
+- **Kafka order is the tracker's job**: it publishes from ONE task, sorted by file then line, or
+  parallel tasks mix the days in every partition and a watermark drops whole days at random (9.7's
+  first run kept 1,017 of 3,034). A Kafka lab's `compose.yaml` holds Kafka only: PostgreSQL's init
+  fails on a lab's partial data (so does a memory lab's: 8.2 has no compose file).
 - **The terminal holds 13 rows at 80 columns**, wrapped lines counted. Spark tables are wide and
   tracebacks long: `show(3)`, `java -version 2>&1 | head -1`, errors caught and printed by condition.
 

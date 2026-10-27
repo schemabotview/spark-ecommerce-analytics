@@ -14,4 +14,5 @@ print(f"rank {als.rank}: {als.userFactors.count()} customer vectors, "
 guesses = model.transform(ratings).select(
     "customer_id", "product_id", "rating",
     F.round("prediction", 2).alias("prediction"))
-guesses.orderBy("customer_id", "product_id").show(4)
+(guesses.dropDuplicates(["customer_id", "product_id"])  # one row a pair
+ .orderBy("customer_id", "product_id").show(4))

@@ -1,12 +1,56 @@
 $ python -m shopwave.ml
 WARNING: Using incubator modules: jdk.incubator.vector
-gold/recommendations: 9165 rows, 1833 customers
+{"ts": "2026-10-27 08:17:36.922", "level": "ERROR", "logger": "SQLQueryContextLogger", "msg": "[UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `rating` cannot be resolved. Did you mean one of the following? [`base`, `product_id`, `customer_id`]. SQLSTATE: 42703", "context": {"errorClass": "UNRESOLVED_COLUMN.WITH_SUGGESTION"}, "exception": {"class": "Py4JJavaError", "msg": "An error occurred while calling o72.transform.\n: org.apache.spark.sql.AnalysisException: [UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `rating` cannot be resolved. Did you mean one of the following? [`base`, `product_id`, `customer_id`]. SQLSTATE: 42703; line 1 pos 37;\n'Project [customer_id#132L, product_id#131L, cast('rating as float) AS rating#134]\n+- SubqueryAlias sqltransformer_d9f473bed54c_624f4af7cd66\n   +- View (`SQLTransformer_d9f473bed54c_624f4af7cd66`, [product_id#131L, customer_id#132L, base#133])\n      +- LogicalRDD [product_id#131L, customer_id#132L, base#133], false\n\n\tat org.apache.spark.sql.errors.QueryCompilationErrors$.unresolvedAttributeError(QueryCompilationErrors.scala:432)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.org$apache$spark$sql$catalyst$analysis$CheckAnalysis$$failUnresolvedAttribute(CheckAnalysis.scala:244)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.$anonfun$checkAnalysis0$8(CheckAnalysis.scala:536)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.$anonfun$checkAnalysis0$8$adapted(CheckAnalysis.scala:534)\n\tat org.apache.spark.sql.catalyst.trees.TreeNode.foreachUp(TreeNode.scala:277)\n\tat org.apache.spark.sql.catalyst.trees.TreeNode.$anonfun$foreachUp$1(TreeNode.scala:276)\n\tat org.apache.spark.sql.catalyst.trees.TreeNode.$anonfun$foreachUp$1$adapted(TreeNode.scala:276)\n\tat scala.collection.immutable.Vector.foreach(Vector.scala:2125)\n\tat org.apache.spark.sql.catalyst.trees.TreeNode.foreachUp(TreeNode.scala:276)\n\tat org.apache.spark.sql.catalyst.trees.TreeNode.$anonfun$foreachUp$1(TreeNode.scala:276)\n\tat org.apache.spark.sql.catalyst.trees.TreeNode.$anonfun$foreachUp$1$adapted(TreeNode.scala:276)\n\tat scala.collection.immutable.Vector.foreach(Vector.scala:2125)\n\tat org.apache.spark.sql.catalyst.trees.TreeNode.foreachUp(TreeNode.scala:276)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.$anonfun$checkAnalysis0$7(CheckAnalysis.scala:534)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.$anonfun$checkAnalysis0$7$adapted(CheckAnalysis.scala:534)\n\tat scala.collection.immutable.List.foreach(List.scala:323)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.$anonfun$checkAnalysis0$2(CheckAnalysis.scala:534)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.$anonfun$checkAnalysis0$2$adapted(CheckAnalysis.scala:363)\n\tat org.apache.spark.sql.catalyst.trees.TreeNode.foreachUp(TreeNode.scala:277)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.checkAnalysis0(CheckAnalysis.scala:363)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.checkAnalysis0$(CheckAnalysis.scala:330)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.checkAnalysis0(Analyzer.scala:336)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.checkAnalysis(CheckAnalysis.scala:319)\n\tat org.apache.spark.sql.catalyst.analysis.CheckAnalysis.checkAnalysis$(CheckAnalysis.scala:306)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.checkAnalysis(Analyzer.scala:336)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.$anonfun$resolveInFixedPoint$1(HybridAnalyzer.scala:275)\n\tat scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)\n\tat org.apache.spark.sql.catalyst.QueryPlanningTracker$.withTracker(QueryPlanningTracker.scala:89)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.resolveInFixedPoint(HybridAnalyzer.scala:275)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.$anonfun$apply$1(HybridAnalyzer.scala:82)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.withTrackedAnalyzerBridgeState(HybridAnalyzer.scala:117)\n\tat org.apache.spark.sql.catalyst.analysis.resolver.HybridAnalyzer.apply(HybridAnalyzer.scala:75)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.runAnalysis$1(Analyzer.scala:368)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.$anonfun$executeAndCheck$2(Analyzer.scala:373)\n\tat org.apache.spark.sql.internal.SQLConf$.withExistingConf(SQLConf.scala:171)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.runWithSessionConf(Analyzer.scala:400)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.$anonfun$executeAndCheck$1(Analyzer.scala:373)\n\tat org.apache.spark.sql.catalyst.plans.logical.AnalysisHelper$.markInAnalyzer(AnalysisHelper.scala:423)\n\tat org.apache.spark.sql.catalyst.analysis.Analyzer.executeAndCheck(Analyzer.scala:373)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$lazyAnalyzed$2(QueryExecution.scala:200)\n\tat org.apache.spark.sql.catalyst.QueryPlanningTracker.measurePhase(QueryPlanningTracker.scala:148)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$executePhase$3(QueryExecution.scala:410)\n\tat org.apache.spark.sql.execution.QueryExecution.withQueryExecutionId(QueryExecution.scala:429)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$executePhase$2(QueryExecution.scala:410)\n\tat org.apache.spark.sql.execution.QueryExecution$.withInternalError(QueryExecution.scala:872)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$executePhase$1(QueryExecution.scala:409)\n\tat org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)\n\tat org.apache.spark.sql.execution.QueryExecution.executePhase(QueryExecution.scala:408)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$lazyAnalyzed$1(QueryExecution.scala:200)\n\tat scala.util.Try$.apply(Try.scala:217)\n\tat org.apache.spark.util.Utils$.doTryWithCallerStacktrace(Utils.scala:1407)\n\tat org.apache.spark.util.Utils$.getTryWithCallerStacktrace(Utils.scala:1457)\n\tat org.apache.spark.util.LazyTry.get(LazyTry.scala:61)\n\tat org.apache.spark.sql.execution.QueryExecution.$anonfun$analyzed$1(QueryExecution.scala:212)\n\tat org.apache.spark.sql.execution.QueryExecution.withAbortTransactionOnFailure(QueryExecution.scala:632)\n\tat org.apache.spark.sql.execution.QueryExecution.analyzed(QueryExecution.scala:212)\n\tat org.apache.spark.sql.execution.QueryExecution.assertAnalyzed(QueryExecution.scala:151)\n\tat org.apache.spark.sql.classic.Dataset$.$anonfun$ofRows$5(Dataset.scala:138)\n\tat org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)\n\tat org.apache.spark.sql.classic.Dataset$.ofRows(Dataset.scala:135)\n\tat org.apache.spark.sql.classic.SparkSession.$anonfun$sql$4(SparkSession.scala:611)\n\tat org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:810)\n\tat org.apache.spark.sql.classic.SparkSession.sql(SparkSession.scala:588)\n\tat org.apache.spark.sql.classic.SparkSession.sql(SparkSession.scala:616)\n\tat org.apache.spark.sql.classic.SparkSession.sql(SparkSession.scala:707)\n\tat org.apache.spark.sql.classic.SparkSession.sql(SparkSession.scala:92)\n\tat org.apache.spark.ml.feature.SQLTransformer.transformSchema(SQLTransformer.scala:86)\n\tat org.apache.spark.ml.PipelineStage.transformSchema(Pipeline.scala:72)\n\tat org.apache.spark.ml.feature.SQLTransformer.transform(SQLTransformer.scala:68)\n\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n\tat py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:244)\n\tat py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)\n\tat py4j.Gateway.invoke(Gateway.java:282)\n\tat py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)\n\tat py4j.commands.CallCommand.execute(CallCommand.java:79)\n\tat py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)\n\tat py4j.ClientServerConnection.run(ClientServerConnection.java:108)\n\tat java.base/java.lang.Thread.run(Thread.java:1583)\n", "stacktrace": [{"class": null, "method": "deco", "file": "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/errors/exceptions/captured.py", "line": "251"}, {"class": null, "method": "get_return_value", "file": "/home/ana/shopwave/.venv/lib/python3.14/site-packages/py4j/protocol.py", "line": "327"}]}}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ana/shopwave/shopwave/ml.py", line 81, in <module>
+    main()
+    ~~~~^^
+  File "/home/ana/shopwave/shopwave/ml.py", line 74, in main
+    top = recommend(*fit(every), every)
+  File "/home/ana/shopwave/shopwave/ml.py", line 63, in recommend
+    scored = predict(base, model, pairs).withColumn(
+             ~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/home/ana/shopwave/shopwave/ml.py", line 52, in predict
+    guess = model.transform(pairs.join(base, "product_id"))
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/ml/base.py", line 258, in transform
+    return self._transform(dataset)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/ml/pipeline.py", line 303, in _transform
+    dataset = t.transform(dataset)
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/ml/base.py", line 258, in transform
+    return self._transform(dataset)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/ml/util.py", line 269, in wrapped
+    return f(self, dataset)
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/ml/wrapper.py", line 434, in _transform
+    return DataFrame(self._java_obj.transform(dataset._jdf), dataset.sparkSession)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/py4j/java_gateway.py", line 1362, in __call__
+    return_value = get_return_value(
+        answer, self.gateway_client, self.target_id, self.name)
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/errors/exceptions/captured.py", line 257, in deco
+    raise converted from None
+pyspark.errors.exceptions.captured.AnalysisException: [UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `rating` cannot be resolved. Did you mean one of the following? [`base`, `product_id`, `customer_id`]. SQLSTATE: 42703; line 1 pos 37;
+'Project [customer_id#132L, product_id#131L, cast('rating as float) AS rating#134]
++- SubqueryAlias sqltransformer_d9f473bed54c_624f4af7cd66
+   +- View (`SQLTransformer_d9f473bed54c_624f4af7cd66`, [product_id#131L, customer_id#132L, base#133])
+      +- LogicalRDD [product_id#131L, customer_id#132L, base#133], false
 $ python -m explore.one_customer
 WARNING: Using incubator modules: jdk.incubator.vector
-customer 1 rated, on average: fashion 4.6★, electronics 4.4★, sports 3.0★, beauty 2.8★, home 2.7★, books 2.2★
-recommended:
-  1. Quill Headphones     electronics  4.47★
-  2. Merida Sunglasses    fashion      4.37★
-  3. Arbo Power Bank      electronics  4.31★
-  4. Nordlys Wall Clock   home         4.19★
-  5. Nordlys Keyboard     electronics  4.16★
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ana/shopwave/explore/one_customer.py", line 9, in <module>
+    top = spark.read.format("delta").load(ml.TOP).join(products, "product_id")
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/sql/readwriter.py", line 312, in load
+    return self._df(self._jreader.load(path))
+                    ~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/py4j/java_gateway.py", line 1362, in __call__
+    return_value = get_return_value(
+        answer, self.gateway_client, self.target_id, self.name)
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/errors/exceptions/captured.py", line 257, in deco
+    raise converted from None
+pyspark.errors.exceptions.captured.AnalysisException: [PATH_NOT_FOUND] Path does not exist: lake/gold/recommendations. SQLSTATE: 42K03

@@ -8,7 +8,8 @@ from shopwave.session import spark_session
 
 spark = spark_session()
 store = spark.sparkContext._jsc.sc().statusStore()
-executors = lambda: [e for e in store.executorList(True).toList()
+scala = lambda seq: [seq.apply(i) for i in range(seq.size())]  # a Seq
+executors = lambda: [e for e in scala(store.executorList(True))
                      if e.id() != "driver"]
 while len(executors()) < 2:  # executors start on the workers, then join
     time.sleep(0.5)
@@ -22,6 +23,6 @@ rows, stages = metrics.run(spark, "cluster", by_country.collect)
 print(f"{len(rows)} countries · stages: {len(stages)}")
 for s in stages:
     ran = store.taskList(s.stageId(), s.attemptId(), 1000)
-    hosts = sorted({t.executorId() for t in ran.toList()})
+    hosts = sorted({t.executorId() for t in scala(ran)})
     print(f"  stage {s.stageId()}: {s.numTasks()} tasks on executors "
           f"{', '.join(hosts)}")

@@ -18,9 +18,10 @@ random_train, random_test = ratings.randomSplit([0.75, 0.25], seed=2026)
 errors = {
     "everyone gets the average": test.withColumn("prediction", F.lit(mean)),
     "the product's average": test.join(product, "product_id"),
-    "ALS, split by time": ml.pipeline().fit(train).transform(test),
-    "ALS, split at random": ml.pipeline().fit(random_train)
-                              .transform(random_test),
+    "ALS alone": ml.pipeline().fit(train).transform(test),
+    "the average + ALS": ml.predict(*ml.fit(train), test),
+    "the same, split at random": ml.predict(*ml.fit(random_train),
+                                            random_test),
 }
 print("RMSE, in stars (lower is better):")
 for name, guesses in errors.items():

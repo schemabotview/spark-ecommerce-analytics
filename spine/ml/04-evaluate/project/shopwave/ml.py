@@ -1,6 +1,6 @@
 """Recommendations: what each customer would rate highly, learned from the
 stars they have already given."""
-from pyspark.ml import Pipeline
+from pyspark.ml import Pipeline, PipelineModel
 from pyspark.ml.feature import SQLTransformer
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import DataFrame, SparkSession
@@ -31,3 +31,21 @@ def split(ratings: DataFrame, day: str) -> tuple[DataFrame, DataFrame]:
     way the model will be used."""
     before = F.col("reviewed_at") < F.lit(day).cast("timestamp")
     return ratings.filter(before), ratings.filter(~before)
+
+
+def fit(ratings: DataFrame) -> tuple[DataFrame, PipelineModel]:
+    """ALS on what each product's average misses. Alone, ALS has no notion
+    of a good product or a generous customer: the average carries that, and
+    ALS learns each customer's taste on top of it."""
+    base = ratings.groupBy("product_id").agg(F.avg("rating").alias("base"))
+    left = ratings.join(base, "product_id").withColumn(
+        "rating", F.col("rating") - F.col("base"))
+    return base, pipeline().fit(left)
+
+
+def predict(base: DataFrame, model: PipelineModel,
+            pairs: DataFrame) -> DataFrame:
+    """Stars for (customer_id, product_id) pairs: the average + ALS."""
+    guess = model.transform(pairs.join(base, "product_id"))
+    return guess.withColumn("prediction",
+                            F.col("base") + F.col("prediction"))

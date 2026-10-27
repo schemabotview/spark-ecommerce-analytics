@@ -6,6 +6,6 @@ export function streamTree(files: string[], open: string, fresh: string[] = [], 
   return explorer({
     files: [...BASE, 'lake/', ...files],
     mark: { ...BASE_MARK, ...Object.fromEntries(fresh.map((f) => [f, 'new' as const])), [open]: 'active' },
-    note: { ...BASE_NOTE, 'lake/': 'Delta', 'compose.yaml': 'postgres + kafka', ...note },
+    note: { ...BASE_NOTE, 'lake/': 'Delta', 'compose.yaml': '+ kafka', ...note },
   })
 }
