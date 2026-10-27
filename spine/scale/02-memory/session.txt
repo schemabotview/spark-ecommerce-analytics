@@ -1,1 +1,10 @@
 $ python -m explore.memory
+WARNING: Using incubator modules: jdk.incubator.vector
+spark.driver.memory: 1g (default)
+JVM heap Spark sees:        1024 MB
+reserved:                    300 MB
+user memory (40%):           290 MB  your objects, UDF data
+unified (60%):               434 MB  execution + storage, shared
+  storage, protected:        217 MB  cached data
+  execution:                 217 MB  shuffles, joins, sorts
+the UI's storage memory:     434 MB

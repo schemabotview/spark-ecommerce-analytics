@@ -7,7 +7,7 @@ from pyspark.sql import SparkSession
 
 
 def spark_session(**conf: str) -> SparkSession:
-    """The session; `conf` adds settings for one job (dots as in Spark's names)."""
+    """The session; `conf` adds one job's settings, named as in Spark."""
     # PySpark also logs every error it raises (Spark's own: logs/spark.log).
     logging.getLogger("DataFrameQueryContextLogger").setLevel(logging.CRITICAL)
     builder = (

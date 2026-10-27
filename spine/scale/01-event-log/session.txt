@@ -1,2 +1,68 @@
 $ du -sh data/sf1/*
+71M	data/sf1/order_items
+93M	data/sf1/orders
+63M	data/sf1/payments
 $ python -m explore.event_log
+WARNING: Using incubator modules: jdk.incubator.vector
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ana/shopwave/explore/event_log.py", line 10, in <module>
+    spark = spark_session(**{
+        "spark.eventLog.enabled": "true",  # every event, as JSON lines
+    ...<2 lines>...
+        "spark.eventLog.compress": "false",  # readable as it is
+    })
+  File "/home/ana/shopwave/shopwave/session.py", line 30, in spark_session
+    return builder.getOrCreate()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/sql/session.py", line 559, in getOrCreate
+    sc = SparkContext.getOrCreate(sparkConf)
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/core/context.py", line 542, in getOrCreate
+    SparkContext(conf=conf or SparkConf())
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/core/context.py", line 207, in __init__
+    self._do_init(
+    ~~~~~~~~~~~~~^
+        master,
+        ^^^^^^^
+    ...<10 lines>...
+        memory_profiler_cls,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/core/context.py", line 300, in _do_init
+    self._jsc = jsc or self._initialize_context(self._conf._jconf)
+                       ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/core/context.py", line 448, in _initialize_context
+    return self._jvm.JavaSparkContext(jconf)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/py4j/java_gateway.py", line 1627, in __call__
+    return_value = get_return_value(
+        answer, self._gateway_client, None, self._fqn)
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/py4j/protocol.py", line 327, in get_return_value
+    raise Py4JJavaError(
+        "An error occurred while calling {0}{1}{2}.\n".
+        format(target_id, ".", name), value)
+py4j.protocol.Py4JJavaError: An error occurred while calling None.org.apache.spark.api.java.JavaSparkContext.
+: java.io.FileNotFoundException: File file:/home/ana/shopwave/logs/events does not exist
+	at org.apache.hadoop.fs.RawLocalFileSystem.deprecatedGetFileStatus(RawLocalFileSystem.java:980)
+	at org.apache.hadoop.fs.RawLocalFileSystem.getFileLinkStatusInternal(RawLocalFileSystem.java:1301)
+	at org.apache.hadoop.fs.RawLocalFileSystem.getFileStatus(RawLocalFileSystem.java:970)
+	at org.apache.hadoop.fs.FilterFileSystem.getFileStatus(FilterFileSystem.java:462)
+	at org.apache.spark.deploy.history.EventLogFileWriter.requireLogBaseDirAsDirectory(EventLogFileWriters.scala:83)
+	at org.apache.spark.deploy.history.SingleEventLogFileWriter.start(EventLogFileWriters.scala:237)
+	at org.apache.spark.scheduler.EventLoggingListener.start(EventLoggingListener.scala:83)
+	at org.apache.spark.SparkContext.<init>(SparkContext.scala:663)
+	at org.apache.spark.api.java.JavaSparkContext.<init>(JavaSparkContext.scala:59)
+	at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:247)
+	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)
+	at py4j.Gateway.invoke(Gateway.java:238)
+	at py4j.commands.ConstructorCommand.invokeConstructor(ConstructorCommand.java:80)
+	at py4j.commands.ConstructorCommand.execute(ConstructorCommand.java:69)
+	at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)
+	at py4j.ClientServerConnection.run(ClientServerConnection.java:108)
+	at java.base/java.lang.Thread.run(Thread.java:1583)

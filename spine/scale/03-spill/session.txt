@@ -1,1 +1,4 @@
 $ python -m explore.spill
+WARNING: Using incubator modules: jdk.incubator.vector
+default   tasks 8 · spilled      0 MB in memory,     0 MB on disk
+squeezed  tasks 8 · spilled    336 MB in memory,    54 MB on disk

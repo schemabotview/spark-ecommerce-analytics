@@ -1,12 +1,14 @@
 """Run one job on a year of data, then read what Spark wrote about it."""
 import glob
 import json
+import os
 
 from pyspark.sql import functions as F
 
 from shopwave import scale
 from shopwave.session import spark_session
 
+os.makedirs("logs/events", exist_ok=True)  # Spark will not create it
 spark = spark_session(**{
     "spark.eventLog.enabled": "true",  # every event, as JSON lines
     "spark.eventLog.dir": "logs/events",
