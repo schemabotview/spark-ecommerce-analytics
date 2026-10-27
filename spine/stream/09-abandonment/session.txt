@@ -1,1 +1,39 @@
 $ python -m explore.abandonment
+WARNING: Using incubator modules: jdk.incubator.vector
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ana/shopwave/explore/abandonment.py", line 14, in <module>
+    query.awaitTermination()
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/sql/streaming/query.py", line 227, in awaitTermination
+    return self._jsq.awaitTermination()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/py4j/java_gateway.py", line 1362, in __call__
+    return_value = get_return_value(
+        answer, self.gateway_client, self.target_id, self.name)
+  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/errors/exceptions/captured.py", line 257, in deco
+    raise converted from None
+pyspark.errors.exceptions.captured.StreamingQueryException: [STREAM_FAILED] Query [id = c25b5274-e02c-4368-93a8-32e78d706d72, runId = caa91726-1200-4e5c-b14a-028a5740df27] terminated with exception: [CAST_INVALID_INPUT] The value 'anon-bot-7f3a' of the type "STRING" cannot be cast to "BIGINT" because it is malformed. Correct the value as per the syntax, or change its target type. Use `try_cast` to tolerate malformed input and return NULL instead. SQLSTATE: 22018
+== DataFrame ==
+"coalesce" was called from
+java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+ SQLSTATE: XXKST
+=== Streaming Query ===
+Identifier: alerts [id = c25b5274-e02c-4368-93a8-32e78d706d72, runId = caa91726-1200-4e5c-b14a-028a5740df27]
+Current Committed Offsets: {}
+Current Available Offsets: {KafkaV2[Subscribe[clicks]]: {"clicks":{"0":161,"1":103,"2":130,"3":105}}}
+
+Current State: ACTIVE
+Thread State: RUNNABLE
+
+Logical Plan:
+WriteToMicroBatchDataSource MemorySink
++- ~Filter (carted#24 AND NOT bought#25)
+   +- ~Aggregate [coalesce(user_id#18L, cast(anon_id#19 as bigint)), session_window#40-T600000ms], [coalesce(user_id#18L, cast(anon_id#19 as bigint)) AS visitor#23L, session_window#40-T600000ms, max((event_type#17 = add_to_cart)) AS carted#24, max((event_type#17 = purchase)) AS bought#25, count(1) AS events#26L]
+      +- ~Filter isnotnull(event_ts#16-T600000ms)
+         +- ~Project [named_struct(start, precisetimestampconversion(precisetimestampconversion(event_ts#16-T600000ms, TimestampType, LongType), LongType, TimestampType), end, knownnullable(precisetimestampconversion(precisetimestampconversion(cast(event_ts#16-T600000ms + cast(30 minutes as interval) as timestamp), TimestampType, LongType), LongType, TimestampType))) AS session_window#40-T600000ms, event_id#15, event_ts#16-T600000ms, event_type#17, user_id#18L, anon_id#19, context#20, items#21, consent#22, partition#10, offset#11L]
+            +- ~EventTimeWatermark b0fb35c2-a9d3-48e9-81e2-f82672283f47, event_ts#16: timestamp, 10 minutes
+               +- ~Project [e#14.event_id AS event_id#15, e#14.event_ts AS event_ts#16, e#14.event_type AS event_type#17, e#14.user_id AS user_id#18L, e#14.anon_id AS anon_id#19, e#14.context AS context#20, e#14.items AS items#21, e#14.consent AS consent#22, partition#10, offset#11L]
+                  +- ~Project [from_json(StructField(event_id,StringType,false), StructField(event_ts,TimestampType,true), StructField(event_type,StringType,true), StructField(user_id,LongType,true), StructField(anon_id,StringType,true), StructField(context,StructType(StructField(device,StringType,true),StructField(device_type,StringType,true),StructField(browser,StringType,true),StructField(user_agent,StringType,true),StructField(campaign,StringType,true)),true), StructField(items,ArrayType(StructType(StructField(product_id,LongType,true),StructField(qty,IntegerType,true),StructField(price,DecimalType(10,2),true)),true),true), StructField(consent,StringType,true), cast(value#8 as string), Some(UTC), false) AS e#14, partition#10, offset#11L]
+                     +- ~StreamingDataSourceV2ScanRelation[key#7, value#8, topic#9, partition#10, offset#11L, timestamp#12, timestampType#13] KafkaTable

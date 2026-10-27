@@ -1,0 +1,2 @@
+{"lab": true, "venv": true, "volatile": ["digits"],
+ "generated": {"sf": 1, "from": "2026-01-01", "to": "2026-12-31", "only": ["orders", "order_items", "payments"], "dest": "data/sf1"}}

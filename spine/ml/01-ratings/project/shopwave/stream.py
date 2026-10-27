@@ -59,9 +59,10 @@ def with_products(events: DataFrame, products: DataFrame) -> DataFrame:
 def abandoned_carts(events: DataFrame, gap: str = "30 minutes") -> DataFrame:
     """Visits that put something in the cart and never bought: a visit is a
     session window, closed after `gap` without an event from that visitor."""
-    visitor = F.coalesce("user_id", "anon_id").alias("visitor")
+    visitor = F.coalesce(F.col("user_id").cast("string"), "anon_id")
     did = lambda kind: F.max(F.col("event_type") == kind)
-    visits = events.groupBy(visitor, F.session_window("event_ts", gap)).agg(
+    visits = events.groupBy(visitor.alias("visitor"),
+                            F.session_window("event_ts", gap)).agg(
         did("add_to_cart").alias("carted"), did("purchase").alias("bought"),
         F.count("*").alias("events"))
     return visits.filter("carted AND NOT bought")
