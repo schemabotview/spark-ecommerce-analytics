@@ -5,10 +5,11 @@ import session from '../../../spine/lakehouse/02-delta-log/session.txt?raw'
 
 // §2 — ◆ full scene: a Delta table on disk. Two commits; every file name, action and count is the lab's.
 const out = outputOf(session, 'python -m explore.delta_log')
-const [, parquet, logs] = out.match(/: (\d+) parquet files · _delta_log\/: (.+)/)!
-const commits = [...out.matchAll(/^(\d{20}\.json): (.+)\n {2}commitInfo: (\w+)\n {2}add (\S+) (\d+) rows, product_id (\d+)–(\d+)/gm)]
+const [, parquet, logs] = out.match(/: (\d+) parquet files · _delta_log\/: (\d+) commits/)!
+const commits = [...out.matchAll(/^(\d{20}\.json): (.+)\n {2}commitInfo: (\w+)\n {2}add (\S+)\s+(\d+) rows, product_id (\d+)–(\d+)/gm)]
   .map(([, name, actions, op, file, rows, lo, hi]) => ({ name, actions, op, file, rows, lo, hi }))
 const total = out.match(/rows now: (\d+)/)![1]
+const [, extra, extraRows] = out.match(/not in the log: (\d+) file, (\d+) rows/)!
 
 const chip = (id: string, title: string, tone?: Item['tone']): Item => ({ type: 'item', id, title, chip: true, tone })
 
@@ -25,7 +26,7 @@ export const lakehouseDeltaLog: SceneModel = {
           ],
         },
         {
-          type: 'group', id: 'log', badge: 2, title: '_delta_log/', sub: logs.split(', ').length + ' commits, numbered', icon: 'folder', tone: 'store', children: commits.map((c, i) => ({
+          type: 'group', id: 'log', badge: 2, title: '_delta_log/', sub: `${logs} commits, numbered from 0`, icon: 'folder', tone: 'store', children: commits.map((c, i) => ({
             type: 'group' as const, id: `c${i}`, title: c.name, sub: c.actions, children: [
               chip(`c${i}-op`, `commitInfo: ${c.op}`, 'store'),
               chip(`c${i}-add`, `add ${c.file} ${c.rows} rows`),
@@ -35,7 +36,8 @@ export const lakehouseDeltaLog: SceneModel = {
         },
         {
           type: 'group', id: 'data', badge: 3, title: 'out/dim_product/', sub: `${parquet} Parquet files`, icon: 'disk', tone: 'infra', children: [
-            { type: 'item', id: 'd-files', title: 'part-….parquet', sub: 'never changed in place, only added', icon: 'file' },
+            { type: 'item', id: 'd-files', title: 'part-*.parquet', sub: 'never changed in place, only added', icon: 'file' },
+            { type: 'item', id: 'd-extra', title: `${extra} file not in the log: ${extraRows} rows`, sub: 'a task wrote it; no commit added it', icon: 'file', tone: 'consume' },
             { type: 'item', id: 'd-read', title: `a reader: ${total} rows`, sub: 'the files the log adds, no others', icon: 'search' },
           ],
         },

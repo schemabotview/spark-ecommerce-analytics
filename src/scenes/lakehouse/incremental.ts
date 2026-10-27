@@ -25,6 +25,13 @@ export const lakehouseIncremental: SceneModel = ideFrame({
       type: 'table', id: 'runs', title: 'Three runs of the same job', tone: 'store', columns: ['arguments', 'added', 'in all'],
       rows: runs.map((r, i) => ({ id: `r${i}`, cells: [r.args, `+${r.added}`, r.total], tone: r.added === '0' ? 'store' as const : undefined })),
     },
+    {
+      type: 'table', id: 'ways', title: 'Ways to find what is new', tone: 'ingest', columns: ['way', 'works when'], rows: [
+        { id: 'w-mark', cells: ['a high-water mark', 'rows are only added'], tone: 'store' },
+        { id: 'w-cdc', cells: ['a change feed (§5)', 'rows change after landing'] },
+        { id: 'w-full', cells: ['rebuild everything', 'the table is small'] },
+      ],
+    },
     { type: 'note', id: 'note', tone: 'store', text: 'Run it twice and the second run adds nothing: the mark is read from the table itself, so a job that crashed or ran again never loads a day twice.' },
   ],
   edges: [

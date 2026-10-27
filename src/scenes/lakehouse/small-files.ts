@@ -29,6 +29,7 @@ export const lakehouseSmallFiles: SceneModel = ideFrame({
       type: 'group', id: 'steps', title: 'Compaction, then clean-up', icon: 'layers', tone: 'ingest', children: [
         { type: 'item', id: 's-opt', title: `OPTIMIZE: ${removed} files → ${added}`, sub: 'one commit: removes the small, adds the big', icon: 'layers' },
         { type: 'item', id: 's-vac', title: `VACUUM: ${deleted} files and folders deleted`, sub: 'what no version still needs; time travel to them ends', icon: 'disk' },
+        { type: 'item', id: 's-next', title: 'the next read opens 1 file', sub: 'not 31: the log lists only the big one', icon: 'search' },
         { type: 'item', id: 's-rows', title: `rows: still ${rows}`, sub: 'the table never changed, only its files', icon: 'check', tone: 'store' },
       ],
     },
@@ -36,6 +37,7 @@ export const lakehouseSmallFiles: SceneModel = ideFrame({
   ],
   edges: [
     { from: 's-opt', to: 's-vac' },
-    { from: 's-vac', to: 's-rows' },
+    { from: 's-vac', to: 's-next' },
+    { from: 's-next', to: 's-rows' },
   ],
 })

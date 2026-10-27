@@ -1,6 +1,7 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, lineOf, linesFrom } from '../ide'
 import { outputOf } from '../lab'
+import { view } from '../fold'
 import { lakeTree } from './tree'
 import code from '../../../spine/lakehouse/01-broken-overwrite/project/explore/overwrite.py?raw'
 import session from '../../../spine/lakehouse/01-broken-overwrite/session.txt?raw'
@@ -14,13 +15,14 @@ const left = outputOf(session, 'ls -A lake/gold/fact_sales | wc -l').trim()
 
 export const lakehouseBrokenOverwrite: SceneModel = ideFrame({
   tree: lakeTree(['explore/overwrite.py'], 'explore/overwrite.py', ['explore/overwrite.py'], { 'lake/gold/': 'Parquet folders' }),
-  editor: { file: 'explore/overwrite.py', code, highlight: [...linesFrom(code, 'broken = sales', '.otherwise('), lineOf(code, 'broken.write.mode')] },
+  editor: { file: 'explore/overwrite.py', code, ...view(code, 'path = "lake/gold'), highlight: [...linesFrom(code, 'broken = sales', '.otherwise('), lineOf(code, 'broken.write.mode')] },
   session,
   side: [
     {
       type: 'group', id: 'mid', title: 'lake/gold/fact_sales, mid-write', icon: 'folder', tone: 'ingest', children: [
         { type: 'item', id: 'm-old', title: `${before} rows in part files`, sub: 'the table every report reads', icon: 'file' },
         { type: 'item', id: 'm-del', title: 'overwrite: the old files deleted first', sub: 'before a single new row is written', icon: 'disk' },
+        { type: 'item', id: 'm-write', title: 'tasks write new part files', sub: 'readers see whatever has landed', icon: 'cpu' },
         { type: 'item', id: 'm-fail', title: `a task fails: ${failed}`, sub: 'December’s rows hit the bug', icon: 'zap', tone: 'consume' },
         { type: 'item', id: 'm-empty', title: `${left} files left`, sub: 'the half-written ones cleaned away too', icon: 'folder', tone: 'consume' },
       ],
@@ -36,7 +38,8 @@ export const lakehouseBrokenOverwrite: SceneModel = ideFrame({
   ],
   edges: [
     { from: 'm-old', to: 'm-del' },
-    { from: 'm-del', to: 'm-fail' },
+    { from: 'm-del', to: 'm-write' },
+    { from: 'm-write', to: 'm-fail' },
     { from: 'm-fail', to: 'm-empty' },
   ],
 })

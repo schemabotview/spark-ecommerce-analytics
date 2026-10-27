@@ -1,4 +1,5 @@
 """Rebuild gold.fact_sales in place, and let the job fail halfway: Delta."""
+from delta.tables import DeltaTable
 from py4j.protocol import Py4JJavaError
 from pyspark.sql import functions as F
 
@@ -22,7 +23,6 @@ try:
 except Py4JJavaError as e:  # Delta's writer raises the JVM's error as it is
     print("the job failed:", e.java_exception.getCondition())
 
-print("after:", read().count(), "rows")
-history = spark.sql(f"DESCRIBE HISTORY delta.`{path}`")
-for h in history.orderBy("version").collect():
-    print(f"  version {h.version}: {h.operation}")
+history = DeltaTable.forPath(spark, path).history().orderBy("version")
+print("after:", read().count(), "rows · versions:", ", ".join(
+    f"{h.version} {h.operation}" for h in history.collect()))

@@ -29,6 +29,13 @@ export const lakehouseScd2: SceneModel = ideFrame({
         { type: 'item', id: 'r-asof', title: `as-of join: ${checked} of ${sales} sales`, sub: `price on the day wrong: ${wrong}`, icon: 'check', tone: 'store' },
       ],
     },
+    {
+      type: 'table', id: 'types', title: 'When a price changes', tone: 'ingest', columns: ['', 'type 1', 'type 2'], rows: [
+        { id: 'y-row', cells: ['the row', 'updated', 'closed; a new one added'] },
+        { id: 'y-old', cells: ['the old price', 'gone', 'kept, with its dates'] },
+        { id: 'y-join', cells: ['a join', 'on product_id', '+ the day in range'], tone: 'store' },
+      ],
+    },
     { type: 'note', id: 'note', tone: 'store', text: 'Type 1 overwrites the price and forgets. Type 2 keeps a row per price, so a sale in March is joined to March’s price, not today’s.' },
   ],
 })

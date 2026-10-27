@@ -27,7 +27,8 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 | 4 | `clean` | 8 | authored, replayed, rendered, looked at; no audio |
 | 5 | `model` | 9 | authored, replayed, rendered, looked at; no audio |
 | 6 | `analytics` | 9 | authored, replayed, rendered, looked at; no audio |
-| 7–11 | | 39 | not started |
+| 7 | `lakehouse` | 9 | authored, replayed, rendered, looked at; no audio |
+| 8–11 | | 30 | not started |
 
 The owner reviews everything at the end (2026-10-26: "do course by course till end").
 
@@ -83,6 +84,9 @@ replayed by `scripts/spine.py` exactly as in python-expense-tracker (`first` / `
   `["uuid"]` for a part file's name (2.5) leaves revenue numbers checked; `["digits"]` (2.6) for
   which row a task trips on and the log's times. A scene reads such values from the session;
   narration never says them.
+- **Delta paths in SQL need `DeltaTable`**: `DESCRIBE HISTORY delta.`lake/...`` does not resolve a
+  relative path (Delta 4.4.1); the scripts use `DeltaTable.forPath(...).history()`. A failed Delta
+  write raises `Py4JJavaError`, so scripts catch it and print `e.java_exception.getCondition()`.
 - **The terminal holds 13 rows at 80 columns**, wrapped lines counted. Spark tables are wide and
   tracebacks long: `show(3)`, `java -version 2>&1 | head -1`, errors caught and printed by condition.
 

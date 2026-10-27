@@ -222,15 +222,15 @@ drawn from small CSVs the scripts write (`capture`), so every point is real.
 
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | Why folders of Parquet break | a failed overwrite; a reader sees half a table | the folder mid-write |
-| 2 | ◆ full scene: a Delta table | concept + lab (`_delta_log` JSON, a checkpoint) | data files + transaction log; a commit as one atomic file |
-| 3 | Converting the lake | bronze/silver/gold become Delta tables | `CONVERT TO DELTA`; the log's first version |
-| 4 | Incremental loads | only new rows since the last `updated_at` | yesterday's high-water mark → today's batch |
-| 5 | CDC with `MERGE` | order status change events upserted | source rows → matched (update) / not matched (insert) |
-| 6 | SCD Type 2 | product price history: `is_current`, `valid_from`, `valid_to` | one product's price rows over time |
-| 7 | Time travel and restore | a bad load, `versionAsOf`, `RESTORE` | the version history, one rolled back |
-| 8 | Schema enforcement and evolution | a write with a wrong type refused; a new column allowed | refused vs evolved |
-| 9 | Small files and layout | `OPTIMIZE`, clustering, `VACUUM`; measured | plot: files and query time before vs after |
+| 1 | Why folders of Parquet break | `explore.overwrite`: a December row raises mid-overwrite; 35,043 rows → `UNABLE_TO_INFER_SCHEMA`, 0 files left | the folder mid-write; what a reader sees |
+| 2 | ◆ full scene: a Delta table | concept + lab (`explore.delta_log`: two commits' actions and stats; 6 files on disk, 5 added) | writes → `_delta_log/` → data files; the file no commit added |
+| 3 | Converting the lake | `delta-spark` + jars + the session's extension; gold writes Delta; the same failed overwrite leaves 35,043 rows; `CONVERT TO DELTA` on bronze orders (365 files kept) | Parquet vs Delta after the failure; what Delta needed; the convert |
+| 4 | Incremental loads | `lake.load_orders`: max(`order_date`) as the mark; +17,944, +2,080, +0 | the mark → new rows → one commit; the three runs |
+| 5 | CDC with `MERGE` | a week of `order_changes`: 1,976 changes, 537 orders twice → refused; `latest` then MERGE: 1,439 updated | latest → matched and newer → one commit; status before / after |
+| 6 | SCD Type 2 | `lake.price_history`: 66 rows, 8 repriced; an as-of join over every sale: 0 wrong | one product's price rows over time; type 1 vs 2 |
+| 7 | Time travel and restore | overwrite instead of append: 20,024 → 47; `versionAsOf=1`; `restoreToVersion` → version 3 | the version history, one rolled back |
+| 8 | Schema enforcement and evolution | a string `total` and a new column refused; `mergeSchema` adds `channel` (old rows null) | refused vs evolved; the options |
+| 9 | Small files and layout | 31 daily appends → 31 files; `OPTIMIZE` → 1; `VACUUM(0)` deletes the rest; rows unchanged (clustering is narrated, not run) | files in the table vs on disk, per step |
 
 **8. `scale` · The full year, measured · 8**
 

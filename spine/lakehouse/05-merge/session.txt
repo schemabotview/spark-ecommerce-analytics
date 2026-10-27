@@ -4,4 +4,4 @@ feed: 1976 changes · 537 orders changed twice
 MERGE as it comes: DELTA_MULTIPLE_SOURCE_ROW_MATCHING_TARGET_ROW_IN_MERGE
 status before: {'cancelled': 616, 'paid': 18014, 'placed': 1394}
 MERGE latest per order: 1439 orders updated
-status after:  {'shipped': 186, 'cancelled': 616, 'paid': 16575, 'delivered': 1253, 'placed': 1394}
+status after:  {'cancelled': 616, 'delivered': 1253, 'paid': 16575, 'placed': 1394, 'shipped': 186}

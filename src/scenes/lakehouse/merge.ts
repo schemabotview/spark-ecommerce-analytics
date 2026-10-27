@@ -16,7 +16,7 @@ const [before, after] = [status('status before:'), status('status after:')]
 const states = [...new Set([...Object.keys(before), ...Object.keys(after)])]
 
 export const lakehouseMerge: SceneModel = ideFrame({
-  tree: lakeTree(['shopwave/lake.py', 'explore/merge.py', 'data/raw/order_changes/'], 'shopwave/lake.py', ['explore/merge.py', 'data/raw/order_changes/'], { 'data/raw/order_changes/': 'the change feed' }),
+  tree: lakeTree(['shopwave/lake.py', 'explore/merge.py', 'data/raw/order_changes/'], 'shopwave/lake.py', ['explore/merge.py', 'data/raw/order_changes/']),
   editor: { file: 'shopwave/lake.py', code, ...view(code, 'def latest(', 'return orders.history(1)'), highlight: [...linesFrom(code, 'newest = Window', '.filter("n = 1")'), ...linesFrom(code, '(orders.alias("o").merge', '.execute())')] },
   session,
   side: [
@@ -31,7 +31,14 @@ export const lakehouseMerge: SceneModel = ideFrame({
       type: 'table', id: 'status', title: 'gold/orders by status', tone: 'store', columns: ['status', 'before', 'after'],
       rows: states.map((s) => ({ id: `s-${s}`, cells: [s, before[s] ?? '—', after[s] ?? '—'], tone: before[s] !== after[s] ? 'store' as const : undefined })),
     },
-    { type: 'note', id: 'note', tone: 'consume', text: `Merged as it comes, the feed fails with ${refused}: two changes to one order, and Delta will not guess which wins.` },
+    {
+      type: 'table', id: 'clauses', title: 'A MERGE’s clauses', tone: 'ingest', columns: ['clause', 'here'], rows: [
+        { id: 'k-upd', cells: ['whenMatchedUpdate', 'a newer status'], tone: 'store' },
+        { id: 'k-ins', cells: ['whenNotMatchedInsert', 'not needed: loaded in §4'] },
+        { id: 'k-del', cells: ['whenMatchedDelete', 'for a deleted row'] },
+      ],
+    },
+    { type: 'note', id: 'note', tone: 'consume', text: `Merged as it comes, the feed fails with ${refused.replaceAll('_', '_\u200b')}: two changes to one order, and Delta will not guess which wins.` },
   ],
   edges: [
     { from: 'f-latest', to: 'f-match' },
