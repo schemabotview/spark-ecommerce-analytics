@@ -1,4 +1,11 @@
 $ docker compose --progress quiet up -d --wait
 $ docker compose exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic clicks --partitions 4
+Created topic clicks.
 $ python -m shopwave.tracker 2026-10-01
+WARNING: Using incubator modules: jdk.incubator.vector
+published 897 events to clicks
 $ docker compose exec kafka /opt/kafka/bin/kafka-get-offsets.sh --bootstrap-server localhost:9092 --topic clicks
+clicks:0:289
+clicks:1:185
+clicks:2:234
+clicks:3:189

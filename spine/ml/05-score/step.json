@@ -1,0 +1,2 @@
+{"from": "ml/04-evaluate", "changes": ["shopwave/ml.py", "explore/one_customer.py"], "venv": true,
+ "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

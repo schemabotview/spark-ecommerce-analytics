@@ -1,0 +1,33 @@
+"""A filter Spark can see, and the same filter hidden in a Python UDF."""
+from pyspark.sql import functions as F
+from pyspark.sql.types import BooleanType
+
+from shopwave import metrics, schemas, scale
+from shopwave.session import spark_session
+
+# Row-at-a-time Python UDFs: the Arrow-batched kind (Spark 4's default) stalls
+# on this scan in Spark 4.2.0, found while building this step.
+arrow = "spark.sql.execution.pythonUDF.arrow.enabled"
+spark = spark_session(**{arrow: "false"})
+orders = spark.read.csv(f"{scale.SF1}/orders/", header=True,
+                        schema=schemas.ORDERS)
+# A year, columnar, sorted by country: each file's min/max then says which
+# countries it holds, so a filter Spark can see skips the other files.
+orders.orderBy("country").write.mode("overwrite").parquet("out/orders")
+orders = spark.read.parquet("out/orders")
+
+
+@F.udf(BooleanType())
+def is_german(country):
+    return country == "DE"
+
+
+queries = {"built-in": orders.filter(F.col("country") == "DE"),
+           "Python UDF": orders.filter(is_german("country"))}
+for name, q in queries.items():
+    q = q.select("order_id", "total")
+    n, stages = metrics.run(spark, name, q.count)
+    plan = q._jdf.queryExecution().executedPlan().toString()
+    pushed = plan.split("PushedFilters: ")[1].split("]")[0] + "]"
+    read = sum(s.inputRecords() for s in stages)
+    print(f"{name:10} {n} rows · read {read:7} · pushed {pushed}")

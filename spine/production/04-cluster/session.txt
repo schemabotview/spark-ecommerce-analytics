@@ -1,0 +1,4 @@
+$ ./cluster.sh start
+$ zip -qr shopwave.zip shopwave
+$ spark-submit --properties-file conf/cluster.conf explore/on_cluster.py
+$ ./cluster.sh stop

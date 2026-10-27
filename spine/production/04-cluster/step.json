@@ -1,0 +1,2 @@
+{"from": "production/03-checks", "changes": ["shopwave/session.py", "cluster.sh", "conf/cluster.conf", "explore/on_cluster.py"], "venv": true, "volatile": ["digits"],
+ "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

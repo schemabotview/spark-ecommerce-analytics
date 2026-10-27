@@ -1,0 +1,2 @@
+{"from": "production/04-cluster", "changes": ["shopwave/daily.py"], "venv": true,
+ "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

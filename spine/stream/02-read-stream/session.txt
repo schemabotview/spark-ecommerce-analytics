@@ -1,1 +1,13 @@
 $ python -m explore.read_stream
+WARNING: Using incubator modules: jdk.incubator.vector
+streaming: True
+a record: key:binary, value:binary, topic:string, partition:int, offset:bigint
+events read: 897
++---------+-----+
+|partition|count|
++---------+-----+
+|        0|  289|
+|        1|  185|
+|        2|  234|
+|        3|  189|
++---------+-----+

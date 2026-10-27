@@ -1,0 +1,3 @@
+$ python -m shopwave.jobs
+$ python -m shopwave.jobs run gold
+$ python -m shopwave.jobs run nothing

@@ -56,6 +56,14 @@ def verify(world: World) -> int:
     twice = sum(1 for n in paid.values() if n > 1)
     check(0 < unpaid < 4 * UNPAID_RATE, f'unpaid orders: {unpaid:.1%}', f'unpaid orders: {unpaid:.1%}')
     check(twice > 0 or DOUBLE_PAID_RATE * len(orders) < 1, f'orders paid twice: {twice}', 'no order is paid twice')
+    category = {p['product_id']: p['category'] for p in world.products()}
+    liked, disliked = [], []
+    for rv in (rv for d in SAMPLE for rv in world.reviews_on(d)):
+        t = world.taste(rv['customer_id'])[category[rv['product_id']]]
+        (liked if t > 1 else disliked if t < -1 else []).append(rv['rating'])
+    gap = statistics.mean(liked) - statistics.mean(disliked) if liked and disliked else 0
+    check(gap > 1.5, f'taste: a favourite category rated {gap:.1f} stars above a disliked one',
+          f'taste is too weak in the reviews: {gap:.1f} stars between liked and disliked')
     currencies = sorted({p['currency'] for d in SAMPLE for p in world.day(d)['payments']})
     check(len(currencies) >= 3, f'payment currencies: {", ".join(currencies)}', f'payments in only {currencies}')
 

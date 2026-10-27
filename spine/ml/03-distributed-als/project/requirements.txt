@@ -1,0 +1,4 @@
+pyspark==4.2.0
+pandas==2.3.3  # pandas UDFs: Spark hands Python whole columns
+pyarrow==26.0.0  # ... in Arrow format, without converting row by row
+delta-spark==4.4.1  # Delta Lake: its Python API (its jars: jars.txt)

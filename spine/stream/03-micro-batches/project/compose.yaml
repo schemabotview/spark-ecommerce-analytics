@@ -1,19 +1,5 @@
-# The shop's database (customers, products) and, from Course 9, Kafka.
+# Kafka: one broker for the lab.
 services:
-  postgres:
-    image: postgres:17
-    environment:
-      POSTGRES_DB: shop
-      POSTGRES_USER: shopwave
-      POSTGRES_PASSWORD: shopwave
-    ports: ["5432:5432"]
-    volumes:
-      - ./db:/docker-entrypoint-initdb.d:ro
-      - ./data/raw:/data:ro
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "shopwave", "-d", "shop"]
-      interval: 1s
-      retries: 30
   kafka:  # one broker that is also its own controller (KRaft, no ZooKeeper)
     image: apache/kafka:4.1.1
     ports: ["9092:9092"]

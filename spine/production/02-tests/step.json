@@ -1,0 +1,1 @@
+{"from": "production/01-jobs", "changes": ["requirements.txt", "tests/conftest.py", "tests/test_transforms.py"], "venv": true, "volatile": ["digits"]}

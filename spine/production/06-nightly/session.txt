@@ -1,0 +1,3 @@
+$ python -m shopwave.jobs nightly
+$ ls lake/gold
+$ tail -2 logs/nightly.log

@@ -1,0 +1,2 @@
+$ python -m shopwave.ml
+$ python -m explore.one_customer

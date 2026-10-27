@@ -13,6 +13,7 @@ Same seed and SF → byte-identical files. Layout under --out:
   clickstream/<day>/events-<hh>.jsonl  by ARRIVAL hour: late and duplicate events included
   returns/returns-<yyyy-mm>.csv      the warehouse's monthly file: Latin-1, with malformed rows
   order_changes/changes-<day>.jsonl  the shop database's change feed (CDC): shipped, delivered
+  reviews/reviews-<day>.csv          star ratings of that day's paid order lines (Course 10)
 """
 from __future__ import annotations
 
@@ -27,7 +28,7 @@ from pathlib import Path
 from .model import CAMPAIGNS, FIRST, LAST, RETURNS_BAD_ROWS, SCHEMA_CHANGE, World, days, rng
 
 TABLES = ['customers', 'products', 'product_prices', 'fx_rates', 'campaigns', 'orders', 'order_items', 'payments',
-          'clickstream', 'returns', 'order_changes']
+          'clickstream', 'returns', 'order_changes', 'reviews']
 
 
 def ts(t) -> str:
@@ -87,6 +88,10 @@ def write(world: World, out: Path, first: date, last: date, only: set[str]) -> N
             path = out / 'order_changes' / f'changes-{d}.jsonl'
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('\n'.join(lines) + '\n' if lines else '')
+        if want('reviews'):
+            rows = world.reviews_on(d)
+            if rows:
+                write_csv(out / 'reviews' / f'reviews-{d}.csv', rows)
         if want('clickstream'):
             hours: dict[int, list[str]] = {}
             for arrived, e in world.events_arriving(d):

@@ -46,6 +46,8 @@ UNPAID_RATE = 0.01  # orders with no payment
 DOUBLE_PAID_RATE = 0.003  # orders paid twice
 RETURNS_BAD_ROWS = 3  # malformed rows per monthly returns file (Latin-1)
 PRICE_CHANGE_SHARE = 0.2  # products whose price changes during the year
+REVIEW_RATE = 0.3  # paid order lines the customer rates, 1-5 stars (Course 10)
+TASTE = 1.3  # stars a customer adds to their favourite category, and takes from one they dislike
 
 COUNTRIES = ['DE', 'FR', 'NL', 'ES', 'IT', 'GB', 'IE', 'BE', 'AT', 'PL', 'SE', 'IN', 'US']
 COUNTRY_W = [24, 16, 9, 9, 9, 10, 3, 4, 3, 4, 3, 3, 3]
@@ -317,6 +319,36 @@ class World:
                             seconds=r.randrange(6 * 3600, 20 * 3600))
                         out.append({'op': 'u', 'order_id': o['order_id'], 'status': status, 'changed_at': at})
         out.sort(key=lambda c: (c['changed_at'], c['order_id']))
+        return out
+
+    @cache
+    def taste(self, customer_id: int) -> dict[str, float]:
+        """Stars a customer adds to each category: one favourite, one disliked, the rest near 0.
+        It shows in their ratings, not in what they buy, so only a model of the ratings finds it."""
+        r = rng(self.seed, 'taste', customer_id)
+        favourite, disliked = r.sample(sorted(CATEGORIES), 2)
+        return {c: TASTE if c == favourite else -TASTE if c == disliked else r.gauss(0, 0.3)
+                for c in sorted(CATEGORIES)}
+
+    @cache
+    def quality(self, product_id: int) -> float:
+        return rng(self.seed, 'quality', product_id).gauss(0, 0.5)
+
+    def reviews_on(self, d: date) -> list[dict]:
+        """Ratings for the paid order lines of day d, given 2-14 days later. Its own random stream:
+        reading the day's orders draws nothing from theirs, so no other table changes."""
+        r = rng(self.seed, 'reviews', d.isoformat())
+        category = {p['product_id']: p['category'] for p in self.products()}
+        orders = {o['order_id']: o for o in self.day(d)['orders'] if o['status'] == 'paid'}
+        out = []
+        for i in self.day(d)['order_items']:
+            o = orders.get(i['order_id'])
+            if o is None or r.random() >= REVIEW_RATE:
+                continue
+            stars = 3.4 + self.taste(o['customer_id'])[category[i['product_id']]] + self.quality(i['product_id'])
+            out.append({'review_id': f'rv{i["order_id"]:08d}{i["line"]}', 'customer_id': o['customer_id'],
+                        'product_id': i['product_id'], 'rating': min(5, max(1, round(stars + r.gauss(0, 0.6)))),
+                        'reviewed_at': o['order_ts'] + timedelta(days=r.randrange(2, 15), seconds=r.randrange(86400))})
         return out
 
     @cache

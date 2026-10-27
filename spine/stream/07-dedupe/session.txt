@@ -1,1 +1,4 @@
 $ python -m explore.stream_dedupe
+WARNING: Using incubator modules: jdk.incubator.vector
+read 3034 · kept 3013 · distinct ids 3013 · copies dropped 13
+ids held in state: 65

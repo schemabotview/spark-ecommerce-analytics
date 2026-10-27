@@ -1,0 +1,4 @@
+$ python -m shopwave.daily 2026-10-05
+$ python -m shopwave.daily 2026-10-05
+$ python -m shopwave.daily 2026-10-01 2026-10-07
+$ python -m shopwave.daily 2026-10-01 2026-10-07

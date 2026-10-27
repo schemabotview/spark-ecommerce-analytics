@@ -1,1 +1,9 @@
 $ python -m explore.micro_batches
+WARNING: Using incubator modules: jdk.incubator.vector
+batch 0: 298 rows · read up to p0:96, p1:61, p2:78, p3:63
+batch 1: 299 rows · read up to p0:192, p1:123, p2:156, p3:126
+batch 2: 299 rows · read up to p0:288, p1:185, p2:234, p3:189
+batch 3:   1 rows · read up to p0:289, p1:185, p2:234, p3:189
+checkpoint/: .metadata.crc, commits, metadata, offsets, sources
+offsets/: .0.crc, .1.crc, .2.crc, .3.crc, 0, 1, 2, 3
+commits/: .0.crc, .1.crc, .2.crc, .3.crc, 0, 1, 2, 3

@@ -14,8 +14,8 @@ query = (once.writeStream.format("memory").queryName("once")
 query.awaitTermination()
 read = sum(p["numInputRows"] for p in query.recentProgress)
 kept = spark.table("once")
-dupes = sum(p["stateOperators"][0].get("numDroppedDuplicateRows", 0)
-            for p in query.recentProgress)
+state = [p["stateOperators"][0] for p in query.recentProgress]
+dupes = sum(s["customMetrics"]["numDroppedDuplicateRows"] for s in state)
 print(f"read {read} · kept {kept.count()} · distinct ids "
       f"{kept.select('event_id').distinct().count()} · copies dropped {dupes}")
 print("ids held in state:", query.recentProgress[-1]["stateOperators"][0]

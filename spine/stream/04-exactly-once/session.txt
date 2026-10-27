@@ -1,2 +1,7 @@
 $ python -m explore.exactly_once crash
+WARNING: Using incubator modules: jdk.incubator.vector
+the stream stopped: STREAM_FAILED
+in the table: 298 events, 297 distinct
 $ python -m explore.exactly_once
+WARNING: Using incubator modules: jdk.incubator.vector
+in the table: 897 events, 893 distinct

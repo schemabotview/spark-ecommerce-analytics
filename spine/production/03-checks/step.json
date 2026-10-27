@@ -1,0 +1,2 @@
+{"from": "production/02-tests", "changes": ["shopwave/checks.py", "shopwave/jobs.py"], "venv": true,
+ "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold"]}

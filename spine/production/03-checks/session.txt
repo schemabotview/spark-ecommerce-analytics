@@ -1,0 +1,2 @@
+$ python -m shopwave.checks; echo "exit code $?"
+$ SHOPWAVE_STRICT=1 python -m shopwave.checks; echo "exit code $?"
