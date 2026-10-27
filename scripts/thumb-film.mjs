@@ -70,6 +70,12 @@ function realCluster() {
   if (!cmdLine) throw new Error(`no spark-submit command in ${SESSIONS.cluster}`)
   const cmd = cmdLine.replace(/^\$ /, '')
 
+  // `master spark://127.0.0.1:7077 · 2 workers × 2 cores` — the cluster the diagram draws.
+  const start = lines.find((l) => /^master .*workers/.test(l))
+  if (!start) throw new Error('no "master … N workers × N cores" line in the cluster session')
+  const workers = +start.match(/(\d+)\s+workers/)[1]
+  const coresEach = +start.match(/×\s*(\d+)\s+cores/)[1]
+
   const master = (lines.find((l) => /^master:/.test(l)) ?? '').replace(/^master:\s*/, '')
   const ex = lines.find((l) => /^executors:/.test(l))
   if (!ex) throw new Error('no executors line in the cluster session')
@@ -84,7 +90,11 @@ function realCluster() {
   const rows = [...work.matchAll(/executor\s+(\d+)\s+ran\s+(\d+)/g)].map((m) => ({ id: m[1], tasks: +m[2] }))
   if (!rows.length) throw new Error('no per-executor counts in the cluster session')
   const top = Math.max(...rows.map((r) => r.tasks))
-  return { cmd, master, executors, cores, stages, tasks,
+  if (rows.length !== workers) {
+    throw new Error(`session reports ${workers} workers but ${rows.length} executor(s) ran — `
+      + 'the diagram draws one worker per executor and may not guess the difference')
+  }
+  return { cmd, master, executors, cores, stages, tasks, workers, coresEach,
            rows: rows.map((r) => ({ ...r, pct: Math.round((r.tasks / top) * 100) })) }
 }
 
@@ -108,8 +118,95 @@ const THEMES = {
            rule: 'rgba(0,0,0,.12)', glow: 'radial-gradient(120% 120% at 10% 8%, #ffffff 0%, #ece6df 70%)' },
 }
 
-function logoSvg() {
-  return readFileSync(join(repoDir, 'public', 'favicon.svg'), 'utf8').replace('<svg ', '<svg class="logo" ')
+/**
+ * The repo's own mark — NOT the Apache Spark logo. That is an ASF trademark, and the ASF permits a
+ * third party to use a project logo essentially only as a hyperlink to the project's own site; it
+ * also forbids a "confusingly similar" derivative, which rules out drawing our own fan shape. (The
+ * sister data-science repo *does* carry the real pandas logo: pandas publishes it under BSD-3, a
+ * copyright licence that says yes. Copyright and trademark are different questions.)
+ *
+ * So: a plain star — a spark, drawn by us, resembling nobody's mark.
+ */
+function markSvg(t) {
+  // A five-pointed star, drawn as a thick outline on a light tile: a spark, not Spark's fan mark.
+  // Round joins and a slight tilt keep it from reading as clip-art geometry.
+  const pts = Array.from({ length: 10 }, (_, i) => {
+    const a = ((-90 + i * 36 - 6) * Math.PI) / 180
+    const r = i % 2 === 0 ? 23 : 9.6
+    return `${(32 + r * Math.cos(a)).toFixed(2)},${(32 + r * Math.sin(a)).toFixed(2)}`
+  }).join(' ')
+  return `<svg class="logo" viewBox="0 0 64 64" role="img" aria-label="Apache Spark — GraphL"
+    xmlns="http://www.w3.org/2000/svg">
+    <rect width="64" height="64" rx="12" fill="#f7f5f2"/>
+    <polygon points="${pts}" fill="none" stroke="${t.accent}" stroke-width="6.4"
+      stroke-linejoin="round" stroke-linecap="round"/>
+  </svg>`
+}
+
+/**
+ * The canonical Spark picture — driver, cluster manager, worker nodes — but drawn from THIS run, not
+ * copied from the docs. Every label is the session's: the master URL, one worker box per worker it
+ * started, one Task box per core each was given, and the real tasks each executor ended up running.
+ * So the diagram a Spark user recognises at a glance is also a true report of the job in the course,
+ * including the lopsided 17/90 split that the honest version has to show.
+ */
+function archSvg(c, t) {
+  const VW = 1000, VH = 560
+  const MID = VH / 2
+  const mono = 'IBM Plex Mono, monospace'
+  const sans = 'IBM Plex Sans, system-ui, sans-serif'
+  const PURPLE = '#5b4a8f', PURPLE_IN = '#2b2347', GREEN = '#5a9e3d'
+
+  const label = (x, y, s, { size = 28, fill = '#ffffff', weight = 600, family = sans, anchor = 'start' } = {}) =>
+    `<text x="${x}" y="${y}" font-size="${size}" font-weight="${weight}" fill="${fill}"
+       font-family="${family}" text-anchor="${anchor}">${esc(s)}</text>`
+
+  const arrow = (x1, y1, x2, y2, both = false) => {
+    const a = Math.atan2(y2 - y1, x2 - x1), h = 15
+    const head = (x, y, dir) => `<polygon points="${x},${y} ${(x - h * Math.cos(dir - 0.42)).toFixed(1)},`
+      + `${(y - h * Math.sin(dir - 0.42)).toFixed(1)} ${(x - h * Math.cos(dir + 0.42)).toFixed(1)},`
+      + `${(y - h * Math.sin(dir + 0.42)).toFixed(1)}" fill="#ffffff" opacity=".75"/>`
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#ffffff" stroke-width="3.4"
+        opacity=".55"/>${head(x2, y2, a)}${both ? head(x1, y1, a + Math.PI) : ''}`
+  }
+
+  // driver ── cluster manager ── one worker box per worker the session actually started
+  const driver = `<rect x="6" y="${MID - 78}" width="232" height="156" rx="18" fill="${t.accent}"/>`
+    + label(122, MID - 32, 'Driver Program', { size: 30, fill: '#14100e', anchor: 'middle' })
+    + `<rect x="30" y="${MID - 6}" width="184" height="58" rx="12" fill="#ffffff"/>`
+    + label(122, MID + 33, 'SparkContext', { size: 27, fill: '#14100e', anchor: 'middle' })
+
+  const cm = `<rect x="330" y="${MID - 62}" width="236" height="124" rx="18" fill="${GREEN}"/>`
+    + label(448, MID - 14, 'Cluster Manager', { size: 29, anchor: 'middle' })
+    + label(448, MID + 28, c.master.replace(/^spark:\/\//, ''),
+        { size: 23, family: mono, weight: 400, anchor: 'middle', fill: 'rgba(255,255,255,.85)' })
+
+  const WX = 652, WW = 342, WH = 238
+  const workers = c.rows.map((r, i) => {
+    const y = i * (WH + 40) + 12
+    const hot = r.tasks === Math.max(...c.rows.map((x) => x.tasks))
+    const tasks = Array.from({ length: c.coresEach }, (_, k) => {
+      const tw = (WW - 48 - 14 * (c.coresEach - 1)) / c.coresEach
+      const tx = WX + 24 + k * (tw + 14)
+      return `<rect x="${tx.toFixed(1)}" y="${y + 126}" width="${tw.toFixed(1)}" height="54" rx="12"
+         fill="${PURPLE_IN}"/>` + label(tx + tw / 2, y + 163, 'Task', { size: 26, anchor: 'middle' })
+    }).join('')
+    return `<rect x="${WX}" y="${y}" width="${WW}" height="${WH}" rx="18" fill="${PURPLE}"/>`
+      + label(WX + 24, y + 40, 'Worker node', { size: 26, fill: 'rgba(255,255,255,.9)' })
+      + `<rect x="${WX + 24}" y="${y + 56}" width="186" height="56" rx="12" fill="${PURPLE_IN}"/>`
+      + label(WX + 117, y + 93, `Executor ${r.id}`, { size: 27, anchor: 'middle' })
+      + `<rect x="${WX + 222}" y="${y + 56}" width="96" height="56" rx="12" fill="${PURPLE_IN}"/>`
+      + label(WX + 270, y + 93, 'Cache', { size: 25, anchor: 'middle' })
+      + tasks
+      + label(WX + 24, y + 216, `${r.tasks} tasks run`,
+          { size: 27, family: mono, fill: hot ? t.accent : 'rgba(255,255,255,.78)' })
+  }).join('')
+
+  const links = arrow(244, MID, 324, MID, true)
+    + c.rows.map((_, i) => arrow(572, MID, WX - 6, i * (WH + 40) + 12 + WH / 2)).join('')
+
+  return `<svg class="plot" viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet"
+    xmlns="http://www.w3.org/2000/svg">${links}${driver}${cm}${workers}</svg>`
 }
 
 function pageHtml({ kpi, cluster, theme, head1, head2, badge }) {
@@ -146,10 +243,10 @@ function pageHtml({ kpi, cluster, theme, head1, head2, badge }) {
        font-family:'IBM Plex Sans',system-ui,sans-serif;color:${t.ink};
        display:flex;align-items:stretch;gap:${40 * SCALE}px;padding:${46 * SCALE}px ${50 * SCALE}px}
 
-  .left{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center}
+  .left{flex:0 0 auto;max-width:${540 * SCALE}px;display:flex;flex-direction:column;justify-content:center}
   .logo{width:${92 * SCALE}px;height:${92 * SCALE}px;display:block;margin-bottom:${18 * SCALE}px;
-        border-radius:${20 * SCALE}px}
-  .h{font-weight:700;line-height:.85;letter-spacing:-.05em;font-size:${116 * SCALE}px}
+        border-radius:${20 * SCALE}px;align-self:flex-start}
+  .h{font-weight:700;line-height:.85;letter-spacing:-.05em;font-size:${116 * SCALE}px;white-space:nowrap}
   .h2{color:${t.accent}}
   .badge{align-self:flex-start;margin-top:${26 * SCALE}px;padding:${11 * SCALE}px ${24 * SCALE}px;
          background:${t.accent};border-radius:${12 * SCALE}px;
@@ -181,13 +278,15 @@ function pageHtml({ kpi, cluster, theme, head1, head2, badge }) {
        background:rgba(255,255,255,.1);overflow:hidden;align-self:center}
   .bar i{display:block;height:100%;border-radius:${10 * SCALE}px}
   .eur{text-align:right;white-space:nowrap;color:rgba(255,255,255,.9)}
-  .foot{font-family:'IBM Plex Mono',monospace;font-size:${23 * SCALE}px;
+  .foot{font-family:'IBM Plex Mono',monospace;font-size:${23 * SCALE}px;white-space:nowrap;
         color:rgba(255,255,255,.4);letter-spacing:.04em}
+  .plotwrap{flex:1;min-height:0;display:flex;margin:${16 * SCALE}px 0 ${12 * SCALE}px}
+  .plot{width:100%;height:100%;display:block;overflow:visible}
 </style>
 <div class="left">
-  ${logoSvg()}
+  ${markSvg(t)}
   <div class="h">${esc(head1)}</div>
-  <div class="h h2">${esc(head2)}</div>
+  ${head2.split(/\s+/).map((w) => `<div class="h h2">${esc(w)}</div>`).join('')}
   <div class="badge">${esc(badge)}</div>
 </div>
 <div class="card">
@@ -195,11 +294,13 @@ function pageHtml({ kpi, cluster, theme, head1, head2, badge }) {
   <div class="cmd">$ <b>${esc(cluster ? cluster.cmd : kpi.cmd)}</b></div>
   ${cluster
     ? `<div class="stat"><em>${esc(cluster.tasks)}</em> tasks · <em>${esc(cluster.stages)}</em> stages</div>
-       <div class="statsub">${esc(cluster.executors)} executors · ${esc(cluster.cores)} cores · ${esc(cluster.master)}</div>`
+       <div class="statsub">${esc(cluster.executors)} executors · ${esc(cluster.cores)} cores · ${esc(cluster.master)}</div>
+       <div class="plotwrap">${archSvg(cluster, t)}</div>
+       <div class="foot">a real cluster · one job, split across executors</div>`
     : `<div class="stat">GMV <em>€${esc(money(kpi.gmv))}</em></div>
-       <div class="statsub">${esc(group(kpi.orders))} paid orders · ${esc(kpi.days)} days</div>`}
-  <div class="rows">${cells}</div>
-  <div class="foot">${cluster ? 'a real cluster · work split across executors' : 'busiest days · orders and revenue'}</div>
+       <div class="statsub">${esc(group(kpi.orders))} paid orders · ${esc(kpi.days)} days</div>
+       <div class="rows">${cells}</div>
+       <div class="foot">busiest days · orders and revenue</div>`}
 </div>`
 }
 
@@ -248,7 +349,7 @@ async function main() {
     await page.evaluate(() => document.fonts.ready)
     // The real command must appear in full — never truncated — so fit it by shrinking, not cutting.
     await page.evaluate(() => {
-      for (const el of document.querySelectorAll('.cmd,.stat,.statsub,.foot')) {
+      for (const el of document.querySelectorAll('.h,.cmd,.stat,.statsub,.foot')) {
         const room = el.clientWidth - 1        // the element's OWN content box
         if (el.scrollWidth <= room) continue   // already fits — leave it alone
         const px = parseFloat(getComputedStyle(el).fontSize)
