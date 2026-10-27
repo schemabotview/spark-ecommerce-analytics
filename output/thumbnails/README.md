@@ -18,8 +18,11 @@ to the project's own site, and separately forbids applying a "confusingly simila
 which rules out drawing our own fan shape as much as copying theirs. The *name* "Apache Spark"
 is fine nominatively, in the title and the narration; the mark is not.
 
-So the tile is a drawn glyph of our own: a plain five-pointed star — a spark — outlined on a
-light tile. It resembles nobody's mark, carries no ASF identity and claims no endorsement.
+So the mark is a drawn glyph of our own: a plain five-pointed star — a spark — outlined and
+standing straight on the background, with no tile behind it. (A white tile would have been the
+brightest object on the cover and would have pulled the eye off the headline.) It is white on
+the dark themes and the accent colour on the light one, where white would vanish. It resembles
+nobody's mark, carries no ASF identity and claims no endorsement.
 
 **The sister data-science repo reaches the opposite conclusion, correctly:** it carries the real
 pandas logo, because pandas publishes its logo under BSD-3-Clause — a copyright licence that

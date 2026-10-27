@@ -109,6 +109,18 @@ const fontFace = (fam, weight, file) => {
     + `src:url(data:font/woff2;base64,${b64}) format('woff2')}`
 }
 
+// The scene engine's tone palette (@graphlearning/graphl-flow), copied from its dark table — the
+// card is dark in every theme, so the dark row is always the right one. Using these instead of
+// invented colours means the cover is painted with the same six tones the scenes are.
+const TONE = {
+  neutral: { accent: '#9aa4b2', tint: '#181b20' },
+  ingest:  { accent: '#4f8ff7', tint: '#111d2e' },
+  store:   { accent: '#37b877', tint: '#122419' },
+  serve:   { accent: '#c98bff', tint: '#1e1428' },
+  consume: { accent: '#f0656f', tint: '#2a1416' },
+  infra:   { accent: '#f0902f', tint: '#241c12' },
+}
+
 const THEMES = {
   dark:  { badgeInk: '#14100e', bg: '#14100e', card: '#1e1813', ink: '#ffffff', accent: '#ff8a3d',
            rule: 'rgba(255,255,255,.13)', glow: 'radial-gradient(125% 115% at 10% 8%, #3a1f0f 0%, #14100e 62%)' },
@@ -127,18 +139,19 @@ const THEMES = {
  *
  * So: a plain star — a spark, drawn by us, resembling nobody's mark.
  */
-function markSvg(t) {
-  // A five-pointed star, drawn as a thick outline on a light tile: a spark, not Spark's fan mark.
-  // Round joins and a slight tilt keep it from reading as clip-art geometry.
+function markSvg(t, theme) {
+  // No tile behind it: a white slab would be the brightest thing on the cover and pull the eye off
+  // the headline. The star sits straight on the background — white on the dark themes, the accent
+  // on the light one, where white would vanish.
+  const ink = theme === 'light' ? t.accent : '#ffffff'
   const pts = Array.from({ length: 10 }, (_, i) => {
     const a = ((-90 + i * 36 - 6) * Math.PI) / 180
-    const r = i % 2 === 0 ? 23 : 9.6
+    const r = i % 2 === 0 ? 29 : 12.1
     return `${(32 + r * Math.cos(a)).toFixed(2)},${(32 + r * Math.sin(a)).toFixed(2)}`
   }).join(' ')
   return `<svg class="logo" viewBox="0 0 64 64" role="img" aria-label="Apache Spark — GraphL"
     xmlns="http://www.w3.org/2000/svg">
-    <rect width="64" height="64" rx="12" fill="#f7f5f2"/>
-    <polygon points="${pts}" fill="none" stroke="${t.accent}" stroke-width="6.4"
+    <polygon points="${pts}" fill="none" stroke="${ink}" stroke-width="7.2"
       stroke-linejoin="round" stroke-linecap="round"/>
   </svg>`
 }
@@ -155,31 +168,38 @@ function archSvg(c, t) {
   const MID = VH / 2
   const mono = 'IBM Plex Mono, monospace'
   const sans = 'IBM Plex Sans, system-ui, sans-serif'
-  const PURPLE = '#5b4a8f', PURPLE_IN = '#2b2347', GREEN = '#5a9e3d'
+
+  // Driver, cluster manager and workers take the engine's infra / store / serve tones — which is
+  // also, happily, the orange / green / purple the canonical Spark diagram has always used. Boxes
+  // are drawn the way the engine draws a group: tint fill, accent border, accent label.
+  const DRIVER = TONE.infra, CM = TONE.store, WORKER = TONE.serve, INNER = TONE.neutral
 
   const label = (x, y, s, { size = 28, fill = '#ffffff', weight = 600, family = sans, anchor = 'start' } = {}) =>
     `<text x="${x}" y="${y}" font-size="${size}" font-weight="${weight}" fill="${fill}"
        font-family="${family}" text-anchor="${anchor}">${esc(s)}</text>`
 
+  const box = (x, y, w, h, tone, r = 16) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${tone.tint}"
+       stroke="${tone.accent}" stroke-width="2.6"/>`
+
   const arrow = (x1, y1, x2, y2, both = false) => {
     const a = Math.atan2(y2 - y1, x2 - x1), h = 15
     const head = (x, y, dir) => `<polygon points="${x},${y} ${(x - h * Math.cos(dir - 0.42)).toFixed(1)},`
       + `${(y - h * Math.sin(dir - 0.42)).toFixed(1)} ${(x - h * Math.cos(dir + 0.42)).toFixed(1)},`
-      + `${(y - h * Math.sin(dir + 0.42)).toFixed(1)}" fill="#ffffff" opacity=".75"/>`
-    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#ffffff" stroke-width="3.4"
-        opacity=".55"/>${head(x2, y2, a)}${both ? head(x1, y1, a + Math.PI) : ''}`
+      + `${(y - h * Math.sin(dir + 0.42)).toFixed(1)}" fill="${TONE.neutral.accent}"/>`
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${TONE.neutral.accent}"
+        stroke-width="3" opacity=".7"/>${head(x2, y2, a)}${both ? head(x1, y1, a + Math.PI) : ''}`
   }
 
-  // driver ── cluster manager ── one worker box per worker the session actually started
-  const driver = `<rect x="6" y="${MID - 78}" width="232" height="156" rx="18" fill="${t.accent}"/>`
-    + label(122, MID - 32, 'Driver Program', { size: 30, fill: '#14100e', anchor: 'middle' })
-    + `<rect x="30" y="${MID - 6}" width="184" height="58" rx="12" fill="#ffffff"/>`
-    + label(122, MID + 33, 'SparkContext', { size: 27, fill: '#14100e', anchor: 'middle' })
+  const driver = box(6, MID - 78, 232, 156, DRIVER)
+    + label(122, MID - 32, 'Driver Program', { size: 30, fill: DRIVER.accent, anchor: 'middle' })
+    + box(30, MID - 6, 184, 58, INNER, 12)
+    + label(122, MID + 33, 'SparkContext', { size: 27, anchor: 'middle' })
 
-  const cm = `<rect x="330" y="${MID - 62}" width="236" height="124" rx="18" fill="${GREEN}"/>`
-    + label(448, MID - 14, 'Cluster Manager', { size: 29, anchor: 'middle' })
+  const cm = box(330, MID - 62, 236, 124, CM)
+    + label(448, MID - 14, 'Cluster Manager', { size: 29, fill: CM.accent, anchor: 'middle' })
     + label(448, MID + 28, c.master.replace(/^spark:\/\//, ''),
-        { size: 23, family: mono, weight: 400, anchor: 'middle', fill: 'rgba(255,255,255,.85)' })
+        { size: 23, family: mono, weight: 400, anchor: 'middle', fill: 'rgba(255,255,255,.72)' })
 
   const WX = 652, WW = 342, WH = 238
   const workers = c.rows.map((r, i) => {
@@ -188,18 +208,18 @@ function archSvg(c, t) {
     const tasks = Array.from({ length: c.coresEach }, (_, k) => {
       const tw = (WW - 48 - 14 * (c.coresEach - 1)) / c.coresEach
       const tx = WX + 24 + k * (tw + 14)
-      return `<rect x="${tx.toFixed(1)}" y="${y + 126}" width="${tw.toFixed(1)}" height="54" rx="12"
-         fill="${PURPLE_IN}"/>` + label(tx + tw / 2, y + 163, 'Task', { size: 26, anchor: 'middle' })
+      return box(tx.toFixed(1), y + 126, tw.toFixed(1), 54, INNER, 12)
+        + label(tx + tw / 2, y + 163, 'Task', { size: 26, anchor: 'middle' })
     }).join('')
-    return `<rect x="${WX}" y="${y}" width="${WW}" height="${WH}" rx="18" fill="${PURPLE}"/>`
-      + label(WX + 24, y + 40, 'Worker node', { size: 26, fill: 'rgba(255,255,255,.9)' })
-      + `<rect x="${WX + 24}" y="${y + 56}" width="186" height="56" rx="12" fill="${PURPLE_IN}"/>`
+    return box(WX, y, WW, WH, WORKER)
+      + label(WX + 24, y + 40, 'Worker node', { size: 26, fill: WORKER.accent })
+      + box(WX + 24, y + 56, 186, 56, INNER, 12)
       + label(WX + 117, y + 93, `Executor ${r.id}`, { size: 27, anchor: 'middle' })
-      + `<rect x="${WX + 222}" y="${y + 56}" width="96" height="56" rx="12" fill="${PURPLE_IN}"/>`
+      + box(WX + 222, y + 56, 96, 56, INNER, 12)
       + label(WX + 270, y + 93, 'Cache', { size: 25, anchor: 'middle' })
       + tasks
       + label(WX + 24, y + 216, `${r.tasks} tasks run`,
-          { size: 27, family: mono, fill: hot ? t.accent : 'rgba(255,255,255,.78)' })
+          { size: 27, family: mono, fill: hot ? TONE.consume.accent : TONE.neutral.accent })
   }).join('')
 
   const links = arrow(244, MID, 324, MID, true)
@@ -284,7 +304,7 @@ function pageHtml({ kpi, cluster, theme, head1, head2, badge }) {
   .plot{width:100%;height:100%;display:block;overflow:visible}
 </style>
 <div class="left">
-  ${markSvg(t)}
+  ${markSvg(t, theme)}
   <div class="h">${esc(head1)}</div>
   ${head2.split(/\s+/).map((w) => `<div class="h h2">${esc(w)}</div>`).join('')}
   <div class="badge">${esc(badge)}</div>
