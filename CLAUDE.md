@@ -21,7 +21,7 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 
 | # | Course | Sections | Status |
 | --- | --- | --- | --- |
-| 1 | `intro` | 3 | not started |
+| 1 | `intro` | 3 | authored, replayed, rendered, looked at; no audio |
 | 2 | `start` | 6 | pilot: authored, replayed, rendered, looked at; no audio |
 | 3 | `ingest` | 8 | authored, replayed, rendered, looked at; no audio |
 | 4 | `clean` | 8 | authored, replayed, rendered, looked at; no audio |
@@ -30,7 +30,8 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 | 7 | `lakehouse` | 9 | authored, replayed, rendered, looked at; no audio |
 | 8 | `scale` | 8 | authored, replayed, rendered, looked at; no audio |
 | 9 | `stream` | 9 | authored, replayed, rendered, looked at; no audio |
-| 10–11 | | 13 | in progress |
+| 10 | `ml` | 6 | authored, replayed, rendered, looked at; no audio |
+| 11 | `production` | 7 | authored, replayed, rendered, looked at; no audio |
 
 The owner reviews everything at the end (2026-10-26: "do course by course till end").
 
@@ -51,7 +52,7 @@ scripts/requirements-gen.txt`.
 A seeded generator of Shopwave's 2026: every table drawn from its own random stream keyed by
 (seed, table, day), so a slice is byte-identical to the same slice of a full run. Every planted
 problem (Black Friday ×20, a 15% bestseller, the June 1 schema change, duplicate and late clicks,
-the bot, unpaid and double-paid orders, the Latin-1 returns) is a named constant in `model.py`
+the bot, unpaid and double-paid orders, the Latin-1 returns, the reviews' per-customer taste) is a named constant in `model.py`
 and asserted by `python -m shopwave_gen verify`. Change the generator only with `verify` green
 and every spine step's `generated` check green — a step's committed data is the generator's.
 
@@ -97,6 +98,12 @@ replayed by `scripts/spine.py` exactly as in python-expense-tracker (`first` / `
   parallel tasks mix the days in every partition and a watermark drops whole days at random (9.7's
   first run kept 1,017 of 3,034). A Kafka lab's `compose.yaml` holds Kafka only: PostgreSQL's init
   fails on a lab's partial data (so does a memory lab's: 8.2 has no compose file).
+- **Spark-submit and the cluster (11.4)**: `session.py` leaves the master to spark-submit when it
+  launched Python (`PYSPARK_GATEWAY_PORT`); what the driver's JVM needs from its start (the log
+  config, Delta's jars) is in `conf/cluster.conf`, since spark-submit starts that JVM first. The
+  status store returns Scala `Seq`s: index them, they do not iterate in Python.
+- **ALS needs the average (10.4)**: ALS alone scores worse than each product's average (no bias
+  terms; regularization pulls toward 0 stars); `ml.fit` trains it on what the average misses.
 - **The terminal holds 13 rows at 80 columns**, wrapped lines counted. Spark tables are wide and
   tracebacks long: `show(3)`, `java -version 2>&1 | head -1`, errors caught and printed by condition.
 

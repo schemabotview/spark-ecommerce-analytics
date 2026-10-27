@@ -9,7 +9,8 @@ Scenes render with `@graphlearning/graphl-flow`; the app shell is `@graphlearnin
 Published as **one video: "Learn Apache Spark by building an e-commerce analytics platform: full
 course, beginner to professional"** (~3 h 10 min, 11 courses).
 
-**Status:** the pilot (Course 2, `start`) is authored. Scope, sections and diagrams are in
+**Status:** all 11 courses (82 sections) are authored, replayed, rendered and looked at; narration
+is written, audio is not recorded yet. Scope, sections and diagrams are in
 [`COURSE-PLAN.md`](COURSE-PLAN.md); authoring rules and status are in [`CLAUDE.md`](CLAUDE.md).
 
 Prerequisite: the Python course,
@@ -37,7 +38,8 @@ npm run shots -- <course>                             # 4K PNGs in out/shots/, t
 
 `python -m shopwave_gen --sf 0.01 --out data/raw` writes a year of Shopwave: orders, order items,
 payments (Parquet), clickstream (JSON by arrival hour), returns (Latin-1), customers, products,
-price history, exchange rates and campaigns. Same seed and scale factor, same bytes.
+price history, exchange rates, campaigns, the order change feed and star-rating reviews. Same seed
+and scale factor, same bytes.
 
 ## Layout
 

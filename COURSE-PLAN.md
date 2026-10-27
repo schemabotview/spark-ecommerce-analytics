@@ -72,6 +72,7 @@ One year of Shopwave, 2026-01-01 → 2026-12-31:
 | `returns` | CSV from the warehouse, Latin-1 | 3 | encoding; malformed rows |
 | `fx_rates` | small CSV, daily | 5 | the textbook broadcast table |
 | `campaigns` | JSON from marketing | 6 | time-ranged; attribution needs a range join |
+| `reviews` | CSV, by order day | 10 | 1–5 stars on 30% of paid lines; a planted taste per customer (a favourite and a disliked category, ±1.3 stars) |
 
 Load shape: **Black Friday** (2026-11-27) is ~20× a normal day, and **one bestseller** is ~15% of
 all order items. This is where the skew lessons come from.
@@ -142,9 +143,9 @@ replayable like everything else.
 
 | # | Section | Frame | Side pane |
 | --- | --- | --- | --- |
-| 1 | What Spark is, and where it's used | concept | Spark → batch, SQL, streaming, ML; who runs it |
+| 1 | What Spark is, and where it's used | concept | what you write (DataFrames/SQL, Streaming, MLlib, 5 languages) → the engine → where it runs |
 | 2 | Shopwave, and what we'll build | concept | **the platform map**: sources → bronze → silver → gold → analytics / stream / ML |
-| 3 | ◆ full scene: why not pandas | concept + lab | pandas on one day (fine) vs one year (`MemoryError` / time, measured); the same report in Spark |
+| 3 | ◆ full scene: why not pandas | concept + lab (`why_not_pandas.py` at SF 1, volatile) | pandas: one day, then the year (3.1 M lines, all in memory); Spark streams the same report through 4 tasks |
 
 **2. `start` · The first job · 6**
 
@@ -261,26 +262,33 @@ drawn from small CSVs the scripts write (`capture`), so every point is real.
 
 **10. `ml` · Recommendations · 6**
 
+The generator's `reviews` table (added for this course, its own random stream: no other table
+changed) carries a planted taste: each customer adds stars to one category and takes them from
+another. Product choice in orders is popularity only, so implicit feedback would teach ALS nothing.
+
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | Features from gold | implicit feedback: views, carts, purchases weighted | the user × product matrix (sparse) |
-| 2 | ML pipelines | `StringIndexer` → `ALS` as one `Pipeline` | stages of the pipeline |
-| 3 | ◆ full scene: distributed ALS | concept + lab | matrix factorisation; user / item blocks across executors |
-| 4 | Evaluating honestly | split by time, not at random; ranking metrics | train window → test window |
-| 5 | Scoring everyone | `recommendForAllUsers` → a gold table | one customer's top 10 |
-| 6 | When not to use Spark | a model that fits on one machine: pandas + scikit-learn | data size → the right tool |
+| 1 | Ratings as a matrix | `ml.ratings`: 9,447 ratings, 1,833 × 50, 7.9% filled; customer 1: fashion 4.6★, books 2.2★ | plot: ratings by stars; one customer's taste |
+| 2 | ML pipelines | `SQLTransformer` → `ALS` as one `Pipeline`; rank 8, regParam 0.1, seed | the stages; four guesses; the settings |
+| 3 | ◆ full scene: distributed ALS | concept + lab (`als_blocks.py`: 4 + 4 blocks, 5 jobs, 54 stages; one u · v = the prediction) | two factor matrices; alternating rounds; blocks |
+| 4 | Evaluating honestly | split by time (before October): average 1.087, product average 1.002, ALS alone 1.244, the average + ALS 0.909, a random split 0.900 | plot + table: RMSE per model |
+| 5 | Scoring everyone | `recommend`: every customer × every product, top 5 → gold/recommendations (9,165 rows); customer 1's are all fashion and electronics | one customer's top 5 beside their taste |
+| 6 | ◆ full scene: when not to use Spark | lab with pandas + scikit-learn only (no Java): Ridge on one-hot taste features, RMSE 0.883 | one machine vs Spark; the two RMSEs |
 
 **11. `production` · Ship it · 7**
 
+The cluster is PySpark's own `sbin/spark-daemon.sh` (pip ships no `start-master.sh`), not Docker:
+the venv already holds everything a standalone master and workers need.
+
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | Jobs as a package | `shopwave/jobs/`, config in one place | package → job entry points |
-| 2 | Testing Spark code | `pyspark.testing.assertDataFrameEqual`, a session fixture | test → transform → expected frame |
-| 3 | Data quality as code | expectations per table; a failing check stops the run | checks lit pass / fail |
-| 4 | A real cluster | `spark-submit` to a standalone master + 2 workers (Docker) | driver → master → workers: tasks on other machines now |
-| 5 | Idempotent runs and backfills | re-run a date: same result; backfill a week | run date → partitions replaced |
-| 6 | The whole platform | every job end to end, one night | **the platform map**, every stage lit |
-| 7 | Where next | Databricks / EMR / Dataproc, Kubernetes, Spark Connect, Iceberg | each part of the platform → its tool at scale |
+| 1 | Jobs as a package | `shopwave/jobs.py`: the night's jobs in order, one entry point, one session | the jobs, in order; one entry point |
+| 2 | Testing Spark code | `tests/`: a session fixture, `assertDataFrameEqual` on three transforms; 3 passed | test → transform → expected frame; what is tested where |
+| 3 | Data quality as code | `shopwave/checks.py`: row conditions and must-be-empty queries, error / warn; 191 unpaid orders warn, exit 0; `SHOPWAVE_STRICT=1` exit 1 | checks lit pass / fail; the two levels |
+| 4 | A real cluster | `cluster.sh` (master + 2 workers × 2 cores), `spark-submit --properties-file conf/cluster.conf` with `shopwave.zip` and Delta's jars | driver → master → workers; tasks per executor (volatile) |
+| 5 | Idempotent runs and backfills | `shopwave/daily.py`: `replaceWhere` one day; a day twice and a week twice give the same table | the four runs; three ways to write a day |
+| 6 | ◆ full scene: the whole platform | `python -m shopwave.jobs nightly`: 7 jobs ✓, job output to `logs/nightly.log` | **the platform map**, every stage lit |
+| 7 | Where next | concept | each part of the platform → its tool at scale |
 
 ## How a section teaches
 
@@ -320,8 +328,8 @@ Spark output is noisier than Python's, so the spine fixes these up front:
 2. Data: our own seeded generator with a scale factor; no public datasets.
 3. Table format: **Delta Lake**, from Course 7 (bronze/silver/gold start as Parquet so the move
    to Delta is motivated by a real failure).
-4. Infrastructure: **Docker Compose** (PostgreSQL from Course 3, Kafka, a standalone master + 2
-   workers in Course 11). Spark itself runs from `pip install pyspark` on the host's Java 21; the
+4. Infrastructure: **Docker Compose** (PostgreSQL from Course 3, Kafka from Course 9). The Course 11
+   cluster (a standalone master + 2 workers) runs from PySpark's own `sbin/spark-daemon.sh`. Spark itself runs from `pip install pyspark` on the host's Java 21; the
    spine needs Docker from Course 3.
 5. One video, one continuous story: 11 courses, no parts or acts.
 6. Background is just-in-time (◆ detours), never a front-loaded course.
