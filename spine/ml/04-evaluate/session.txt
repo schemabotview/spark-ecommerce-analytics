@@ -1,48 +1,9 @@
 $ python -m explore.evaluate
 WARNING: Using incubator modules: jdk.incubator.vector
 train: 6264 ratings before October · test: 3183 after
-Traceback (most recent call last):
-  File "<frozen runpy>", line 203, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/home/ana/shopwave/explore/evaluate.py", line 22, in <module>
-    "the average + ALS": ml.predict(*ml.fit(train), test),
-                         ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ana/shopwave/shopwave/ml.py", line 50, in predict
-    return guess.withColumn("prediction",
-           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
-                            F.col("base") + F.col("prediction"))
-                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/sql/classic/dataframe.py", line 1801, in withColumn
-    return DataFrame(self._jdf.withColumn(colName, col._jc), self.sparkSession)
-                     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/py4j/java_gateway.py", line 1362, in __call__
-    return_value = get_return_value(
-        answer, self.gateway_client, self.target_id, self.name)
-  File "/home/ana/shopwave/.venv/lib/python3.14/site-packages/pyspark/errors/exceptions/captured.py", line 257, in deco
-    raise converted from None
-pyspark.errors.exceptions.captured.AnalysisException: [UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `base` cannot be resolved. Did you mean one of the following? [`prediction`, `__als_validated_input_749cdb7da602`.`rating`, `__als_validated_input_749cdb7da602`.`customer_id`, `__als_validated_input_749cdb7da602`.`product_id`]. SQLSTATE: 42703;
-'Project [customer_id#285, product_id#286, rating#284, '`+`('base, prediction#290) AS prediction#297]
-+- Filter atleastnnonnulls(1, prediction#290)
-   +- Project [customer_id#285, product_id#286, rating#284, UDF(features#250, features#264) AS prediction#290]
-      +- Join LeftOuter, (product_id#286 = id#263)
-         :- Join LeftOuter, (customer_id#285 = id#249)
-         :  :- SubqueryAlias __als_validated_input_749cdb7da602
-         :  :  +- Project [CASE WHEN (isnull(customer_id#1L) OR NOT (customer_id#1L = cast(cast(customer_id#1L as int) as bigint))) THEN cast(raise_error(USER_RAISED_EXCEPTION, map(errorMessage, concat(ALS only supports non-Null values in Integer range and without fractional part for column customer_id, but got , cast(customer_id#1L as string))), NullType) as int) ELSE cast(customer_id#1L as int) END AS customer_id#285, CASE WHEN (isnull(product_id#2L) OR NOT (product_id#2L = cast(cast(product_id#2L as int) as bigint))) THEN cast(raise_error(USER_RAISED_EXCEPTION, map(errorMessage, concat(ALS only supports non-Null values in Integer range and without fractional part for column product_id, but got , cast(product_id#2L as string))), NullType) as int) ELSE cast(product_id#2L as int) END AS product_id#286, rating#284]
-         :  :     +- Project [customer_id#1L, product_id#2L, cast(rating#3 as float) AS rating#284]
-         :  :        +- SubqueryAlias sqltransformer_e10aabe6d82e_5d840f0eeb9e
-         :  :           +- View (`SQLTransformer_e10aabe6d82e_5d840f0eeb9e`, [product_id#2L, review_id#0, customer_id#1L, rating#3, reviewed_at#4, base#152])
-         :  :              +- Project [product_id#2L, review_id#0, customer_id#1L, rating#3, reviewed_at#4, base#152]
-         :  :                 +- Join Inner, (product_id#2L = product_id#267L)
-         :  :                    :- Filter NOT (reviewed_at#4 < cast(2026-10-01 as timestamp))
-         :  :                    :  +- Relation [review_id#0,customer_id#1L,product_id#2L,rating#3,reviewed_at#4] csv
-         :  :                    +- Aggregate [product_id#267L], [product_id#267L, avg(rating#268) AS base#152]
-         :  :                       +- Filter (reviewed_at#269 < cast(2026-10-01 as timestamp))
-         :  :                          +- Relation [review_id#265,customer_id#266L,product_id#267L,rating#268,reviewed_at#269] csv
-         :  +- SubqueryAlias __als_user_factors_c11d3a71091a
-         :     +- Project [_1#242 AS id#249, _2#243 AS features#250]
-         :        +- SerializeFromObject [invoke(knownnotnull(assertnotnull(input[0, scala.Tuple2, true]))._1()) AS _1#242, static_invoke(UnsafeArrayData.fromPrimitiveArray(invoke(knownnotnull(assertnotnull(input[0, scala.Tuple2, true]))._2()))) AS _2#243]
-         :           +- ExternalRDD [obj#239]
-         +- SubqueryAlias __als_item_factors_a4ac3212f613
-            +- Project [_1#256 AS id#263, _2#257 AS features#264]
-               +- SerializeFromObject [invoke(knownnotnull(assertnotnull(input[0, scala.Tuple2, true]))._1()) AS _1#256, static_invoke(UnsafeArrayData.fromPrimitiveArray(invoke(knownnotnull(assertnotnull(input[0, scala.Tuple2, true]))._2()))) AS _2#257]
-                  +- ExternalRDD [obj#253]
+RMSE, in stars (lower is better):
+  everyone gets the average  1.087
+  the product's average      1.002
+  ALS alone                  1.244
+  the average + ALS          0.909
+  the same, split at random  0.900

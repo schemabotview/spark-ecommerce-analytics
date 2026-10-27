@@ -1,1 +1,5 @@
 $ python why_not_pandas.py
+pandas, one day :     7279 lines ·      3 MB in memory ·   0.0 s
+pandas, the year:  3149491 lines ·   1259 MB in memory ·  10.2 s
+WARNING: Using incubator modules: jdk.incubator.vector
+Spark,  the year   : 13 countries · data streamed through 4 tasks ·   9.1 s

@@ -2,6 +2,7 @@ import type { SceneModel } from '@graphlearning/graphl-flow'
 import { terminal } from '../ide'
 import { outputOf } from '../lab'
 import session from '../../../spine/ml/06-without-spark/session.txt?raw'
+import evaluated from '../../../spine/ml/04-evaluate/session.txt?raw'
 
 // §6 — ◆ full scene: when not to use Spark. The sizes, the RMSE and the time are the lab's
 // (volatile: the scene reads them; the narration never says the seconds).
@@ -9,6 +10,7 @@ const out = outputOf(session, 'python -m explore.without_spark')
 const [, ratings, mb] = out.match(/(\d+) ratings · ([\d.]+) MB in memory/)!
 const [, columns, rmse] = out.match(/features: (\d+) columns · RMSE on the test months: ([\d.]+)/)!
 const secs = out.match(/scored in ([\d.]+) s/)![1]
+const als = evaluated.match(/the average \+ ALS\s+([\d.]+)/)![1]
 
 export const mlWithoutSpark: SceneModel = {
   title: 'When not to use Spark',
@@ -33,7 +35,7 @@ export const mlWithoutSpark: SceneModel = {
     {
       type: 'table', id: 'compare', title: 'RMSE on the same test months (10.4), in stars', tone: 'neutral', columns: ['model', 'features', 'RMSE'], rows: [
         { id: 'c-ridge', cells: ['Ridge, scikit-learn', `${columns} one-hot: customer × category, product`, rmse], tone: 'store' },
-        { id: 'c-als', cells: ['the average + ALS, Spark', 'factors learned from the matrix', 'see 10.4'] },
+        { id: 'c-als', cells: ['the average + ALS, Spark', 'factors learned from the matrix', als] },
       ],
     },
     {

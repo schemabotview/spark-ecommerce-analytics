@@ -31,9 +31,12 @@ spark = (SparkSession.builder.master("local[4]").appName("shopwave")
                  "-Dlog4j2.configurationFile=conf/log4j2.properties")
          .config("spark.ui.showConsoleProgress", "false").getOrCreate())
 start = time.perf_counter()
-read = lambda t: spark.read.csv(f"data/sf1/{t}/", header=True,
-                                inferSchema=False)
-orders, items = read("orders"), read("order_items")
+read = lambda t, schema: spark.read.csv(f"data/sf1/{t}/", header=True,
+                                        schema=schema)
+orders = read("orders", "order_id long, order_ts timestamp, customer_id long,"
+              " country string, status string, total decimal(10,2)")
+items = read("order_items", "order_id long, line int, product_id long, "
+             "qty int, unit_price decimal(10,2)")
 lines = items.join(orders.filter("status = 'paid'"), "order_id")
 by_country = lines.groupBy("country").agg(
     F.sum(F.col("qty") * F.col("unit_price")).alias("revenue"))

@@ -1,3 +1,4 @@
+import { intro } from './intro'
 import { start } from './start'
 import { ingest } from './ingest'
 import { clean } from './clean'
@@ -6,11 +7,13 @@ import { analytics } from './analytics'
 import { lakehouse } from './lakehouse'
 import { scale } from './scale'
 import { stream } from './stream'
+import { ml } from './ml'
 import type { Course, Section } from './types'
 
 // Course registry, in syllabus order. One course per chapter of COURSE-PLAN.md; a course is
 // registered here only once it is authored.
 export const COURSES: Record<string, Course> = {
+  [intro.id]: intro,
   [start.id]: start,
   [ingest.id]: ingest,
   [clean.id]: clean,
@@ -19,6 +22,7 @@ export const COURSES: Record<string, Course> = {
   [lakehouse.id]: lakehouse,
   [scale.id]: scale,
   [stream.id]: stream,
+  [ml.id]: ml,
 }
 
 export type { Course, Section }

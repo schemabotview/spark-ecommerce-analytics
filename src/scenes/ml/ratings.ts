@@ -1,6 +1,7 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, linesFrom } from '../ide'
 import { outputOf } from '../lab'
+import { view } from '../fold'
 import { mlTree } from './tree'
 import code from '../../../spine/ml/01-ratings/project/explore/ratings.py?raw'
 import session from '../../../spine/ml/01-ratings/session.txt?raw'
@@ -15,7 +16,7 @@ const taste = [...out.matchAll(/^\s+(\w+)\s+([\d.]+)★ over (\d+)$/gm)].map(([,
 
 export const mlRatings: SceneModel = ideFrame({
   tree: mlTree(['shopwave/schemas.py', 'shopwave/ml.py', 'explore/ratings.py'], 'explore/ratings.py', ['shopwave/ml.py', 'explore/ratings.py', 'data/raw/reviews/']),
-  editor: { file: 'explore/ratings.py', code, highlight: linesFrom(code, 'theirs = (ratings.filter', '.agg(F.count("*")') },
+  editor: { file: 'explore/ratings.py', code, ...view(code, 'spark = spark_session()'), highlight: linesFrom(code, 'theirs = (ratings.filter', '.agg(F.count("*")') },
   session,
   side: [
     {

@@ -33,6 +33,7 @@ export const mlPipeline: SceneModel = ideFrame({
         { id: 'k-rank', cells: ['rank', `${rank}: numbers per customer`] },
         { id: 'k-reg', cells: ['regParam', '0.1: keeps them small'] },
         { id: 'k-cold', cells: ['coldStartStrategy', 'drop: no guess for strangers'] },
+        { id: 'k-seed', cells: ['seed', '2026: the same factors every run'] },
       ],
     },
   ],
