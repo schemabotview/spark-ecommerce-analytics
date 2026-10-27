@@ -1,1 +1,7 @@
 $ python -m explore.scd2
+WARNING: Using incubator modules: jdk.incubator.vector
+price rows: 66 · products repriced: 8
+  product 10: €   43.87  2026-01-01 → 2026-02-22
+  product 10: €   50.45  2026-02-23 → 2026-11-27
+  product 10: €   55.50  2026-11-28 → 9999-12-31  current
+sales checked: 35043 of 35043 · price on the day wrong: 0

@@ -1,0 +1,1 @@
+{"from": "stream/02-read-stream", "changes": ["shopwave/stream.py", "explore/exactly_once.py"], "venv": true, "setup": ["docker compose exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic clicks --partitions 4", "python -m shopwave.tracker 2026-10-01"]}

@@ -1,1 +1,10 @@
 $ python -m explore.delta_log
+WARNING: Using incubator modules: jdk.incubator.vector
+out/dim_product/: 6 parquet files · _delta_log/: 00000000000000000000.json, 00000000000000000001.json
+00000000000000000000.json: commitInfo ×1, metaData ×1, protocol ×1, add ×4
+  commitInfo: WRITE
+  add part-00000-ae717… 14 rows, product_id 37–50
+00000000000000000001.json: commitInfo ×1, add ×1
+  commitInfo: WRITE
+  add part-00001-5cd6e… 2 rows, product_id 1–2
+rows now: 52

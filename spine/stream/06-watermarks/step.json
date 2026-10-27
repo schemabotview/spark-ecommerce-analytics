@@ -1,0 +1,1 @@
+{"from": "stream/05-windows", "changes": ["explore/watermarks.py"], "venv": true, "setup": ["docker compose exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic clicks --partitions 4", "python -m shopwave.tracker 2026-10-01 2026-10-02 2026-10-03"]}

@@ -1,0 +1,2 @@
+$ du -sh data/sf1/*
+$ python -m explore.event_log

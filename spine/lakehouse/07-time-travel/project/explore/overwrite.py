@@ -1,5 +1,5 @@
 """Rebuild gold.fact_sales in place, and let the job fail halfway: Delta."""
-from pyspark.errors import PySparkException
+from py4j.protocol import Py4JJavaError
 from pyspark.sql import functions as F
 
 from shopwave import gold
@@ -19,8 +19,8 @@ broken = sales.withColumn("revenue", F.when(
     .otherwise(F.col("revenue")))
 try:
     broken.write.format("delta").mode("overwrite").save(path)
-except PySparkException as e:
-    print("the job failed:", e.getCondition())
+except Py4JJavaError as e:  # Delta's writer raises the JVM's error as it is
+    print("the job failed:", e.java_exception.getCondition())
 
 print("after:", read().count(), "rows")
 history = spark.sql(f"DESCRIBE HISTORY delta.`{path}`")

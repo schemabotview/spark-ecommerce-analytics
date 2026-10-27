@@ -1,0 +1,2 @@
+{"from": "stream/07-dedupe", "changes": ["shopwave/stream.py", "explore/stream_static.py"], "venv": true,
+ "setup": ["python -m shopwave.bronze", "python -m shopwave.silver", "python -m shopwave.gold", "docker compose exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic clicks --partitions 4", "python -m shopwave.tracker 2026-10-01"]}

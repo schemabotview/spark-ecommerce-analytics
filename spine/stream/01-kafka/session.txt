@@ -1,0 +1,4 @@
+$ docker compose --progress quiet up -d --wait
+$ docker compose exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic clicks --partitions 4
+$ python -m shopwave.tracker 2026-10-01
+$ docker compose exec kafka /opt/kafka/bin/kafka-get-offsets.sh --bootstrap-server localhost:9092 --topic clicks

@@ -11,5 +11,6 @@ files = sum(f.endswith(".parquet") for _, _, fs in os.walk("out/orders")
 spark.sql("CONVERT TO DELTA parquet.`out/orders` "
           "PARTITIONED BY (_file_date DATE)")
 print(f"converted: {files} parquet files kept where they were")
+log = [f for f in os.listdir("out/orders/_delta_log") if f.endswith(".json")]
 print("rows:", spark.read.format("delta").load("out/orders").count(),
-      "· log:", sorted(os.listdir("out/orders/_delta_log"))[0])
+      "· log:", ", ".join(sorted(log)))

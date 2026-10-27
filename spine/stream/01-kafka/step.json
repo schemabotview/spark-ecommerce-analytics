@@ -1,0 +1,1 @@
+{"from": "scale/08-cores", "changes": ["compose.yaml", "jars.txt", "shopwave/tracker.py"], "venv": true, "services": false}

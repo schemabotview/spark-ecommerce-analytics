@@ -1,0 +1,1 @@
+{"lab": true, "venv": true, "generated": {"sf": 0.01, "from": "2026-10-01", "to": "2026-10-01", "only": ["clickstream"]}, "setup": ["docker compose exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic clicks --partitions 4", "python -m shopwave.tracker 2026-10-01"]}

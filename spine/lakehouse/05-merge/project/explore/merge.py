@@ -13,8 +13,8 @@ try:
     lake.apply_changes(spark, feed)
 except PySparkException as e:
     print("MERGE as it comes:", e.getCondition())
-status = lambda: dict(spark.read.format("delta").load(lake.ORDERS)
-                      .groupBy("status").count().collect())
+status = lambda: dict(sorted(spark.read.format("delta").load(lake.ORDERS)
+                             .groupBy("status").count().collect()))
 print("status before:", status())
 m = lake.apply_changes(spark, lake.latest(feed))
 print(f"MERGE latest per order: {m['numTargetRowsUpdated']} orders updated")

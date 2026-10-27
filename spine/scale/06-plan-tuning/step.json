@@ -1,0 +1,1 @@
+{"from": "scale/05-partition-size", "changes": ["explore/plan_tuning.py"], "venv": true, "volatile": ["digits"]}

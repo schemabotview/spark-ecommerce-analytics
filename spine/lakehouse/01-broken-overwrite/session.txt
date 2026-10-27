@@ -1,2 +1,2 @@
 $ python -m explore.overwrite
-$ ls lake/gold/fact_sales
+$ ls -A lake/gold/fact_sales | wc -l
