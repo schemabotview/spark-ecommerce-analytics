@@ -1,1 +1,6 @@
 $ python -m explore.schema
+WARNING: Using incubator modules: jdk.incubator.vector
+total as a string: refused, DELTA_FAILED_TO_MERGE_FIELDS
+a new column: refused, DELTA_METADATA_MISMATCH
+with mergeSchema: written · columns now: 9
+channel on old rows: 20024 nulls · on new rows: 2

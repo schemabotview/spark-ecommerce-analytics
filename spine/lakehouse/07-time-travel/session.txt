@@ -1,1 +1,9 @@
 $ python -m explore.time_travel
+WARNING: Using incubator modules: jdk.incubator.vector
+today: 20024 orders
+after the bad load: 47 orders
+  version 0: WRITE   Append
+  version 1: WRITE   Append
+  version 2: WRITE   Overwrite
+version 1, read as it was: 20024
+restored: 20024 orders, as version 3

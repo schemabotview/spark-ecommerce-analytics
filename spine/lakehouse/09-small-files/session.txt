@@ -1,2 +1,9 @@
 $ python -m explore.small_files
+WARNING: Using incubator modules: jdk.incubator.vector
+after 31 nightly appends: 31 files
+OPTIMIZE: 31 files → 1
+files now in the table: 1
+Deleted 37 files and directories in a total of 1 directories.
+VACUUM: rows still 3672
 $ ls out/daily_sales | grep -c parquet
+1
