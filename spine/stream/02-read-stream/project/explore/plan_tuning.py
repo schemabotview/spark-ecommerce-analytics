@@ -5,7 +5,10 @@ from pyspark.sql.types import BooleanType
 from shopwave import metrics, schemas, scale
 from shopwave.session import spark_session
 
-spark = spark_session()
+# Row-at-a-time Python UDFs: the Arrow-batched kind (Spark 4's default) stalls
+# on this scan in Spark 4.2.0, found while building this step.
+arrow = "spark.sql.execution.pythonUDF.arrow.enabled"
+spark = spark_session(**{arrow: "false"})
 orders = spark.read.csv(f"{scale.SF1}/orders/", header=True,
                         schema=schemas.ORDERS)
 orders.write.mode("overwrite").parquet("out/orders")  # a year, columnar

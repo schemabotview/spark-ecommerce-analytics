@@ -1,2 +1,7 @@
 $ nproc
+4
 $ python -m explore.cores
+local[1]:   8.6 s · 1.0× faster than 1 core
+local[2]:   5.2 s · 1.7× faster than 1 core
+local[3]:   4.2 s · 2.0× faster than 1 core
+local[4]:   3.8 s · 2.3× faster than 1 core

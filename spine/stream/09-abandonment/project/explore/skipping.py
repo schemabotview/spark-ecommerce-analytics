@@ -13,8 +13,10 @@ sales = scale.year_sales(spark)
  .mode("overwrite").save(path))
 
 day = spark.read.format("delta").load(path).filter(
-    F.col("order_date") == "2026-11-27")
-print("Black Friday lines:", day.count())
+    F.col("order_date") == "2026-11-27").select("revenue")
+# collect() runs THIS plan, so its scan's metrics are filled in (a count()
+# would plan and run a query of its own)
+print("Black Friday lines:", len(day.collect()))
 scan = day._jdf.queryExecution().executedPlan().collectLeaves().apply(0)
 read = scan.metrics().apply("numFiles").value()
 total = DeltaTable.forPath(spark, path).detail().first().numFiles
