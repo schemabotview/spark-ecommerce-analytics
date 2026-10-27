@@ -1,6 +1,7 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { ideFrame, linesFrom } from '../ide'
 import { outputOf } from '../lab'
+import { view } from '../fold'
 import { scaleTree } from './tree'
 import code from '../../../spine/scale/08-cores/project/explore/cores.py?raw'
 import session from '../../../spine/scale/08-cores/session.txt?raw'
@@ -12,14 +13,14 @@ const cpus = outputOf(session, 'nproc').trim()
 
 export const scaleCores: SceneModel = ideFrame({
   tree: scaleTree(['shopwave/scale.py', 'explore/cores.py'], 'explore/cores.py', ['explore/cores.py']),
-  editor: { file: 'explore/cores.py', code, highlight: [...linesFrom(code, 'spark = spark_session(**{"spark.master"'), ...linesFrom(code, 'start = time.perf_counter()', 'print(f"{time.perf_counter()')] },
+  editor: { file: 'explore/cores.py', code, ...view(code, 'if len(sys.argv) > 1'), highlight: [...linesFrom(code, 'spark = spark_session(**{"spark.master"'), ...linesFrom(code, 'start = time.perf_counter()', 'print(f"{time.perf_counter()')] },
   session,
   side: [
     {
       type: 'plot', id: 'plot', title: 'Speed-up over 1 core, the same job', compact: true,
       x: { label: 'cores (local[n])', min: 0, max: runs.length, step: 1 }, y: { label: '× faster', min: 0, max: runs.length, step: 1 },
       series: [
-        { kind: 'segment', from: [0, 0], to: [runs.length, runs.length], label: 'perfect' },
+        { kind: 'segment', from: [1, 1], to: [runs.length, runs.length], label: 'perfect' },
         { kind: 'line', points: runs.map((r) => [r.cores, r.speedup] as [number, number]), tone: 'store', label: 'measured' },
       ],
     },

@@ -28,7 +28,8 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 | 5 | `model` | 9 | authored, replayed, rendered, looked at; no audio |
 | 6 | `analytics` | 9 | authored, replayed, rendered, looked at; no audio |
 | 7 | `lakehouse` | 9 | authored, replayed, rendered, looked at; no audio |
-| 8–11 | | 30 | not started |
+| 8 | `scale` | 8 | authored, replayed, rendered, looked at; no audio |
+| 9–11 | | 22 | not started |
 
 The owner reviews everything at the end (2026-10-26: "do course by course till end").
 
@@ -87,6 +88,10 @@ replayed by `scripts/spine.py` exactly as in python-expense-tracker (`first` / `
 - **Delta paths in SQL need `DeltaTable`**: `DESCRIBE HISTORY delta.`lake/...`` does not resolve a
   relative path (Delta 4.4.1); the scripts use `DeltaTable.forPath(...).history()`. A failed Delta
   write raises `Py4JJavaError`, so scripts catch it and print `e.java_exception.getCondition()`.
+- **Spark 4.2.0 traps found at SF 1**: Arrow-batched Python UDFs stall on a Parquet scan (8.6
+  turns them off); a Python UDF's scan bytes are not counted (its reader runs in another thread),
+  so 8.6 counts rows; a scan's metrics fill only on the plan that ran (`collect()` on the same
+  DataFrame, 8.7); the event log dir must exist before the session starts (8.1).
 - **The terminal holds 13 rows at 80 columns**, wrapped lines counted. Spark tables are wide and
   tracebacks long: `show(3)`, `java -version 2>&1 | head -1`, errors caught and printed by condition.
 

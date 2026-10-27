@@ -1,5 +1,6 @@
 $ python -m explore.cache
 WARNING: Using incubator modules: jdk.incubator.vector
-cache off: 13 stages ran · read   485 MB from files
-cache on :  9 stages ran · read   397 MB from files
+seconds         revenue  by country     qty > 2
+cache off           6.7         3.2         2.3
+cache on            6.8         1.3         0.7
 cached: 200 partitions · 78 MB in memory · 0 MB on disk

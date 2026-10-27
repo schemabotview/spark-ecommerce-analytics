@@ -1,4 +1,4 @@
 $ python -m explore.skipping
 WARNING: Using incubator modules: jdk.incubator.vector
 Black Friday lines: 147089
-files read: 0 of 48 · skipped by min/max: 48
+files read: 1 of 48 · skipped by min/max: 47

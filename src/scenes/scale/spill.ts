@@ -27,6 +27,13 @@ export const scaleSpill: SceneModel = ideFrame({
         { type: 'item', id: 's-merge', title: 'the runs merged at the end', sub: 'the same result, read back from disk', icon: 'layers' },
       ],
     },
+    {
+      type: 'table', id: 'fix', title: 'A stage that spills: the fixes', tone: 'neutral', columns: ['fix', 'setting'], rows: [
+        { id: 'x-parts', cells: ['fewer rows per task', 'shuffle.partitions ↑'] },
+        { id: 'x-mem', cells: ['more memory per task', 'executor.memory ↑'] },
+        { id: 'x-less', cells: ['less data to sort', 'filter, select first'] },
+      ],
+    },
     { type: 'note', id: 'note', tone: 'consume', text: 'Spill is how Spark survives too little memory: slower, never wrong. The fixes: more memory per task, fewer rows per task (more partitions), or less data (filter and select first).' },
   ],
   edges: [

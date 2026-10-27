@@ -11,7 +11,9 @@ arrow = "spark.sql.execution.pythonUDF.arrow.enabled"
 spark = spark_session(**{arrow: "false"})
 orders = spark.read.csv(f"{scale.SF1}/orders/", header=True,
                         schema=schemas.ORDERS)
-orders.write.mode("overwrite").parquet("out/orders")  # a year, columnar
+# A year, columnar, sorted by country: each file's min/max then says which
+# countries it holds, so a filter Spark can see skips the other files.
+orders.orderBy("country").write.mode("overwrite").parquet("out/orders")
 orders = spark.read.parquet("out/orders")
 
 
@@ -27,6 +29,5 @@ for name, q in queries.items():
     n, stages = metrics.run(spark, name, q.count)
     plan = q._jdf.queryExecution().executedPlan().toString()
     pushed = plan.split("PushedFilters: ")[1].split("]")[0] + "]"
-    read = sum(s.inputBytes() for s in stages)
-    print(f"{name:10} {n} rows · read {read / 2**20:5.1f} MB · "
-          f"pushed {pushed}")
+    read = sum(s.inputRecords() for s in stages)
+    print(f"{name:10} {n} rows · read {read:7} · pushed {pushed}")

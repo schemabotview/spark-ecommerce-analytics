@@ -236,14 +236,14 @@ drawn from small CSVs the scripts write (`capture`), so every point is real.
 
 | # | Section | Step | Side pane |
 | --- | --- | --- | --- |
-| 1 | Reading a job | the year at SF 1: jobs, stages, tasks from the event log | the stage table (our scene, not a UI screenshot) |
-| 2 | ◆ full scene: executor memory | concept + lab (memory metrics) | heap: execution vs storage (unified), user memory, overhead |
-| 3 | Spill | less memory → spill to disk, measured | spill bytes per stage |
-| 4 | Caching | `cache` a reused DataFrame; when it helps and hurts | storage level; plot: with vs without |
-| 5 | Partition sizing | `maxPartitionBytes`, ~128 MB per task | partitions vs file sizes |
-| 6 | The plan as a tuning tool | a UDF hides a filter: pushdown and pruning lost, then restored | two plans side by side |
-| 7 | Data skipping | Delta file statistics skip most files | files read / files total |
-| 8 | Cores and time | `local[1]` → `local[8]`, measured | plot: wall time vs cores, the flattening |
+| 1 | Reading a job | the year at SF 1 (`data/sf1`, 2 M orders); `explore.event_log` reads `SparkListenerStageCompleted` back: 12 + 12 read tasks, a 4-task join, 1 final task | the stage table (our scene, not a UI screenshot); the job's shape |
+| 2 | ◆ full scene: executor memory | concept + lab (`explore.memory`: 1024 MB heap → 300 reserved, 290 user, 434 unified) | heap: execution vs storage (unified), user memory, overhead |
+| 3 | Spill | a sort, then the same sort forced to spill every 100,000 rows (volatile sizes) | spill in memory vs on disk; one task's sort |
+| 4 | Caching | three questions, timed, without and with `cache()` (volatile); 200 partitions cached | plot: seconds per question; when it helps / hurts; storage levels |
+| 5 | Partition sizing | 365 files, 70 MB: 128m → 12, 16m → 92, 1m → 369 partitions (the 4 MB open cost) | partitions per setting; how files are packed |
+| 6 | The plan as a tuning tool | the year as Parquet sorted by country: `country = 'DE'` reads 488,060 rows, the UDF 2,000,001; Arrow UDFs stall on this scan in 4.2.0, so row-at-a-time | two plans side by side; what a UDF hides |
+| 7 | Data skipping | 48 range-partitioned Delta files; Black Friday reads 1, skips 47 | plot: files read / skipped |
+| 8 | Cores and time | `local[1]` → `local[4]` on a 4-CPU machine, each in its own process, timed (volatile) | plot: speed-up vs perfect, the flattening |
 
 **9. `stream` · Live data from Kafka · 9**
 

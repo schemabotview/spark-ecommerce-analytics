@@ -4,6 +4,7 @@ import { clean } from './clean'
 import { model } from './model'
 import { analytics } from './analytics'
 import { lakehouse } from './lakehouse'
+import { scale } from './scale'
 import type { Course, Section } from './types'
 
 // Course registry, in syllabus order. One course per chapter of COURSE-PLAN.md; a course is
@@ -15,6 +16,7 @@ export const COURSES: Record<string, Course> = {
   [model.id]: model,
   [analytics.id]: analytics,
   [lakehouse.id]: lakehouse,
+  [scale.id]: scale,
 }
 
 export type { Course, Section }
