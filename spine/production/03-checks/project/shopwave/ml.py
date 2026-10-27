@@ -48,8 +48,9 @@ def fit(ratings: DataFrame) -> tuple[DataFrame, PipelineModel]:
 
 def predict(base: DataFrame, model: PipelineModel,
             pairs: DataFrame) -> DataFrame:
-    """Stars for (customer_id, product_id) pairs: the average + ALS."""
-    guess = model.transform(pairs.join(base, "product_id"))
+    """Stars for (customer_id, product_id) pairs: the average + ALS. The
+    fitted ALS stage alone scores them: it needs only the two ids."""
+    guess = model.stages[-1].transform(pairs.join(base, "product_id"))
     return guess.withColumn("prediction",
                             F.col("base") + F.col("prediction"))
 
