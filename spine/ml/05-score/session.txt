@@ -1,2 +1,12 @@
 $ python -m shopwave.ml
+WARNING: Using incubator modules: jdk.incubator.vector
+gold/recommendations: 9165 rows, 1833 customers
 $ python -m explore.one_customer
+WARNING: Using incubator modules: jdk.incubator.vector
+customer 1 rated, on average: fashion 4.6★, electronics 4.4★, sports 3.0★, beauty 2.8★, home 2.7★, books 2.2★
+recommended:
+  1. Quill Headphones     electronics  4.47★
+  2. Merida Sunglasses    fashion      4.37★
+  3. Arbo Power Bank      electronics  4.31★
+  4. Nordlys Wall Clock   home         4.19★
+  5. Nordlys Keyboard     electronics  4.16★

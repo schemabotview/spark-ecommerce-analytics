@@ -1,4 +1,15 @@
 $ ./cluster.sh start
+master spark://127.0.0.1:7077 · 2 workers × 2 cores
 $ zip -qr shopwave.zip shopwave
 $ spark-submit --properties-file conf/cluster.conf explore/on_cluster.py
+WARNING: Using incubator modules: jdk.incubator.vector
+Traceback (most recent call last):
+  File "/home/ana/shopwave/explore/on_cluster.py", line 13, in <module>
+    while len(executors()) < 2:  # executors start on the workers, then join
+              ~~~~~~~~~^^
+  File "/home/ana/shopwave/explore/on_cluster.py", line 11, in <lambda>
+    executors = lambda: [e for e in store.executorList(True).toList()
+                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+TypeError: 'JavaObject' object is not iterable
 $ ./cluster.sh stop
+cluster stopped

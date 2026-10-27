@@ -1,3 +1,13 @@
 $ python -m shopwave.jobs
+bronze     land every source, as it came
+silver     clean and conform; quality gates
+gold       the star schema, as Delta tables
+orders     gold/orders: orders since the mark
+changes    gold/orders: the change feed merged
+recommend  gold/recommendations: ALS, refitted
 $ python -m shopwave.jobs run gold
+▶ gold
+WARNING: Using incubator modules: jdk.incubator.vector
+gold: written fact_sales, fact_payments, dim_customer, dim_product
 $ python -m shopwave.jobs run nothing
+usage: python -m shopwave.jobs [run JOB ... | nightly]; jobs: bronze, silver, gold, orders, changes, recommend

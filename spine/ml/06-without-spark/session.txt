@@ -1,1 +1,4 @@
 $ python -m explore.without_spark
+9447 ratings · 1.3 MB in memory
+features: 3763 columns · RMSE on the test months: 0.883
+read, fit and scored in 0.4 s

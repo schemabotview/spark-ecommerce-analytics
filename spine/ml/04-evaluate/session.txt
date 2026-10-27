@@ -1,1 +1,8 @@
 $ python -m explore.evaluate
+WARNING: Using incubator modules: jdk.incubator.vector
+train: 6264 ratings before October · test: 3183 after
+RMSE, in stars (lower is better):
+  everyone gets the average  1.087
+  the product's average      1.002
+  ALS, split by time         1.244
+  ALS, split at random       1.182

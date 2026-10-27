@@ -1,3 +1,19 @@
 $ python -m shopwave.jobs nightly
+WARNING: Using incubator modules: jdk.incubator.vector
+✓ bronze     land every source, as it came
+✓ silver     clean and conform; quality gates
+✓ gold       the star schema, as Delta tables
+✓ checks     what gold must be true of
+✓ orders     gold/orders: orders since the mark
+✓ changes    gold/orders: the change feed merged
+✓ recommend  gold/recommendations: ALS, refitted
 $ ls lake/gold
+dim_customer
+dim_product
+fact_payments
+fact_sales
+orders
+recommendations
 $ tail -2 logs/nightly.log
+changes: 1976 read · 1439 orders · 1439 updated
+gold/recommendations: 9165 rows, 1833 customers

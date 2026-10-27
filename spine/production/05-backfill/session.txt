@@ -1,4 +1,12 @@
 $ python -m shopwave.daily 2026-10-05
+WARNING: Using incubator modules: jdk.incubator.vector
+daily_sales: 2026-10-05…2026-10-05 rebuilt · 11 rows, 1 days · € 4609.94
 $ python -m shopwave.daily 2026-10-05
+WARNING: Using incubator modules: jdk.incubator.vector
+daily_sales: 2026-10-05…2026-10-05 rebuilt · 11 rows, 1 days · € 4609.94
 $ python -m shopwave.daily 2026-10-01 2026-10-07
+WARNING: Using incubator modules: jdk.incubator.vector
+daily_sales: 2026-10-01…2026-10-07 rebuilt · 83 rows, 7 days · € 42416.90
 $ python -m shopwave.daily 2026-10-01 2026-10-07
+WARNING: Using incubator modules: jdk.incubator.vector
+daily_sales: 2026-10-01…2026-10-07 rebuilt · 83 rows, 7 days · € 42416.90

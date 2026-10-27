@@ -1,6 +1,6 @@
 $ python -m explore.watermarks
 WARNING: Using incubator modules: jdk.incubator.vector
-batches: 7 · final hours written: 51
-watermark now: 2026-10-03T19:53:55.000Z
-late purchases dropped: 0
+batches: 8 · final hours written: 75 · events in them: 2898
+watermark now: 2026-10-03T21:57:29.000Z
+late events dropped: 8
 windows still open in state: 3

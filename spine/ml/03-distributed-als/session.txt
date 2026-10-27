@@ -1,1 +1,9 @@
 $ python -m explore.als_blocks
+WARNING: Using incubator modules: jdk.incubator.vector
+9447 ratings · blocks: 4 of customers, 4 of products
+fit: 5 jobs, 54 stages for 10 rounds of: fix one side, solve the other
+customer factors: 1833 × 8 · product factors: 50 × 8
+customer 1 · product 1 (rated 5★):
+  u =  0.98  0.07 -0.19  0.41 …
+  v =  0.42  0.10  0.11  0.32 …
+  u · v = 3.89 = the prediction, 3.89

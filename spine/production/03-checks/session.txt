@@ -1,2 +1,19 @@
 $ python -m shopwave.checks; echo "exit code $?"
+WARNING: Using incubator modules: jdk.incubator.vector
+✓ fact_sales: revenue >= 0                       0 bad rows
+✓ fact_sales: qty BETWEEN 1 AND 10               0 bad rows
+✓ fact_payments: amount_eur > 0                  0 bad rows
+✓ dim_product: category IS NOT NULL              0 bad rows
+! paid orders with no payment                  191 bad rows
+✓ sales of unknown products                      0 bad rows
+exit code 0
 $ SHOPWAVE_STRICT=1 python -m shopwave.checks; echo "exit code $?"
+WARNING: Using incubator modules: jdk.incubator.vector
+✓ fact_sales: revenue >= 0                       0 bad rows
+✓ fact_sales: qty BETWEEN 1 AND 10               0 bad rows
+✓ fact_payments: amount_eur > 0                  0 bad rows
+✓ dim_product: category IS NOT NULL              0 bad rows
+✗ paid orders with no payment                  191 bad rows
+✓ sales of unknown products                      0 bad rows
+checks: failed, the night stops here
+exit code 1
