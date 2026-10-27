@@ -5,12 +5,6 @@ $ spark-submit --properties-file conf/cluster.conf explore/on_cluster.py
 WARNING: Using incubator modules: jdk.incubator.vector
 master: spark://127.0.0.1:7077
 executors: 2 · cores: 4
-13 countries · stages: 6
-  stage 0: 1 tasks on executors 1
-  stage 2: 50 tasks on executors 0, 1
-  stage 5: 1 tasks on executors 1
-  stage 7: 50 tasks on executors 0, 1
-  stage 8: 4 tasks on executors 0, 1
-  stage 10: 1 tasks on executors 1
+13 countries · 6 stages, 107 tasks: executor 0 ran 17, executor 1 ran 90
 $ ./cluster.sh stop
 cluster stopped

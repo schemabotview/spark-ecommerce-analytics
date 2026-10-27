@@ -26,6 +26,13 @@ export const productionTests: SceneModel = ideFrame({
       type: 'table', id: 'list', title: `${passed} passed`, tone: 'store', columns: ['test'],
       rows: tests.map((t) => ({ id: t, cells: [t.replace(/^test_/, '').replaceAll('_', ' ')] })),
     },
+    {
+      type: 'table', id: 'where', title: 'What is tested where', tone: 'neutral', columns: ['what', 'how', 'when'], rows: [
+        { id: 'w-fn', cells: ['each transform', 'pytest, rows by hand', 'every change'], tone: 'store' },
+        { id: 'w-job', cells: ['the jobs together', 'a nightly on small data', 'before a release'] },
+        { id: 'w-data', cells: ['the data itself', 'checks.py (§3)', 'every night'] },
+      ],
+    },
     { type: 'note', id: 'note', tone: 'ingest', text: 'conftest.py starts one SparkSession for the whole run: a JVM takes seconds to start, a test on four rows takes milliseconds.' },
   ],
   edges: [

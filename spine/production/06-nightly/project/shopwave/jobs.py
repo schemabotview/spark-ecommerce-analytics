@@ -50,8 +50,7 @@ def main(argv: list[str]) -> None:
     elif argv[0] == "run" and set(argv[1:]) <= set(JOBS):
         run(argv[1:])
     else:
-        sys.exit(f"usage: python -m shopwave.jobs [run JOB ... | nightly]; "
-                 f"jobs: {', '.join(JOBS)}")
+        sys.exit(f"no such job: {' '.join(argv)}; python -m shopwave.jobs")
 
 
 if __name__ == "__main__":

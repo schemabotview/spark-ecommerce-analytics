@@ -10,4 +10,4 @@ $ python -m shopwave.jobs run gold
 WARNING: Using incubator modules: jdk.incubator.vector
 gold: written fact_sales, fact_payments, dim_customer, dim_product
 $ python -m shopwave.jobs run nothing
-usage: python -m shopwave.jobs [run JOB ... | nightly]; jobs: bronze, silver, gold, orders, changes, recommend
+no such job: run nothing; python -m shopwave.jobs

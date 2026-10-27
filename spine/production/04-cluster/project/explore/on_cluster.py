@@ -20,9 +20,7 @@ print(f"executors: {len(executors())} · cores: "
 sales = spark.read.format("delta").load("lake/gold/fact_sales")
 by_country = sales.groupBy("country").agg(F.sum("revenue").alias("revenue"))
 rows, stages = metrics.run(spark, "cluster", by_country.collect)
-print(f"{len(rows)} countries · stages: {len(stages)}")
-for s in stages:
-    ran = store.taskList(s.stageId(), s.attemptId(), 1000)
-    hosts = sorted({t.executorId() for t in scala(ran)})
-    print(f"  stage {s.stageId()}: {s.numTasks()} tasks on executors "
-          f"{', '.join(hosts)}")
+ran = [t.executorId() for s in stages
+       for t in scala(store.taskList(s.stageId(), s.attemptId(), 1000))]
+per = ", ".join(f"executor {e} ran {ran.count(e)}" for e in sorted(set(ran)))
+print(f"{len(rows)} countries · {len(stages)} stages, {len(ran)} tasks: {per}")

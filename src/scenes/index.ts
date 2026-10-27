@@ -9,12 +9,13 @@ import { lakehouseScenes } from './lakehouse'
 import { scaleScenes } from './scale'
 import { streamScenes } from './stream'
 import { mlScenes } from './ml'
+import { productionScenes } from './production'
 
 // Scene registry. Sections reference scenes by id; a graphl-flow scene carries no id of its own, so
 // the id is the key here. Scenes are grouped by course (one folder each, mirroring src/content),
 // each folder exporting a Record; ids are globally unique, and a duplicate THROWS rather than
 // letting one course's scene shadow another's.
-const GROUPS: Record<string, SceneModel>[] = [introScenes, startScenes, ingestScenes, cleanScenes, modelScenes, analyticsScenes, lakehouseScenes, scaleScenes, streamScenes, mlScenes]
+const GROUPS: Record<string, SceneModel>[] = [introScenes, startScenes, ingestScenes, cleanScenes, modelScenes, analyticsScenes, lakehouseScenes, scaleScenes, streamScenes, mlScenes, productionScenes]
 
 export const SCENES: Record<string, SceneModel> = {}
 for (const group of GROUPS)
