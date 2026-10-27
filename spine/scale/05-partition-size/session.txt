@@ -1,1 +1,6 @@
 $ python -m explore.partition_size
+365 files · 70 MB · about 197 KB each
+WARNING: Using incubator modules: jdk.incubator.vector
+maxPartitionBytes 128m:   12 partitions
+maxPartitionBytes  16m:   92 partitions
+maxPartitionBytes   1m:  369 partitions
