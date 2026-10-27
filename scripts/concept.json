@@ -4,5 +4,9 @@
   "site": "https://graphl.in",
   "appPath": "/spark-ecommerce-analytics",
   "hashtags": "#ApacheSpark #PySpark #DataEngineering #TechEducation",
-  "panelBg": "radial-gradient(118% 104% at 70% 34%, #f08a4b 0%, #e25a1c 44%, #14100e 100%)"
+  "panelBg": "radial-gradient(118% 104% at 70% 34%, #f08a4b 0%, #e25a1c 44%, #14100e 100%)",
+  "film": {
+    "title": "Learn Apache Spark by building an e-commerce analytics platform: full course, beginner to professional",
+    "blurb": "Every job is really run on Apache Spark 4.2.0 (PySpark, Python 3.14.9, Java 21) — every plan, every stage count and every printed row is real output."
+  }
 }

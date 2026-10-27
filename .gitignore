@@ -2,8 +2,10 @@ node_modules
 dist
 dist-snapshot
 /out
+scripts/out
 .tmp
 /segments
+scripts/segments
 /images
 *.local
 .claude

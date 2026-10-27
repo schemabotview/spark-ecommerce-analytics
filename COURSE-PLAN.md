@@ -29,10 +29,10 @@ into this one.
 ## Packaging for YouTube
 
 **One video: "Learn Apache Spark by building an e-commerce analytics platform: full course,
-beginner to professional"** covers all 11 courses, 82 sections, ~3 h 10 min, as one continuous
+beginner to professional"** covers all 11 courses, 82 sections, 1 h 41 min, as one continuous
 story: the platform grows from its first job to a production pipeline, with no break in the middle.
 
-A course is one YouTube chapter group and the owner's review unit. A section (90–150 s) is one
+A course is one YouTube chapter group and the owner's review unit. A section (51–96 s, mean 74) is one
 chapter, titled *concept: what the platform gets* (e.g. "Broadcast joins: currency conversion in
 one stage"). The video opens with the finished platform running (the payoff first). It is published
 only when all 11 courses are recorded. Each section can also go out as a Short (portrait,

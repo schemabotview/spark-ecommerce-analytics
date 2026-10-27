@@ -1,0 +1,88 @@
+Learn Apache Spark by building an e-commerce analytics platform: full course, beginner to professional
+
+82 sections, 11 courses, 1:41:10.
+Every job is really run on Apache Spark 4.2.0 (PySpark, Python 3.14.9, Java 21) — every plan, every stage count and every printed row is real output.
+
+⏱ CHAPTERS
+0:00:00 ▸ Spark, Shopwave, and why one machine is not enough — What Spark is, and where it is used
+0:01:17 Shopwave, and what we will build
+0:02:34 Why not pandas
+0:03:44 ▸ The first job — Java, a virtual environment and PySpark
+0:05:14 SparkSession: the first DataFrame
+0:06:38 Where a Spark job runs: driver, executors, tasks
+0:08:09 Transformations and actions: nothing runs until you ask
+0:09:30 Daily revenue: the first real job
+0:10:59 Two kinds of error: in the plan, and in a task
+0:12:26 ▸ Land every source (bronze) — Schemas: declare every type
+0:13:54 Corrupt records: encodings and bad lines
+0:15:19 Nested JSON: the clickstream
+0:16:40 explode: one row per item
+0:17:58 Schema drift: the tracker changed
+0:19:19 JDBC: reading the shop's database
+0:20:46 Rows or columns: why Parquet
+0:22:08 The bronze layer
+0:23:36 ▸ Clean and conform (silver) — Column expressions: bronze to silver
+0:24:57 Nulls and conditions
+0:26:26 Deduplication
+0:27:42 Timestamps and time zones
+0:29:05 A Python UDF: spotting the bot
+0:30:28 Built-ins vs pandas UDF vs Python UDF
+0:31:59 Catalyst: how Spark rewrites a query
+0:33:35 Quality gates: write only what makes sense
+0:35:02 ▸ A star schema, and Black Friday (gold) — Facts and dimensions: the star schema
+0:36:25 Join types: what each one keeps
+0:37:45 The shuffle: where a groupBy moves data
+0:39:11 Sort-merge join: shuffle both sides
+0:40:21 Broadcast join: currency conversion without a shuffle
+0:41:45 Partitions: how many tasks, how many files
+0:43:08 Skew: one product, one slow task
+0:44:29 Adaptive Query Execution: re-planning mid-job
+0:45:58 Salting: splitting a hot key by hand
+0:47:21 ▸ Answer the business — KPIs: a year of Shopwave
+0:48:47 Window functions: top products per category
+0:50:04 Frames: a 7-day moving average
+0:51:31 Sessionization: clicks into visits
+0:52:55 The conversion funnel
+0:54:13 Cohort retention: do customers come back?
+0:55:32 RFM segments
+0:56:54 Attribution: which campaign brought the sale
+0:58:18 Spark SQL: the same engine
+0:59:43 ▸ Delta Lake — Why folders of Parquet break
+1:00:50 A Delta table: Parquet files and a log
+1:02:04 Converting the lake
+1:03:16 Incremental loads
+1:04:15 CDC with MERGE
+1:05:21 SCD Type 2
+1:06:22 Time travel and restore
+1:07:15 Schema enforcement and evolution
+1:08:12 Small files and layout
+1:09:13 ▸ The full year, measured — Reading a job
+1:10:23 Executor memory: where a gigabyte goes
+1:11:50 Spill
+1:12:52 Caching
+1:13:45 Partition sizing
+1:14:54 The plan as a tuning tool
+1:15:55 Data skipping
+1:16:49 Cores and time
+1:17:44 ▸ Live data from Kafka — Kafka
+1:18:48 readStream
+1:19:53 A stream is a series of small batch jobs
+1:20:58 Exactly once into Delta
+1:22:02 Live revenue
+1:23:03 Watermarks
+1:24:11 Streaming deduplication
+1:25:13 Stream-static joins
+1:26:21 Cart abandonment
+1:27:27 ▸ Recommendations — Ratings as a matrix
+1:28:31 ML pipelines
+1:29:42 Distributed ALS
+1:30:47 Evaluating honestly
+1:31:58 Scoring everyone
+1:32:54 When not to use Spark
+1:34:03 ▸ Ship it — Jobs as a package
+1:34:54 Testing Spark code
+1:35:53 Data quality as code
+1:36:53 A real cluster
+1:38:08 Idempotent runs and backfills
+1:38:59 The whole platform
+1:39:51 Where next

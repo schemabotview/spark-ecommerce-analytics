@@ -21,17 +21,20 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 
 | # | Course | Sections | Status |
 | --- | --- | --- | --- |
-| 1 | `intro` | 3 | authored, replayed, rendered, looked at; no audio |
-| 2 | `start` | 6 | pilot: authored, replayed, rendered, looked at; no audio |
-| 3 | `ingest` | 8 | authored, replayed, rendered, looked at; no audio |
-| 4 | `clean` | 8 | authored, replayed, rendered, looked at; no audio |
-| 5 | `model` | 9 | authored, replayed, rendered, looked at; no audio |
-| 6 | `analytics` | 9 | authored, replayed, rendered, looked at; no audio |
-| 7 | `lakehouse` | 9 | authored, replayed, rendered, looked at; no audio |
-| 8 | `scale` | 8 | authored, replayed, rendered, looked at; no audio |
-| 9 | `stream` | 9 | authored, replayed, rendered, looked at; no audio |
-| 10 | `ml` | 6 | authored, replayed, rendered, looked at; no audio |
-| 11 | `production` | 7 | authored, replayed, rendered, looked at; no audio |
+| 1 | `intro` | 3 | authored, narrated, recorded 4K |
+| 2 | `start` | 6 | pilot: authored, narrated, recorded 4K |
+| 3 | `ingest` | 8 | authored, narrated, recorded 4K |
+| 4 | `clean` | 8 | authored, narrated, recorded 4K |
+| 5 | `model` | 9 | authored, narrated, recorded 4K |
+| 6 | `analytics` | 9 | authored, narrated, recorded 4K |
+| 7 | `lakehouse` | 9 | authored, narrated, recorded 4K |
+| 8 | `scale` | 8 | authored, narrated, recorded 4K |
+| 9 | `stream` | 9 | authored, narrated, recorded 4K |
+| 10 | `ml` | 6 | authored, narrated, recorded 4K |
+| 11 | `production` | 7 | authored, narrated, recorded 4K |
+
+Narrated and recorded 2026-10-27: all 82 wavs in, every course captured at 3840x2160, and
+combined into the single YouTube film (`npm run film` -> 1 h 41 min).
 
 The owner reviews everything at the end (2026-10-26: "do course by course till end").
 
