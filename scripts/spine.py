@@ -231,7 +231,8 @@ def masked(text: str, step: Path) -> str:
         text = UUID.sub('<uuid>', text)
     if 'hex' in kinds:
         text = re.sub(r'0x[0-9a-f]+', '0x#', text)
-    return re.sub(r'\d+(?:[.,]\d+)*', '#', text) if 'digits' in kinds else text
+    # A number's padding goes with it: f'{s:5.1f}' pads 8.6 one space more than 10.1
+    return re.sub(r' *\d+(?:[.,]\d+)*', ' #', text) if 'digits' in kinds else text
 
 
 def config_of(step: Path) -> dict:
@@ -363,6 +364,7 @@ def main() -> int:
         print('✗ the chain or its data is broken: fix step.json or the snapshots before rewriting transcripts')
         return 1
     for step in steps:
+        before = problems
         transcript, captured = replay(step)
         name = step.relative_to(ROOT)
         if write:
@@ -383,7 +385,7 @@ def main() -> int:
             if (step / 'captured' / file).read_text() != text:
                 problems += 1
                 print(f'✗ {name}: captured/{file} differs from a real run')
-        print(f'{"✗" if problems else "✓"} {name}')
+        print(f'{"✗" if problems > before else "✓"} {name}')
     if not write:
         print(f"{'✗' if problems else '✓'} {len(steps)} spine step(s) replayed, {problems} problem(s)")
     return 1 if problems else 0

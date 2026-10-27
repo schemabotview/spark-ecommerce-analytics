@@ -7,7 +7,7 @@ import code from '../../../spine/production/02-tests/project/tests/test_transfor
 import session from '../../../spine/production/02-tests/session.txt?raw'
 
 // §2 — testing Spark code. The pass count is the session's (its seconds are volatile).
-const passed = outputOf(session, 'python -m pytest -q tests').match(/(\d+) passed/)![1]
+const passed = outputOf(session, 'python -m pytest -q tests | tail -1').match(/(\d+) passed/)![1]
 const tests = [...code.matchAll(/^def (test_\w+)\(spark\):/gm)].map(([, t]) => t)
 
 export const productionTests: SceneModel = ideFrame({
