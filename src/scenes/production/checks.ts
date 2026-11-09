@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { prodTree } from './tree'
@@ -12,7 +13,8 @@ const checks = [...out.matchAll(/^([✓✗!]) (.+?)\s+(\d+) bad rows$/gm)].map((
 const strict = outputOf(session, 'SHOPWAVE_STRICT=1 python -m shopwave.checks 2>&1 | tail -1; echo "exit code ${PIPESTATUS[0]}"')
 const codes = [out, strict].map((o) => o.match(/exit code (\d+)/)![1])
 
-export const productionChecks: SceneModel = ideFrame({
+export const productionChecks: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: prodTree(['shopwave/checks.py', 'shopwave/jobs.py'], 'shopwave/checks.py', ['shopwave/checks.py']),
   editor: { file: 'shopwave/checks.py', code, ...view(code, 'ROWS = [', 'LEFT ANTI JOIN dim_product p'), highlight: linesFrom(code, 'ROWS = [', '("error", "dim_product"') },
   session,
@@ -34,7 +36,6 @@ export const productionChecks: SceneModel = ideFrame({
         { type: 'item', id: 'n-stop', title: 'an error: the night stops', sub: 'nothing builds on bad data', icon: 'zap', tone: 'consume' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'The paid orders with no payment are the generator’s planted 1%: a known problem finance chases, so a warning, not a stop. A check’s level is a decision someone owns.' },
   ],
   edges: [
     { from: 'n-gold', to: 'n-check' },

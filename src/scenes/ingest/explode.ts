@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, lineOf } from '../ide'
+import { lineOf } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { ingestTree } from './tree'
 import code from '../../../spine/ingest/04-explode/project/explore/explode.py?raw'
@@ -13,7 +14,8 @@ const [, exploded, outer] = out.match(/explode: (\d+) rows · explode_outer: (\d
 const rows = [...out.matchAll(/^\|(\w+\.\.\.)\|\s*(\d+)\|\s*(\d+)\|\s*([\d.]+)\|$/gm)].map((m) => m.slice(1))
 const first = rows.filter((r) => r[0] === rows[0][0])
 
-export const ingestExplode: SceneModel = ideFrame({
+export const ingestExplode: SceneModel = ideFrame2({
+  model: 'A list becomes rows',
   tree: ingestTree(['shopwave/__init__.py', 'shopwave/bronze.py', 'shopwave/schemas.py', 'shopwave/session.py', 'explore/clicks.py', 'explore/explode.py', 'explore/infer.py', 'explore/returns.py'],
     'explore/explode.py', ['explore/explode.py']),
   editor: { file: 'explore/explode.py', code, highlight: [lineOf(code, 'F.explode("items")'), lineOf(code, 'F.explode_outer')] },
@@ -32,17 +34,10 @@ export const ingestExplode: SceneModel = ideFrame({
       type: 'table', id: 'counts', title: 'Counted on 2026-10-01', tone: 'ingest', columns: ['', 'rows'], rows: [
         { id: 'c-events', cells: ['events', events] },
         { id: 'c-items', cells: ['events with items', withItems] },
-        { id: 'c-explode', cells: ['explode: one row per item', exploded], tone: 'infra' },
-        { id: 'c-outer', cells: ['explode_outer: + empty lists, as null', outer] },
+        { id: 'c-explode', cells: ['explode: a row per item', exploded], tone: 'infra' },
+        { id: 'c-outer', cells: ['explode_outer: + empty lists', outer] },
       ],
     },
-    {
-      type: 'table', id: 'which', title: 'Which one', tone: 'infra', columns: ['the question', 'use'], rows: [
-        { id: 'w-sold', cells: ['what was sold, per product', 'explode'] },
-        { id: 'w-events', cells: ['every event, with its items', 'explode_outer'] },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'infra', text: `explode drops the ${+events - +withItems} events with an empty list; explode_outer keeps each as one row with a null item. Pick on purpose.` },
   ],
   edges: [{ from: 'ev', to: 'rows', label: 'explode' }],
 })

@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { mlTree } from './tree'
@@ -14,7 +15,8 @@ const taste = rated.split(', ').map((t) => t.split(' '))
 const top = [...out.matchAll(/^\s+(\d)\. (.+?)\s{2,}(\w+)\s+([\d.]+)★$/gm)].map(([, rank, name, cat, score]) => ({ rank, name, cat, score }))
 const liked = new Set(taste.slice(0, 2).map(([c]) => c))
 
-export const mlScore: SceneModel = ideFrame({
+export const mlScore: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: mlTree(['shopwave/ml.py', 'explore/one_customer.py', 'lake/gold/recommendations/'], 'shopwave/ml.py', ['explore/one_customer.py', 'lake/gold/recommendations/']),
   editor: { file: 'shopwave/ml.py', code, ...view(code, 'def recommend(', 'main()'), highlight: linesFrom(code, 'pairs = customers.select("customer_id")', '"rank", F.row_number().over(best))') },
   session,

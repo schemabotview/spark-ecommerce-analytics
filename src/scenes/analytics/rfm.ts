@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { analyticsTree } from './tree'
@@ -11,15 +12,12 @@ const out = outputOf(session, 'python -m explore.rfm')
 const scored = out.match(/customers scored: (\d+)/)![1]
 const segs = [...out.matchAll(/^(\w+)\s+(\d+) customers ·\s+([\d.]+) orders · last\s+(\d+) days ago · €\s+([\d,]+)$/gm)].map((m) => m.slice(1))
 
-export const analyticsRfm: SceneModel = ideFrame({
+export const analyticsRfm: SceneModel = ideFrame2({
+  model: 'Score each customer; segment by rules',
   tree: analyticsTree(['shopwave/analytics.py', 'explore/cohorts.py', 'explore/rfm.py'], 'shopwave/analytics.py', ['explore/rfm.py']),
   editor: { file: 'shopwave/analytics.py', code, ...view(code, 'def rfm(', undefined, 0), highlight: [...linesFrom(code, 'score = lambda', '.withColumn("m"'), ...linesFrom(code, 'segment = (F.when')] },
   session,
   side: [
-    {
-      type: 'table', id: 'segments', title: `${scored} customers, five segments`, tone: 'store', columns: ['segment', 'customers', 'orders', 'last order', 'revenue'],
-      rows: segs.map(([s, c, f, r, m]) => ({ id: `s-${s}`, cells: [s, c, f, `${r} d ago`, `€ ${m}`], tone: s === 'champions' ? 'store' as const : s === 'lost' ? 'consume' as const : undefined })),
-    },
     {
       type: 'group', id: 'score', title: 'ntile(4) over all customers', icon: 'chart', tone: 'ingest', children: [
         { type: 'item', id: 's-r', title: 'R: days since the last order', sub: 'fewer is better: 4', icon: 'clock' },
@@ -28,14 +26,9 @@ export const analyticsRfm: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'rules', title: 'Segment rules, first match wins', tone: 'neutral', columns: ['segment', 'when'], rows: [
-        { id: 'r-champ', cells: ['champions', 'R = 4 and F = 4'] },
-        { id: 'r-loyal', cells: ['loyal', 'F ≥ 3'] },
-        { id: 'r-new', cells: ['new', 'R = 4'] },
-        { id: 'r-lost', cells: ['lost', 'R = 1'] },
-        { id: 'r-occ', cells: ['occasional', 'the rest'] },
-      ],
+      type: 'table', id: 'segments', title: `${scored} customers, five segments`, tone: 'store', columns: ['segment', 'customers', 'revenue'],
+      rows: segs.map(([s, c, , , m]) => ({ id: `s-${s}`, cells: [s, c, `€ ${m}`], tone: s === 'champions' ? 'store' as const : s === 'lost' ? 'consume' as const : undefined })),
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'A window with no partitionBy puts every customer in one partition, on one task: fine for two thousand, a bottleneck for millions (Spark warns in its log).' },
   ],
+  edges: [{ from: 'score', to: 'segments', label: 'rules' }],
 })

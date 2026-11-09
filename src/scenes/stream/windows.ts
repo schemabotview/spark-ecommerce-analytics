@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { streamTree } from './tree'
@@ -11,7 +12,8 @@ const out = outputOf(session, 'python -m explore.live_revenue')
 const [, batches, hours] = out.match(/batches: (\d+) · hours with sales: (\d+)/)!
 const top = [...out.matchAll(/(\d\d-\d\d \d\d:\d\d)–(\d\d:\d\d)\s+(\d+) orders\s+€\s+([\d.]+)/g)].map(([, from, to, orders, eur]) => ({ from, to, orders, eur }))
 
-export const streamWindows: SceneModel = ideFrame({
+export const streamWindows: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: streamTree(['shopwave/stream.py', 'explore/live_revenue.py'], 'shopwave/stream.py', ['explore/live_revenue.py']),
   editor: { file: 'shopwave/stream.py', code, ...view(code, 'def purchases(', 'F.sum("revenue").alias("revenue"))'), highlight: linesFrom(code, 'return purchases.groupBy(F.window("event_ts", width))') },
   session,
@@ -34,7 +36,6 @@ export const streamWindows: SceneModel = ideFrame({
         { id: 'o-append', cells: ['append', 'final rows only, once (§6)'] },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'Complete mode writes the whole result table after every batch, and keeps every window in state for ever. Fine for a day; §6 shows how to let windows close.' },
   ],
   edges: [
     { from: 'w-event', to: 'w-bucket' },

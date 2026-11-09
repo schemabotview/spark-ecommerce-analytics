@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { lakeTree } from './tree'
 import code from '../../../spine/lakehouse/09-small-files/project/explore/small_files.py?raw'
@@ -13,7 +14,8 @@ const deleted = out.match(/Deleted (\d+) files and directories/)![1]
 const rows = out.match(/VACUUM: rows still (\d+)/)![1]
 const onDisk = outputOf(session, 'ls out/daily_sales | grep -c parquet').trim()
 
-export const lakehouseSmallFiles: SceneModel = ideFrame({
+export const lakehouseSmallFiles: SceneModel = ideFrame2({
+  model: 'OPTIMIZE compacts; VACUUM cleans',
   tree: lakeTree(['explore/small_files.py', 'out/daily_sales/'], 'explore/small_files.py', ['explore/small_files.py']),
   editor: { file: 'explore/small_files.py', code, highlight: [...linesFrom(code, 'result = table.optimize()'), ...linesFrom(code, 'removed = table.vacuum(0)')] },
   session,
@@ -33,7 +35,6 @@ export const lakehouseSmallFiles: SceneModel = ideFrame({
         { type: 'item', id: 's-rows', title: `rows: still ${rows}`, sub: 'the table never changed, only its files', icon: 'check', tone: 'store' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'Every task opens its files one by one: a table of thousands of tiny files spends its time opening them. VACUUM keeps 7 days by default; 0 is for a demo.' },
   ],
   edges: [
     { from: 's-opt', to: 's-vac' },

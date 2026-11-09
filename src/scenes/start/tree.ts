@@ -23,13 +23,10 @@ export function explorer({ conf, logs, out, session, py = [], orders }: Files): 
   return [
     { name: '.venv', folder: true, state: 'muted', note: 'PySpark 4.2.0' },
     ...(conf ? [{ name: 'conf', children: [file('log4j2.properties', mark(conf))] }] : []),
-    {
-      name: 'data', children: [{
-        name: 'raw', children: [orders === 'open'
-          ? { name: 'orders', children: [{ name: 'orders-2026-10-01.csv', state: 'active' as const }, { name: '… 30 more days', state: 'muted' as const }] }
-          : { name: 'orders', folder: true, note: '31 days' }],
-      }],
-    },
+    // The compact explorer (frame v2) is 175px: data/raw/orders is one row, so a day's file fits.
+    orders === 'open'
+      ? { name: 'data/raw/orders', children: [{ name: '…2026-10-01.csv', state: 'active' as const }, { name: '30 more days', state: 'muted' as const }] }
+      : { name: 'data/raw/orders', folder: true },
     ...(logs ? [{ name: 'logs', folder: true, state: 'muted' as const, note: "Spark's log" }] : []),
     ...(out ? [{ name: 'out', folder: true, state: 'new' as const, note: 'daily_revenue' }] : []),
     file('.gitignore', undefined),

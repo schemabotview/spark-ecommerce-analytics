@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { lakeTree } from './tree'
@@ -15,7 +16,8 @@ const [, asOf, read] = out.match(/version (\d+), read as it was: (\d+)/)!
 const [, restored, as] = out.match(/restored: (\d+) orders, as version (\d+)/)!
 const last = versions[versions.length - 1].v
 
-export const lakehouseTimeTravel: SceneModel = ideFrame({
+export const lakehouseTimeTravel: SceneModel = ideFrame2({
+  model: 'Every version stays readable',
   tree: lakeTree(['explore/time_travel.py', 'lake/gold/orders/'], 'explore/time_travel.py', ['explore/time_travel.py'], { 'lake/gold/orders/': 'Delta' }),
   editor: { file: 'explore/time_travel.py', code, ...view(code, 'orders = DeltaTable'), highlight: [...linesFrom(code, 'one_day.write'), ...linesFrom(code, 'print(f"version {before}', 'orders.restoreToVersion')] },
   session,
@@ -37,14 +39,6 @@ export const lakehouseTimeTravel: SceneModel = ideFrame({
         { type: 'item', id: 's-restore', title: `RESTORE: version ${as}`, sub: 'a new commit; the history keeps the mistake', icon: 'layers', tone: 'store' },
       ],
     },
-    {
-      type: 'table', id: 'ways', title: 'Reading the past', tone: 'ingest', columns: ['option', 'reads'], rows: [
-        { id: 'x-ver', cells: ['versionAsOf', 'a version number'] },
-        { id: 'x-ts', cells: ['timestampAsOf', 'the version current then'] },
-        { id: 'x-res', cells: ['restoreToVersion', 'makes it current again'], tone: 'store' },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'store', text: 'Old versions live as long as their files: VACUUM (§9) deletes what no version within the retention needs, and time travel to it ends there.' },
   ],
   edges: [
     { from: 's-bug', to: 's-read' },

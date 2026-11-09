@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { view } from '../fold'
 import { prodTree } from './tree'
 import code from '../../../spine/production/05-backfill/project/shopwave/daily.py?raw'
@@ -9,7 +10,8 @@ import session from '../../../spine/production/05-backfill/session.txt?raw'
 const runs = [...session.matchAll(/^\$ python -m shopwave\.daily (.+)\n(?:.*\n)*?daily_sales: .+ rebuilt · (\d+) rows, (\d+) days · € ([\d.]+)/gm)]
   .map(([, args, rows, days, eur]) => ({ args, rows, days, eur }))
 
-export const productionBackfill: SceneModel = ideFrame({
+export const productionBackfill: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: prodTree(['shopwave/daily.py', 'lake/gold/daily_sales/'], 'shopwave/daily.py', ['shopwave/daily.py']),
   editor: { file: 'shopwave/daily.py', code, ...view(code, 'def build(', 'build(spark, first + timedelta(days=n))'), highlight: linesFrom(code, '(daily.write.format("delta").mode("overwrite")', '.partitionBy("order_date").save(DAILY))') },
   session,
@@ -32,7 +34,6 @@ export const productionBackfill: SceneModel = ideFrame({
         { id: 'm-rw', cells: ['overwrite + replaceWhere', 'the same table'], tone: 'store' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'Appending a day would double it on a retry. A job that replaces exactly what it owns can be run any number of times: that is idempotent.' },
   ],
   edges: [
     { from: 'h-day', to: 'h-swap' },

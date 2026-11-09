@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, lineOf, linesFrom } from '../ide'
+import { lineOf, linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { lakeTree } from './tree'
@@ -13,7 +14,8 @@ const failed = out.match(/the job failed: (\w+)/)![1]
 const after = out.match(/after: (\w+)/)![1]
 const left = outputOf(session, 'ls -A lake/gold/fact_sales | wc -l').trim()
 
-export const lakehouseBrokenOverwrite: SceneModel = ideFrame({
+export const lakehouseBrokenOverwrite: SceneModel = ideFrame2({
+  model: 'An overwrite deletes first',
   tree: lakeTree(['explore/overwrite.py'], 'explore/overwrite.py', ['explore/overwrite.py'], { 'lake/gold/': 'Parquet folders' }),
   editor: { file: 'explore/overwrite.py', code, ...view(code, 'path = "lake/gold'), highlight: [...linesFrom(code, 'broken = sales', '.otherwise('), lineOf(code, 'broken.write.mode')] },
   session,
@@ -30,11 +32,10 @@ export const lakehouseBrokenOverwrite: SceneModel = ideFrame({
     {
       type: 'table', id: 'reader', title: 'What a reader sees', tone: 'consume', columns: ['when', 'reads'], rows: [
         { id: 'r-before', cells: ['before the job', `${before} rows`] },
-        { id: 'r-during', cells: ['while it writes', 'some new files, no old ones'] },
+        { id: 'r-during', cells: ['while it writes', 'new files only'] },
         { id: 'r-after', cells: ['after it fails', after], tone: 'consume' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'A folder has no idea which files make up the table: whatever is in it is the table. Delta adds a log that says so, and writes it last.' },
   ],
   edges: [
     { from: 'm-old', to: 'm-del' },

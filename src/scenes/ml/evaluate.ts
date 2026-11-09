@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { mlTree } from './tree'
@@ -12,7 +13,8 @@ const [, train, test] = out.match(/train: (\d+) ratings before October · test: 
 const scores = [...out.matchAll(/^ {2}(.+?)\s+(\d\.\d{3})$/gm)].map(([, name, rmse]) => ({ name, rmse: +rmse }))
 const best = Math.min(...scores.filter((s) => !s.name.includes('random')).map((s) => s.rmse))
 
-export const mlEvaluate: SceneModel = ideFrame({
+export const mlEvaluate: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: mlTree(['shopwave/ml.py', 'explore/evaluate.py'], 'shopwave/ml.py', ['explore/evaluate.py']),
   editor: { file: 'shopwave/ml.py', code, ...view(code, 'def split(', 'F.col("base") + F.col("prediction"))'), highlight: [...linesFrom(code, 'before = F.col("reviewed_at")'), ...linesFrom(code, 'base = ratings.groupBy("product_id")', '"rating", F.col("rating") - F.col("base"))')] },
   session,
@@ -26,6 +28,5 @@ export const mlEvaluate: SceneModel = ideFrame({
       type: 'table', id: 'scores', title: `Train: ${train} before October · test: ${test} after`, tone: 'store', columns: ['#', 'model', 'RMSE'],
       rows: scores.map((s, i) => ({ id: `s${i}`, cells: [String(i + 1), s.name, s.rmse.toFixed(3)], tone: s.rmse === best ? 'store' as const : s.name === 'ALS alone' ? 'consume' as const : undefined })),
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'A random split lets the model train on December to predict October: it looks better than it will be. Split by time, the way it will be used.' },
   ],
 })

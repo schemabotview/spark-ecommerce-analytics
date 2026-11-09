@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { ingestTree } from './tree'
@@ -9,10 +10,10 @@ import session from '../../../spine/ingest/08-bronze/session.txt?raw'
 // §8 — the bronze layer, written. Every count is the session's; the folders are its `ls`.
 const out = outputOf(session, 'python -m shopwave.bronze')
 const counts = Object.fromEntries([...out.matchAll(/(\w+\/\w+)\s+(\d+) rows/g)].map((m) => [m[1], m[2]]))
-const days = outputOf(session, 'ls lake/bronze/clicks').split('\n').filter((l) => l.startsWith('_file_date='))
 const n = (p: string) => counts[p]
 
-export const ingestBronze: SceneModel = ideFrame({
+export const ingestBronze: SceneModel = ideFrame2({
+  model: 'Bronze: every source, as it came',
   tree: ingestTree(['db/', 'jars/', 'lake/bronze/', 'lake/quarantine/', 'shopwave/bronze.py', 'shopwave/schemas.py', 'shopwave/session.py', 'explore/', 'compose.yaml'],
     'shopwave/bronze.py', ['lake/bronze/', 'lake/quarantine/'], { 'lake/bronze/': '7 tables' }),
   editor: { file: 'shopwave/bronze.py', code, ...view(code, 'def main(', undefined, 0), highlight: [...linesFrom(code, 'for name, df in daily.items()', 'out.parquet('), ...linesFrom(code, 'bad.drop("_file_date")', 'quarantine/returns')] },
@@ -38,11 +39,6 @@ export const ingestBronze: SceneModel = ideFrame({
         },
       ],
     },
-    {
-      type: 'table', id: 'days', title: 'ls lake/bronze/clicks', tone: 'infra', columns: ['folder', 'holds'],
-      rows: days.map((d) => ({ id: d.replace('_file_date=', 'd'), cells: [d, `the events that arrived on ${d.split('=')[1]}`] })),
-    },
-    { type: 'note', id: 'note', tone: 'infra', text: 'Bronze changes nothing in the data: it fixes only the format and the types. A query for one day reads only that day’s folder.' },
   ],
   edges: [{ from: 'sources', to: 'bronze', label: 'land' }],
 })

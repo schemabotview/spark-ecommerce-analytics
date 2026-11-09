@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { streamTree } from './tree'
@@ -13,7 +14,8 @@ const mark = out.match(/watermark now: (\S+)/)![1].replace('T', ' ').replace(/\.
 const dropped = out.match(/late events dropped: (\d+)/)![1]
 const open = out.match(/windows still open in state: (\d+)/)![1]
 
-export const streamWatermarks: SceneModel = ideFrame({
+export const streamWatermarks: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: streamTree(['shopwave/stream.py', 'explore/watermarks.py'], 'explore/watermarks.py', ['explore/watermarks.py']),
   editor: { file: 'explore/watermarks.py', code, ...view(code, 'spark = spark_session()'), highlight: [...linesFrom(code, 'late_ok = events.withWatermark'), ...linesFrom(code, '.outputMode("append")')] },
   session,
@@ -35,7 +37,6 @@ export const streamWatermarks: SceneModel = ideFrame({
         { id: 'r-open', cells: ['windows still in state', open] },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'The watermark trades completeness for memory: a longer delay keeps more late events and more state. Choose it from how late your data really arrives.' },
   ],
   edges: [
     { from: 'm-max', to: 'm-mark' },

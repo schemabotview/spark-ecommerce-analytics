@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { analyticsTree } from './tree'
@@ -8,10 +9,10 @@ import session from '../../../spine/analytics/04-sessions/session.txt?raw'
 
 // §4 — sessionization. Counts for people and the bot, and visitor 1's first events, are the session's.
 const out = outputOf(session, 'python -m explore.sessions')
-const who = [...out.matchAll(/^(people|the bot)\s+(\d+) events ·\s+(\d+) visitors ·\s+(\d+) sessions · ([\d.]+) events each$/gm)].map((m) => m.slice(1))
 const one = [...out.matchAll(/^ {2}visitor 1\s+([\d-]+ [\d:]+)\s+(\w+)\s+session (\d+)$/gm)].map((m) => m.slice(1))
 
-export const analyticsSessions: SceneModel = ideFrame({
+export const analyticsSessions: SceneModel = ideFrame2({
+  model: 'A gap over 30 minutes starts a session',
   tree: analyticsTree(['shopwave/analytics.py', 'explore/frames.py', 'explore/sessions.py'], 'shopwave/analytics.py', ['explore/sessions.py']),
   editor: { file: 'shopwave/analytics.py', code, ...view(code, 'def sessions(', undefined, 0), highlight: linesFrom(code, 'in_order = Window', '.drop("starts")') },
   session,
@@ -26,10 +27,6 @@ export const analyticsSessions: SceneModel = ideFrame({
         { type: 'item', id: 'r-gap', title: 'a gap over 30 minutes → 1', sub: 'else 0: this event starts a session', icon: 'filter' },
         { type: 'item', id: 'r-sum', title: 'a running sum of the 1s', sub: 'the session’s number', icon: 'check', tone: 'store' },
       ],
-    },
-    {
-      type: 'table', id: 'who', title: 'October', tone: 'store', columns: ['', 'events', 'visitors', 'sessions', 'per session'],
-      rows: who.map(([w, e, v, s, per]) => ({ id: `w-${w.replace(' ', '-')}`, cells: [w, e, v, s, per], tone: w === 'the bot' ? 'consume' as const : undefined })),
     },
   ],
   edges: [{ from: 'r-lag', to: 'r-gap' }, { from: 'r-gap', to: 'r-sum' }],

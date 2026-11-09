@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { prodTree } from './tree'
@@ -9,7 +10,8 @@ import session from '../../../spine/production/01-jobs/session.txt?raw'
 // §1 — jobs as a package. The job list is the session's own listing.
 const jobs = [...outputOf(session, 'python -m shopwave.jobs').matchAll(/^(\w+)\s+(.+)$/gm)].map(([, name, what]) => ({ name, what }))
 
-export const productionJobs: SceneModel = ideFrame({
+export const productionJobs: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: prodTree(['shopwave/bronze.py', 'shopwave/silver.py', 'shopwave/gold.py', 'shopwave/lake.py', 'shopwave/ml.py', 'shopwave/jobs.py'], 'shopwave/jobs.py', ['shopwave/jobs.py']),
   editor: { file: 'shopwave/jobs.py', code, ...view(code, 'JOBS: dict['), highlight: linesFrom(code, 'JOBS: dict[', '"recommend": (') },
   session,

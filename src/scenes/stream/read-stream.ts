@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { streamTree } from './tree'
@@ -12,7 +13,8 @@ const columns = out.match(/a record: (.+)/)![1].split(', ').map((c) => c.split('
 const read = out.match(/events read: (\d+)/)![1]
 const parts = [...out.matchAll(/^\|\s+(\d+)\|\s+(\d+)\|$/gm)].map(([, p, n]) => ({ p, n }))
 
-export const streamReadStream: SceneModel = ideFrame({
+export const streamReadStream: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: streamTree(['shopwave/tracker.py', 'shopwave/stream.py', 'explore/read_stream.py'], 'shopwave/stream.py', ['shopwave/stream.py', 'explore/read_stream.py']),
   editor: { file: 'shopwave/stream.py', code, ...view(code, 'def kafka(', 'e.*", "partition", "offset")'), highlight: [...linesFrom(code, 'reader = (spark.readStream'), ...linesFrom(code, 'event = F.from_json')] },
   session,

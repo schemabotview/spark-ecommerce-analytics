@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { modelTree } from './tree'
 import code from '../../../spine/model/04-sort-merge/project/explore/sort_merge.py?raw'
@@ -9,7 +10,8 @@ import session from '../../../spine/model/04-sort-merge/session.txt?raw'
 const out = outputOf(session, 'python -m explore.sort_merge')
 const [, rows, moved] = out.match(/joined rows: (\d+) · bytes shuffled: (\d+)/)!
 
-export const modelSortMerge: SceneModel = ideFrame({
+export const modelSortMerge: SceneModel = ideFrame2({
+  model: 'Shuffle, sort, then merge',
   tree: modelTree(['shopwave/gold.py', 'shopwave/metrics.py', 'explore/joins.py', 'explore/sort_merge.py'], 'explore/sort_merge.py', ['shopwave/metrics.py', 'explore/sort_merge.py']),
   editor: { file: 'explore/sort_merge.py', code, highlight: [...linesFrom(code, 'spark.conf.set("spark.sql.autoBroadcastJoinThreshold"'), ...linesFrom(code, 'joined = items.join')] },
   session,
@@ -41,15 +43,6 @@ export const modelSortMerge: SceneModel = ideFrame({
         { id: 'c-bytes', cells: ['bytes shuffled', moved], tone: 'infra' },
       ],
     },
-    {
-      type: 'table', id: 'strategies', title: 'How Spark picks a join', tone: 'ingest', columns: ['strategy', 'when'], rows: [
-        { id: 's-bhj', cells: ['broadcast hash', 'one side under 10 MB: next section'] },
-        { id: 's-smj', cells: ['sort-merge', 'both sides large: the default'], tone: 'infra' },
-        { id: 's-shj', cells: ['shuffled hash', 'one side small per partition'] },
-        { id: 's-bnlj', cells: ['broadcast nested loop', 'no equality in the condition'] },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'infra', text: 'Both sides are shuffled so that equal order_ids land in the same task, then sorted, then merged in one pass. It works for any size: the default when neither side is small.' },
   ],
   edges: [{ from: 'sides', to: 'smj', label: 'merge' }],
 })

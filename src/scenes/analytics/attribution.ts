@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { analyticsTree } from './tree'
@@ -8,18 +9,18 @@ import session from '../../../spine/analytics/08-attribution/session.txt?raw'
 
 // §8 — last-touch attribution. Campaign windows and credited revenue are the session's.
 const out = outputOf(session, 'python -m explore.attribution')
-const camps = [...out.matchAll(/(\S+) \((\d\d-\d\d)→(\d\d-\d\d)\)/g)].map((m) => m.slice(1))
 const credit = [...out.matchAll(/^(\S+)\s+(\w+)\s+(\d+) sales\s+€\s+([\d.]+)$/gm)].map((m) => m.slice(1))
 
-export const analyticsAttribution: SceneModel = ideFrame({
+export const analyticsAttribution: SceneModel = ideFrame2({
+  model: 'Last touch gets the credit',
   tree: analyticsTree(['shopwave/analytics.py', 'shopwave/bronze.py', 'explore/attribution.py', 'explore/rfm.py'], 'shopwave/analytics.py', ['explore/attribution.py'],
     { 'shopwave/bronze.py': '+ campaigns' }),
   editor: { file: 'shopwave/analytics.py', code, ...view(code, 'def attribution(', undefined, 0), highlight: [...linesFrom(code, 'touched = visits.withColumn', '"touch", F.last'), ...linesFrom(code, 'running = (F.col("touch")', 'return bought.join')] },
   session,
   side: [
     {
-      type: 'table', id: 'credit', title: 'October’s sales, credited', tone: 'store', columns: ['campaign', 'channel', 'sales', 'revenue'],
-      rows: credit.map(([c, ch, n, r]) => ({ id: `r-${c.replace(/[()]/g, '')}`, cells: [c, ch, n, `€ ${r}`] })),
+      type: 'table', id: 'credit', title: 'October’s sales, credited', tone: 'store', columns: ['campaign', 'sales', 'revenue'],
+      rows: credit.map(([c, , n, r]) => ({ id: `r-${c.replace(/[()]/g, '')}`, cells: [c, n, `€ ${r}`] })),
     },
     {
       type: 'group', id: 'how', title: 'Last touch, in two steps', icon: 'workflow', tone: 'ingest', children: [
@@ -27,11 +28,6 @@ export const analyticsAttribution: SceneModel = ideFrame({
         { type: 'item', id: 'h-range', title: 'join campaigns on a range', sub: 'touch = id AND date BETWEEN start AND end', icon: 'filter', tone: 'store' },
       ],
     },
-    {
-      type: 'table', id: 'camps', title: 'Campaigns (bronze: multi-line JSON)', tone: 'neutral', columns: ['campaign', 'runs'],
-      rows: camps.map(([c, a, b]) => ({ id: `c-${c}`, cells: [c, `${a} → ${b}`] })),
-    },
-    { type: 'note', id: 'note', tone: 'store', text: 'In October only the newsletter and retargeting were running: a click still named black-friday would fall outside its dates and earn nothing.' },
   ],
   edges: [{ from: 'h-last', to: 'h-range' }],
 })

@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { view } from '../fold'
 import { lakeTree } from './tree'
 import code from '../../../spine/lakehouse/04-incremental/project/shopwave/lake.py?raw'
@@ -9,7 +10,8 @@ import session from '../../../spine/lakehouse/04-incremental/session.txt?raw'
 const runs = [...session.matchAll(/^\$ python -m shopwave\.lake orders(.*)\n(?:.*\n)*?gold\/orders: \+(\d+) rows, (\d+) in all/gm)]
   .map(([, args, added, total]) => ({ args: args.trim() || '(none)', added, total }))
 
-export const lakehouseIncremental: SceneModel = ideFrame({
+export const lakehouseIncremental: SceneModel = ideFrame2({
+  model: 'Load only what is new',
   tree: lakeTree(['shopwave/lake.py'], 'shopwave/lake.py', ['shopwave/lake.py'], { 'shopwave/lake.py': 'Delta jobs' }),
   editor: { file: 'shopwave/lake.py', code, ...view(code, 'def load_orders(', 'return new.count()'), highlight: linesFrom(code, 'if DeltaTable.isDeltaTable', 'orders = orders.filter(F.col("order_date") > mark)') },
   session,
@@ -25,14 +27,6 @@ export const lakehouseIncremental: SceneModel = ideFrame({
       type: 'table', id: 'runs', title: 'Three runs of the same job', tone: 'store', columns: ['arguments', 'added', 'in all'],
       rows: runs.map((r, i) => ({ id: `r${i}`, cells: [r.args, `+${r.added}`, r.total], tone: r.added === '0' ? 'store' as const : undefined })),
     },
-    {
-      type: 'table', id: 'ways', title: 'Ways to find what is new', tone: 'ingest', columns: ['way', 'works when'], rows: [
-        { id: 'w-mark', cells: ['a high-water mark', 'rows are only added'], tone: 'store' },
-        { id: 'w-cdc', cells: ['a change feed (§5)', 'rows change after landing'] },
-        { id: 'w-full', cells: ['rebuild everything', 'the table is small'] },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'store', text: 'Run it twice and the second run adds nothing: the mark is read from the table itself, so a job that crashed or ran again never loads a day twice.' },
   ],
   edges: [
     { from: 'h-mark', to: 'h-new' },

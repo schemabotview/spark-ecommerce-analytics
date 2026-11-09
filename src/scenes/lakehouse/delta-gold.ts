@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, lineOf } from '../ide'
+import { lineOf } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { lakeTree } from './tree'
@@ -19,24 +20,17 @@ const convert = outputOf(session, 'python -m explore.convert')
 const files = convert.match(/converted: (\d+) parquet files/)![1]
 const [, rows, log] = convert.match(/rows: (\d+) · log: (\S+)/)!
 
-export const lakehouseDeltaGold: SceneModel = ideFrame({
+export const lakehouseDeltaGold: SceneModel = ideFrame2({
+  model: 'A log makes a folder a table',
   tree: lakeTree(['shopwave/session.py', 'shopwave/gold.py', 'explore/overwrite.py', 'explore/convert.py', 'jars.txt', 'requirements.txt'], 'shopwave/gold.py', ['explore/convert.py'], { 'lake/gold/': 'Delta now' }),
   editor: { file: 'shopwave/gold.py', code, ...view(code, 'def main('), highlight: [lineOf(code, 'df.write.format("delta")')] },
   session,
   side: [
     {
-      type: 'table', id: 'twice', title: `The same failed overwrite, ${before} rows before`, tone: 'store', columns: ['', 'Parquet folder', 'Delta table'], rows: [
-        { id: 't-fail', cells: ['the job', p.failed, d.failed] },
-        { id: 't-after', cells: ['a reader after', p.after, `${d.after} rows`], tone: 'store' },
-        { id: 't-log', cells: ['the log', '—', `versions: ${versions}`] },
-      ],
-    },
-    {
-      type: 'table', id: 'setup', title: 'What Delta needed', tone: 'ingest', columns: ['file', 'change'], rows: [
-        { id: 'u-req', cells: ['requirements.txt', 'delta-spark==4.4.1'] },
-        { id: 'u-jars', cells: ['jars.txt', 'delta-spark, delta-storage'] },
-        { id: 'u-sess', cells: ['session.py', 'the extension + the catalog'] },
-        { id: 'u-gold', cells: ['gold.py', 'format("delta")'] },
+      type: 'table', id: 'twice', title: `The same failed overwrite, ${before} rows before`, tone: 'store', columns: ['', 'a reader after it'], rows: [
+        { id: 't-parquet', cells: ['Parquet', p.after], tone: 'consume' },
+        { id: 't-delta', cells: ['Delta', `${d.after} rows`], tone: 'store' },
+        { id: 't-log', cells: ['Delta’s log', `versions: ${versions}`] },
       ],
     },
     {
@@ -46,7 +40,6 @@ export const lakehouseDeltaGold: SceneModel = ideFrame({
         { type: 'item', id: 'c-rows', title: `${rows} rows, read as Delta`, sub: 'the same rows, now a table', icon: 'table', tone: 'store' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'store', text: 'Delta’s writer does not delete anything: it writes new files, then one commit swaps them in. A failed job never commits, so readers keep the old version.' },
   ],
   edges: [
     { from: 'c-files', to: 'c-log' },

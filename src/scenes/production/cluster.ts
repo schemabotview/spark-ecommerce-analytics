@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { prodTree } from './tree'
@@ -14,7 +15,8 @@ const [, executors, cores] = out.match(/executors: (\d+) · cores: (\d+)/)!
 const [, countries, stages, tasks, per] = out.match(/(\d+) countries · (\d+) stages, (\d+) tasks: (.+)/)!
 const ran = [...per.matchAll(/executor (\d+) ran (\d+)/g)].map(([, e, n]) => ({ e, n }))
 
-export const productionCluster: SceneModel = ideFrame({
+export const productionCluster: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: prodTree(['cluster.sh', 'conf/cluster.conf', 'explore/on_cluster.py', 'shopwave/session.py'], 'cluster.sh', ['cluster.sh', 'conf/cluster.conf', 'explore/on_cluster.py']),
   editor: { file: 'cluster.sh', lang: 'shell', code, ...view(code, 'case "$1" in', 'echo "cluster stopped";;'), highlight: linesFrom(code, '"$daemon" start $master 1', '--work-dir "$SPARK_LOG_DIR/work" > /dev/null') },
   session,
@@ -42,7 +44,6 @@ export const productionCluster: SceneModel = ideFrame({
         { id: 'v-jars', cells: ['jars', 'spark.jars in code', 'before the JVM starts'] },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'Executors are other processes now: shopwave.zip ships the package to them, and conf/cluster.conf gives the driver its jars before it starts. On real machines, the data must be on storage they all reach.' },
   ],
   edges: [
     { from: 'c-driver', to: 'c-master' },

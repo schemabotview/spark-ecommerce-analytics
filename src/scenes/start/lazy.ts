@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, lineOf } from '../ide'
+import { lineOf } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { explorer } from './tree'
 import code from '../../../spine/start/04-lazy/project/lazy.py?raw'
@@ -14,7 +15,8 @@ const read = after('read October'), paid = after('kept paid orders'), german = a
 const count = out.match(/count\(\): (\d+)/)![1]
 const jobs = (n: string) => `${n} job${n === '1' ? '' : 's'} so far`
 
-export const startLazy: SceneModel = ideFrame({
+export const startLazy: SceneModel = ideFrame2({
+  model: 'Transformations plan; actions run',
   tree: explorer({ conf: 'plain', logs: true, session: 'new', py: [['first_job.py', undefined], ['lazy.py', 'active']] }),
   editor: { file: 'lazy.py', code, highlight: [lineOf(code, 'paid = '), lineOf(code, 'german = '), lineOf(code, 'german.count()')] },
   session,
@@ -28,19 +30,11 @@ export const startLazy: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'kinds', title: 'Two kinds of method', tone: 'ingest', columns: ['kind', 'returns', 'examples'], rows: [
-        { id: 'k-t', cells: ['transformation', 'a new DataFrame, at once', 'filter, select, groupBy'] },
-        { id: 'k-a', cells: ['action', 'an answer: runs a job', 'count, show, write'], tone: 'infra' },
+      type: 'table', id: 'kinds', title: 'Two kinds of method', tone: 'ingest', columns: ['kind', 'returns'], rows: [
+        { id: 'k-t', cells: ['filter, select', 'a DataFrame, at once'] },
+        { id: 'k-a', cells: ['count, show', 'an answer: a job'], tone: 'infra' },
       ],
     },
-    {
-      type: 'table', id: 'actions', title: 'Actions so far in the course', tone: 'infra', columns: ['action', 'in', 'answer'], rows: [
-        { id: 'a-show', cells: ['show(3)', 'first_job.py', 'prints 3 rows'] },
-        { id: 'a-count', cells: ['count()', 'lazy.py', `${count} rows`], tone: 'infra' },
-        { id: 'a-write', cells: ['write.csv(…)', 'next section', 'files on disk'] },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'ingest', text: 'A DataFrame is a plan, not data. An action hands the whole plan to Spark, which can then read only the columns and rows the plan needs.' },
   ],
   edges: [
     { from: 'p-read', to: 'p-paid' },

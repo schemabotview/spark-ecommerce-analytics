@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { ingestTree } from './tree'
@@ -13,7 +14,8 @@ const parts = [...out.matchAll(/partition (\d+):\s+(\d+) rows {2}where (.+)/g)].
 const health = outputOf(session, "docker compose ps --format '{{.Service}}: {{.State}} ({{.Health}})'")
 const short = (where: string) => where.replaceAll('"customer_id"', 'id').replace(' or id is null', ' or null').replace(' AND ', ' and ')
 
-export const ingestJdbc: SceneModel = ideFrame({
+export const ingestJdbc: SceneModel = ideFrame2({
+  model: 'One query per partition',
   tree: ingestTree(['db/init.sql', 'jars/', 'shopwave/bronze.py', 'shopwave/schemas.py', 'shopwave/session.py', 'explore/jdbc.py', 'compose.yaml', 'jars.txt'],
     'shopwave/bronze.py', ['db/init.sql', 'jars/', 'explore/jdbc.py', 'compose.yaml', 'jars.txt'], { 'jars/': 'the JDBC driver' }),
   editor: { file: 'shopwave/bronze.py', code, ...view(code, 'def table(', undefined, 0), highlight: linesFrom(code, 'return spark.read.jdbc(', 'numPartitions=partitions') },
@@ -37,14 +39,6 @@ export const ingestJdbc: SceneModel = ideFrame({
       type: 'table', id: 'parts', title: 'One query per partition', tone: 'infra', columns: ['', 'where', 'rows'],
       rows: parts.map(([i, n, w]) => ({ id: `p${i}`, cells: [i, short(w), n] })),
     },
-    {
-      type: 'table', id: 'args', title: 'What read.jdbc is told', tone: 'ingest', columns: ['argument', 'here', 'because'], rows: [
-        { id: 'a-col', cells: ['column', 'customer_id', 'a key spread evenly'] },
-        { id: 'a-bounds', cells: ['lowerBound, upperBound', 'min, max', 'asked first'] },
-        { id: 'a-n', cells: ['numPartitions', '4', 'queries, and connections'] },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'infra', text: 'Without column and bounds, Spark sends ONE query and one task reads the whole table. With them, it splits the key range into strides, one query each, in parallel.' },
   ],
   edges: [{ from: 'spark', to: 'db', label: '4 queries' }],
 })

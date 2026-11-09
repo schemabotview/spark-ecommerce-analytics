@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { scaleTree } from './tree'
@@ -14,7 +15,8 @@ const reads = stages.filter((s) => +s.read > 0).map((s) => +s.read)
 const role = (s: (typeof stages)[number]) =>
   +s.read > 0 ? (+s.read === Math.max(...reads) ? 'read order_items' : 'read orders, paid only') : +s.write > 0 ? 'join, then partial sums' : 'add the sums up'
 
-export const scaleEventLog: SceneModel = ideFrame({
+export const scaleEventLog: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: scaleTree(['shopwave/scale.py', 'explore/event_log.py', 'logs/events/'], 'explore/event_log.py', ['shopwave/scale.py', 'explore/event_log.py', 'logs/events/'], { 'logs/events/': 'JSON lines' }),
   editor: { file: 'explore/event_log.py', code, ...view(code, 'os.makedirs'), highlight: [...linesFrom(code, '"spark.eventLog.enabled"', '"spark.eventLog.compress"'), ...linesFrom(code, 'if event["Event"] != "SparkListenerStageCompleted"')] },
   session,
@@ -28,7 +30,6 @@ export const scaleEventLog: SceneModel = ideFrame({
         type: 'item' as const, id: `g${s.id}`, title: `stage ${s.id}: ${role(s)}`, sub: `${s.tasks} task${s.tasks === '1' ? '' : 's'}`, icon: +s.read > 0 ? 'file' as const : 'cpu' as const,
       })),
     },
-    { type: 'note', id: 'note', tone: 'store', text: 'The Spark UI is drawn from these same events: the history server replays the log. Every table this course shows is read from it, not from a screenshot.' },
   ],
   edges: stages.slice(1).map((s, i) => ({ from: `g${stages[i].id}`, to: `g${s.id}` })),
 })

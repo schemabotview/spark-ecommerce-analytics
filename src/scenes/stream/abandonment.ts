@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { streamTree } from './tree'
@@ -11,7 +12,8 @@ const out = outputOf(session, 'python -m explore.abandonment')
 const [, batches, alerts, open] = out.match(/batches: (\d+) · alerts: (\d+) · visits still open in state: (\d+)/)!
 const first = [...out.matchAll(/^\s+(\S+)\s+(\d\d:\d\d)–(\d\d:\d\d)\s+(\d+) events/gm)].map(([, who, from, to, n]) => ({ who, from, to, n }))
 
-export const streamAbandonment: SceneModel = ideFrame({
+export const streamAbandonment: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: streamTree(['shopwave/stream.py', 'explore/abandonment.py'], 'shopwave/stream.py', ['explore/abandonment.py']),
   editor: { file: 'shopwave/stream.py', code, ...view(code, 'def abandoned_carts('), highlight: linesFrom(code, 'visits = events.groupBy(visitor.alias("visitor")', 'return visits.filter("carted AND NOT bought")') },
   session,
@@ -34,7 +36,6 @@ export const streamAbandonment: SceneModel = ideFrame({
         { id: 'k-session', cells: ['session', 'set by gaps in activity'], tone: 'store' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: `${open} visits were still open when the stream stopped: their 30 minutes had not passed, so no one knows yet.` },
   ],
   edges: [
     { from: 'v-open', to: 'v-quiet' },

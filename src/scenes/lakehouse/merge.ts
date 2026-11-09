@@ -1,7 +1,7 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { lineOf, linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
-import { view } from '../fold'
 import { lakeTree } from './tree'
 import code from '../../../spine/lakehouse/05-merge/project/shopwave/lake.py?raw'
 import session from '../../../spine/lakehouse/05-merge/session.txt?raw'
@@ -9,15 +9,15 @@ import session from '../../../spine/lakehouse/05-merge/session.txt?raw'
 // §5 — CDC with MERGE. The feed's size, the refusal and both status counts are the session's.
 const out = outputOf(session, 'python -m explore.merge')
 const [, changes, twice] = out.match(/feed: (\d+) changes · (\d+) orders changed twice/)!
-const refused = out.match(/MERGE as it comes: (\w+)/)![1]
 const updated = out.match(/MERGE latest per order: (\d+) orders updated/)![1]
 const status = (line: string) => Object.fromEntries([...out.match(new RegExp(`${line}\\s*\\{(.*)\\}`))![1].matchAll(/'(\w+)': (\d+)/g)].map((m) => [m[1], m[2]]))
 const [before, after] = [status('status before:'), status('status after:')]
 const states = [...new Set([...Object.keys(before), ...Object.keys(after)])]
 
-export const lakehouseMerge: SceneModel = ideFrame({
+export const lakehouseMerge: SceneModel = ideFrame2({
+  model: 'MERGE: update in one commit',
   tree: lakeTree(['shopwave/lake.py', 'explore/merge.py', 'data/raw/order_changes/'], 'shopwave/lake.py', ['explore/merge.py', 'data/raw/order_changes/']),
-  editor: { file: 'shopwave/lake.py', code, ...view(code, 'def latest(', 'return orders.history(1)'), highlight: [...linesFrom(code, 'newest = Window', '.filter("n = 1")'), ...linesFrom(code, '(orders.alias("o").merge', '.execute())')] },
+  editor: { file: 'shopwave/lake.py', code, show: [[lineOf(code, 'def latest('), lineOf(code, '.filter("n = 1")')], [lineOf(code, 'orders = DeltaTable.forPath'), lineOf(code, '.execute())')]], highlight: [...linesFrom(code, 'newest = Window', '.filter("n = 1")'), ...linesFrom(code, '(orders.alias("o").merge', '.execute())')] },
   session,
   side: [
     {
@@ -31,14 +31,6 @@ export const lakehouseMerge: SceneModel = ideFrame({
       type: 'table', id: 'status', title: 'gold/orders by status', tone: 'store', columns: ['status', 'before', 'after'],
       rows: states.map((s) => ({ id: `s-${s}`, cells: [s, before[s] ?? '—', after[s] ?? '—'], tone: before[s] !== after[s] ? 'store' as const : undefined })),
     },
-    {
-      type: 'table', id: 'clauses', title: 'A MERGE’s clauses', tone: 'ingest', columns: ['clause', 'here'], rows: [
-        { id: 'k-upd', cells: ['whenMatchedUpdate', 'a newer status'], tone: 'store' },
-        { id: 'k-ins', cells: ['whenNotMatchedInsert', 'not needed: loaded in §4'] },
-        { id: 'k-del', cells: ['whenMatchedDelete', 'for a deleted row'] },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'consume', text: `Merged as it comes, the feed fails with ${refused.replaceAll('_', '_\u200b')}: two changes to one order, and Delta will not guess which wins.` },
   ],
   edges: [
     { from: 'f-latest', to: 'f-match' },

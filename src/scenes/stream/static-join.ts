@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { streamTree } from './tree'
@@ -11,7 +12,8 @@ const out = outputOf(session, 'python -m explore.stream_static')
 const [, batches, products] = out.match(/batches: (\d+) · dim_product: (\d+) products/)!
 const rows = [...out.matchAll(/^\|\s*(\w+)\|\s*(\d+)\|\s*(\d+)\|\s*(\d+)\|$/gm)].map(([, c, v, a, p]) => ({ c, v, a, p }))
 
-export const streamStaticJoin: SceneModel = ideFrame({
+export const streamStaticJoin: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: streamTree(['shopwave/stream.py', 'explore/stream_static.py', 'lake/gold/dim_product/'], 'shopwave/stream.py', ['explore/stream_static.py'], { 'lake/gold/dim_product/': 'Delta' }),
   editor: { file: 'shopwave/stream.py', code, ...view(code, 'def with_products('), highlight: linesFrom(code, 'items = events.select("event_id"', 'return items.join(products') },
   session,
@@ -33,7 +35,6 @@ export const streamStaticJoin: SceneModel = ideFrame({
         { id: 'k-stream', cells: ['stream–stream', 'both sides, until a watermark'] },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'No state for the static side: a product renamed in gold shows up from the next batch on. Joining two streams is different: both sides must be held in state.' },
   ],
   edges: [
     { from: 'j-stream', to: 'j-static', label: 'join' },

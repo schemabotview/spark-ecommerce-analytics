@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { modelTree } from './tree'
@@ -11,7 +12,8 @@ const out = outputOf(session, 'python -m explore.aqe')
 const runs = [...out.matchAll(/AQE (on|off)\s*: join stage\s+(\d+) tasks · largest\s+(\d+) rows · median\s+(\d+) · read (\d+) rows/g)].map((m) => m.slice(1))
 const off = runs.find((r) => r[0] === 'off')!, on = runs.find((r) => r[0] === 'on')!
 
-export const modelAqe: SceneModel = ideFrame({
+export const modelAqe: SceneModel = ideFrame2({
+  model: 'AQE re-plans between stages',
   tree: modelTree(['shopwave/gold.py', 'shopwave/metrics.py', 'explore/aqe.py', 'explore/skew.py'], 'explore/aqe.py', ['explore/aqe.py']),
   editor: { file: 'explore/aqe.py', code, ...view(code, 'spark = spark_session()', undefined, 0), highlight: linesFrom(code, '# AQE\'s thresholds', 'minPartitionSize') },
   session,
@@ -28,14 +30,6 @@ export const modelAqe: SceneModel = ideFrame({
       type: 'table', id: 'runs', title: 'The skewed join, twice', tone: 'ingest', columns: ['AQE', 'tasks', 'largest', 'median'],
       rows: [off, on].map(([w, t, big, med]) => ({ id: `r-${w}`, cells: [w, t, big, med], tone: w === 'on' ? 'store' as const : 'consume' as const })),
     },
-    {
-      type: 'table', id: 'knobs', title: 'Its thresholds: default, and here', tone: 'neutral', columns: ['spark.sql.adaptive.…', 'default', 'here'], rows: [
-        { id: 'n-adv', cells: ['advisoryPartitionSizeInBytes', '64 MB', code.match(/advisoryPartitionSizeInBytes", "(\w+)"/)![1]] },
-        { id: 'n-skew', cells: ['skewJoin.skewedPartition…', '256 MB', code.match(/skewedPartitionThresholdInBytes", "(\w+)"/)![1]] },
-        { id: 'n-min', cells: ['coalescePartitions.minPartitionSize', '1 MB', code.match(/minPartitionSize", "(\w+)"/)![1]] },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'store', text: 'AQE is on by default since Spark 3.2. Its thresholds are sized for gigabytes (a skewed partition is over 256 MB), so here they are scaled down to our month: same rules, smaller numbers.' },
   ],
   edges: [{ from: 'a-stats', to: 'a-coalesce' }, { from: 'a-coalesce', to: 'a-split' }, { from: 'a-split', to: 'a-bhj' }],
 })

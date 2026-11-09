@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { scaleTree } from './tree'
 import code from '../../../spine/scale/05-partition-size/project/explore/partition_size.py?raw'
@@ -10,7 +11,8 @@ const out = outputOf(session, 'python -m explore.partition_size')
 const [, files, total, each] = out.match(/(\d+) files · (\d+) MB · about (\d+) KB each/)!
 const sizes = [...out.matchAll(/maxPartitionBytes\s+(\w+):\s+(\d+) partitions/g)].map(([, size, parts]) => ({ size, parts }))
 
-export const scalePartitionSize: SceneModel = ideFrame({
+export const scalePartitionSize: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: scaleTree(['explore/partition_size.py'], 'explore/partition_size.py', ['explore/partition_size.py'], { 'data/sf1/': `${files} files a table` }),
   editor: { file: 'explore/partition_size.py', code, highlight: linesFrom(code, 'for size in', 'f"{items.rdd.getNumPartitions()') },
   session,
@@ -33,7 +35,6 @@ export const scalePartitionSize: SceneModel = ideFrame({
         { id: 'a-files', cells: ['the files', 'big: compact small ones (7.9)'] },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'Too few partitions leave cores idle; too many spend their time starting tasks. Small files are the usual cause of the second.' },
   ],
   edges: [
     { from: 'r-cost', to: 'r-pack' },

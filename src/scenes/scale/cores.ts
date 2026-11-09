@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { scaleTree } from './tree'
@@ -11,7 +12,8 @@ const out = outputOf(session, 'python -m explore.cores')
 const runs = [...out.matchAll(/local\[(\d+)\]:\s+([\d.]+) s · ([\d.]+)×/g)].map(([, c, s, x]) => ({ cores: +c, secs: +s, speedup: +x }))
 const cpus = outputOf(session, 'nproc').trim()
 
-export const scaleCores: SceneModel = ideFrame({
+export const scaleCores: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: scaleTree(['shopwave/scale.py', 'explore/cores.py'], 'explore/cores.py', ['explore/cores.py']),
   editor: { file: 'explore/cores.py', code, ...view(code, 'if len(sys.argv) > 1'), highlight: [...linesFrom(code, 'spark = spark_session(**{"spark.master"'), ...linesFrom(code, 'start = time.perf_counter()', 'print(f"{time.perf_counter()')] },
   session,
@@ -30,6 +32,5 @@ export const scaleCores: SceneModel = ideFrame({
         { type: 'item', id: 'w-shared', title: 'the shared machine', sub: 'one disk, one memory bus, the OS', icon: 'server' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'More cores help until something they share runs out. On a cluster the same curve flattens on the network and the shuffle: measure before you buy.' },
   ],
 })

@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { streamTree } from './tree'
 import code from '../../../spine/stream/07-dedupe/project/explore/stream_dedupe.py?raw'
@@ -11,7 +12,8 @@ const [, read, kept, , copies] = out.match(/read (\d+) · kept (\d+) · distinct
 const held = out.match(/ids held in state: (\d+)/)![1]
 const late = +read - +kept - +copies
 
-export const streamDedupe: SceneModel = ideFrame({
+export const streamDedupe: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: streamTree(['shopwave/stream.py', 'explore/stream_dedupe.py'], 'explore/stream_dedupe.py', ['explore/stream_dedupe.py']),
   editor: { file: 'explore/stream_dedupe.py', code, highlight: linesFrom(code, 'once = (events.withWatermark', '.dropDuplicatesWithinWatermark') },
   session,
@@ -38,7 +40,6 @@ export const streamDedupe: SceneModel = ideFrame({
         { id: 'w-wm', cells: ['…WithinWatermark', 'recent ids only'], tone: 'store' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'Plain dropDuplicates on a stream keeps every id for ever. Within a watermark, the state holds only the recent ones: a copy must arrive within the window to be caught.' },
   ],
   edges: [
     { from: 's-new', to: 's-seen' },

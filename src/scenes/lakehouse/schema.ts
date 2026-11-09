@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { lakeTree } from './tree'
@@ -12,15 +13,16 @@ const refusal = (name: string) => out.match(new RegExp(`${name}: refused, (\\w+)
 const columns = out.match(/columns now: (\d+)/)![1]
 const [, oldNulls, newRows] = out.match(/channel on old rows: (\d+) nulls · on new rows: (\d+)/)!
 
-export const lakehouseSchema: SceneModel = ideFrame({
+export const lakehouseSchema: SceneModel = ideFrame2({
+  model: 'Enforce the schema; evolve it on purpose',
   tree: lakeTree(['explore/schema.py', 'lake/gold/orders/'], 'explore/schema.py', ['explore/schema.py'], { 'lake/gold/orders/': 'Delta' }),
   editor: { file: 'explore/schema.py', code, ...view(code, 'orders = spark.read'), highlight: [...linesFrom(code, 'wrong_type ='), ...linesFrom(code, 'extra ='), ...linesFrom(code, 'append(extra, mergeSchema')] },
   session,
   side: [
     {
       type: 'table', id: 'writes', title: 'Three appends to gold/orders', tone: 'store', columns: ['write', 'Delta says'], rows: [
-        { id: 'w-type', cells: ['total as a string', refusal('total as a string')], tone: 'consume' },
-        { id: 'w-col', cells: ['a new column', refusal('a new column')], tone: 'consume' },
+        { id: 'w-type', cells: ['total as a string', refusal('total as a string') && 'refused'], tone: 'consume' },
+        { id: 'w-col', cells: ['a new column', refusal('a new column') && 'refused'], tone: 'consume' },
         { id: 'w-merge', cells: ['the same, mergeSchema', `written: ${columns} columns`], tone: 'store' },
       ],
     },
@@ -31,14 +33,6 @@ export const lakehouseSchema: SceneModel = ideFrame({
         { type: 'item', id: 'r-evolve', title: 'mergeSchema: a column added on purpose', sub: `old rows: ${oldNulls} nulls · new rows: ${newRows}`, icon: 'layers' },
       ],
     },
-    {
-      type: 'table', id: 'opts', title: 'Changing a schema on purpose', tone: 'ingest', columns: ['option', 'with', 'does'], rows: [
-        { id: 'o-merge', cells: ['mergeSchema', 'append', 'adds new columns'], tone: 'store' },
-        { id: 'o-over', cells: ['overwriteSchema', 'overwrite', 'replaces the schema'] },
-        { id: 'o-none', cells: ['neither', 'any write', 'refused if it differs'], tone: 'consume' },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'consume', text: 'A folder of Parquet takes any write: the wrong type lands in new files, and the next reader fails, not the writer. Delta refuses the write itself.' },
   ],
   edges: [
     { from: 'r-check', to: 'r-refuse' },

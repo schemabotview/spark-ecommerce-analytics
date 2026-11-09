@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { explorer } from './tree'
 import code from '../../../spine/start/05-daily-revenue/project/daily_revenue.py?raw'
@@ -11,7 +12,8 @@ const listing = outputOf(session, 'ls out/daily_revenue').split('\n')
 const part = listing.find((f) => f.startsWith('part-'))!
 const short = part.replace(/^(part-\d+)-.*(\.csv)$/, '$1-…$2')
 
-export const startDailyRevenue: SceneModel = ideFrame({
+export const startDailyRevenue: SceneModel = ideFrame2({
+  model: 'Read, filter, shuffle, write',
   tree: explorer({ conf: 'plain', logs: true, out: true, session: 'plain', py: [['first_job.py', undefined], ['lazy.py', undefined], ['daily_revenue.py', 'active']] }),
   editor: { file: 'daily_revenue.py', code, highlight: [...linesFrom(code, '.groupBy(', '.alias("revenue")'), ...linesFrom(code, 'daily.write')] },
   session,
@@ -25,19 +27,11 @@ export const startDailyRevenue: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'tasks', title: 'Who does each step', tone: 'infra', columns: ['step', 'done by'], rows: [
-        { id: 't-read', cells: ['read, filter', 'each task, on its own partition'] },
-        { id: 't-shuffle', cells: ['groupBy', 'a shuffle: rows move to their day’s task'], tone: 'infra' },
-        { id: 't-write', cells: ['write', 'each task writes its own part file'] },
-      ],
-    },
-    {
       type: 'table', id: 'folder', title: 'ls out/daily_revenue', tone: 'store', columns: ['file', 'what it is'], rows: [
-        { id: 'f-success', cells: ['_SUCCESS', 'empty: the write finished'] },
-        { id: 'f-part', cells: [short, 'CSV: a header, then one line per day'], tone: 'store' },
+        { id: 'f-success', cells: ['_SUCCESS', 'empty: it finished'] },
+        { id: 'f-part', cells: [short, 'CSV: a line per day'], tone: 'store' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'store', text: 'Spark writes one file per partition, in parallel. Here Spark merged the tiny partitions into one before writing, so there is one part file.' },
   ],
   edges: [
     { from: 'j-read', to: 'j-filter' },

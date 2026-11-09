@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { scaleTree } from './tree'
@@ -14,7 +15,8 @@ const secs = (label: string) => out.match(new RegExp(`cache ${label}\\s+(.+)`))!
 const [off, on] = [secs('off'), secs('on')]
 const [, parts, mem] = out.match(/cached: (\d+) partitions · (\d+) MB in memory/)!
 
-export const scaleCache: SceneModel = ideFrame({
+export const scaleCache: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: scaleTree(['shopwave/scale.py', 'explore/cache.py'], 'explore/cache.py', ['explore/cache.py']),
   editor: { file: 'explore/cache.py', code, ...view(code, 'questions = {', 'cached: {rdd'), highlight: linesFrom(code, 'if cached:', 'sales = sales.cache()') },
   session,
@@ -41,6 +43,5 @@ export const scaleCache: SceneModel = ideFrame({
         { id: 'l-d', cells: ['DISK_ONLY', 'local disk only'] },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'cache() is lazy: the first action fills it and runs no faster. Free it with unpersist() when you are done.' },
   ],
 })

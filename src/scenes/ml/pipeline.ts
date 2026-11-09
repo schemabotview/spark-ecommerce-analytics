@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { mlTree } from './tree'
@@ -12,7 +13,8 @@ const stages = out.match(/stages: (.+)/)![1].split(' → ')
 const [, rank, users, items] = out.match(/rank (\d+): (\d+) customer vectors, (\d+) product vectors/)!
 const rows = [...out.matchAll(/^\|\s*(\d+)\|\s*(\d+)\|\s*([\d.]+)\|\s*([\d.]+)\|$/gm)].map(([, c, p, r, g]) => ({ c, p, r, g }))
 
-export const mlPipeline: SceneModel = ideFrame({
+export const mlPipeline: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: mlTree(['shopwave/ml.py', 'explore/pipeline.py'], 'shopwave/ml.py', ['explore/pipeline.py']),
   editor: { file: 'shopwave/ml.py', code, ...view(code, 'def pipeline('), highlight: [...linesFrom(code, 'columns = SQLTransformer'), ...linesFrom(code, 'als = ALS(', 'return Pipeline(stages=[columns, als])')] },
   session,

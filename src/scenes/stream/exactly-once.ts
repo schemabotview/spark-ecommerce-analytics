@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { streamTree } from './tree'
@@ -13,7 +14,8 @@ const [, firstRows, firstDistinct] = crash.match(/in the table: (\d+) events, (\
 const again = outputOf(session, 'python -m explore.exactly_once')
 const [, rows, distinct] = again.match(/in the table: (\d+) events, (\d+) distinct/)!
 
-export const streamExactlyOnce: SceneModel = ideFrame({
+export const streamExactlyOnce: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: streamTree(['shopwave/stream.py', 'explore/exactly_once.py', 'out/clicks/', 'out/clicks_checkpoint/'], 'shopwave/stream.py', ['explore/exactly_once.py']),
   editor: { file: 'shopwave/stream.py', code, ...view(code, 'def to_delta(', '.trigger(availableNow=True).start(table))'), highlight: linesFrom(code, 'return (events.writeStream.format("delta")', '.trigger(availableNow=True).start(table))') },
   session,
@@ -38,7 +40,6 @@ export const streamExactlyOnce: SceneModel = ideFrame({
         { id: 'g-once', cells: ['exactly once', 'checkpoint + a Delta sink'], tone: 'store' },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: `${+rows - +distinct} ids still appear twice: the tracker sent them twice (Course 4). Exactly once is per Kafka record; duplicates in the source are §7’s job.` },
   ],
   edges: [
     { from: 'e-ckpt', to: 'e-rerun' },

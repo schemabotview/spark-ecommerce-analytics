@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { scaleTree } from './tree'
@@ -12,7 +13,8 @@ const runs = [...out.matchAll(/^(built-in|Python UDF)\s+(\d+) rows · read\s+(\d
   .map(([, name, rows, read, pushed]) => ({ name, rows, read, pushed }))
 const [builtin, udf] = runs
 
-export const scalePlanTuning: SceneModel = ideFrame({
+export const scalePlanTuning: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: scaleTree(['explore/plan_tuning.py', 'out/orders/'], 'explore/plan_tuning.py', ['explore/plan_tuning.py'], { 'out/orders/': 'sorted by country' }),
   editor: { file: 'explore/plan_tuning.py', code, ...view(code, 'arrow = '), highlight: [...linesFrom(code, 'orders.orderBy("country")'), ...linesFrom(code, 'queries = {"built-in"', '"Python UDF": orders')] },
   session,
@@ -46,7 +48,6 @@ export const scalePlanTuning: SceneModel = ideFrame({
         { id: 'o-cost', cells: ['rows to Python', 'none', 'every one'] },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'The answer is the same; the work is not. Read PushedFilters in explain() first when a query reads more than it should.' },
   ],
   edges: [
     { from: 'b-scan', to: 'b-count' },

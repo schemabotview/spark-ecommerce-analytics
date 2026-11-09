@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, lineOf, linesFrom } from '../ide'
+import { lineOf, linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { explorer } from './tree'
 import code from '../../../spine/start/02-first-dataframe/project/first_job.py?raw'
@@ -11,7 +12,8 @@ const out = outputOf(session, 'python first_job.py')
 const dtypes = [...out.split('\n').at(-1)!.matchAll(/\('(\w+)', '(\w+)'\)/g)].map((m) => [m[1], m[2]])
 const shown = out.match(/only showing top (\d+) rows/)![1]
 
-export const startFirstDataframe: SceneModel = ideFrame({
+export const startFirstDataframe: SceneModel = ideFrame2({
+  model: 'A session, a reader, a DataFrame',
   tree: explorer({ conf: 'new', py: [['first_job.py', 'active']] }),
   editor: { file: 'first_job.py', code, highlight: [...linesFrom(code, 'SparkSession.builder', '.getOrCreate()'), lineOf(code, 'spark.read.csv')] },
   session,
@@ -24,18 +26,9 @@ export const startFirstDataframe: SceneModel = ideFrame({
       ],
     },
     {
-      type: 'table', id: 'settings', title: 'The builder, line by line', tone: 'ingest', columns: ['setting', 'means'], rows: [
-        { id: 's-master', cells: ['master("local[4]")', 'this machine, 4 tasks at a time'] },
-        { id: 's-name', cells: ['appName("shopwave")', 'labels the run in Spark’s log'] },
-        { id: 's-log', cells: ['extraJavaOptions', 'Spark’s log → logs/spark.log'] },
-        { id: 's-get', cells: ['getOrCreate()', 'starts the JVM, or reuses it'] },
-      ],
-    },
-    {
       type: 'table', id: 'schema', title: 'orders.dtypes', tone: 'consume', columns: ['column', 'type'],
       rows: dtypes.map(([name, type]) => ({ id: `c-${name}`, cells: [name, type], tone: name === 'total' ? 'consume' as const : undefined })),
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'Every column is a string, even total. A CSV file is only text, and Spark guesses nothing unless asked to: Course 3 gives orders a real schema.' },
   ],
   edges: [
     { from: 'f-builder', to: 'f-read' },

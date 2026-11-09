@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { SIDE_W, ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { modelTree } from './tree'
@@ -13,13 +14,14 @@ const [, tasks, busy] = out.match(/join stage: (\d+) tasks, (\d+) with rows/)!
 const largest = out.match(/largest first: \[([\d, ]+)\]/)![1].split(', ').map(Number)
 const [, , med] = out.match(/largest task (\d+) rows · median task (\d+) rows/)!
 
-export const modelSkew: SceneModel = ideFrame({
+export const modelSkew: SceneModel = ideFrame2({
+  model: 'One key, one overloaded task',
   tree: modelTree(['shopwave/gold.py', 'shopwave/metrics.py', 'explore/partitions.py', 'explore/skew.py'], 'explore/skew.py', ['explore/skew.py']),
   editor: { file: 'explore/skew.py', code, ...view(code, 'sales = spark.read', undefined, 0), highlight: [...linesFrom(code, 'joined = sales.join', 'write = joined.write'), ...linesFrom(code, 'join = max(stages')] },
   session,
   side: [
     {
-      type: 'plot', id: 'rows', title: 'Rows per task: the largest six, and the median', compact: true,
+      type: 'plot', id: 'rows', title: 'Rows per task: the largest six, and the median', compact: true, w: SIDE_W - 34,
       x: { labels: [...largest.map((_, i) => `#${i + 1}`), 'median'] }, y: { min: 0, max: Math.ceil(largest[0] / 200) * 200, label: 'rows' },
       series: [{ kind: 'bar', points: largest.map((r, i) => [i, r] as [number, number]), tone: 'consume' },
         { kind: 'bar', points: [[largest.length, +med]], tone: 'store' }],
@@ -31,14 +33,5 @@ export const modelSkew: SceneModel = ideFrame({
         { id: 'f-ratio', cells: ['largest ÷ median', `${Math.round(largest[0] / +med)}×`], tone: 'consume' },
       ],
     },
-    {
-      type: 'table', id: 'sources', title: 'Where skew comes from', tone: 'neutral', columns: ['a key that', 'example'], rows: [
-        { id: 'k-best', cells: ['sells far more', 'the bestseller'] },
-        { id: 'k-bot', cells: ['acts far more', 'the scraper: Course 6'] },
-        { id: 'k-null', cells: ['is missing', 'null customer_id'] },
-        { id: 'k-default', cells: ['is a placeholder', "'unknown', 0, ''"] },
-      ],
-    },
-    { type: 'note', id: 'note', tone: 'consume', text: 'A join sends every row with one key to one task. The bestseller’s task does many times the median’s work, and the stage ends only when it does: the others wait.' },
   ],
 })

@@ -1,5 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { ideFrame, linesFrom } from '../ide'
+import { linesFrom } from '../ide'
+import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { scaleTree } from './tree'
 import code from '../../../spine/scale/03-spill/project/explore/spill.py?raw'
@@ -11,7 +12,8 @@ const runs = [...out.matchAll(/^(\w+)\s+tasks (\d+) · spilled\s+(\d+) MB in mem
   .map(([, label, tasks, mem, disk]) => ({ label, tasks, mem, disk }))
 const squeezed = runs.find((r) => r.label === 'squeezed')!
 
-export const scaleSpill: SceneModel = ideFrame({
+export const scaleSpill: SceneModel = ideFrame2({
+  model: 'TODO',
   tree: scaleTree(['shopwave/scale.py', 'shopwave/metrics.py', 'explore/spill.py'], 'explore/spill.py', ['explore/spill.py']),
   editor: { file: 'explore/spill.py', code, highlight: [...linesFrom(code, 'conf = {"spark.shuffle', 'if limit else {}'), ...linesFrom(code, 'ordered = sales.sortWithinPartitions')] },
   session,
@@ -34,7 +36,6 @@ export const scaleSpill: SceneModel = ideFrame({
         { id: 'x-less', cells: ['less data to sort', 'filter, select first'] },
       ],
     },
-    { type: 'note', id: 'note', tone: 'consume', text: 'Spill is how Spark survives too little memory: slower, never wrong. The fixes: more memory per task, fewer rows per task (more partitions), or less data (filter and select first).' },
   ],
   edges: [
     { from: 's-fill', to: 's-spill' },
