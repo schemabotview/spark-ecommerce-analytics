@@ -127,7 +127,7 @@ replayed by `scripts/spine.py` exactly as in python-expense-tracker (`first` / `
 never let the pane overflow. `ideFrame2` windows the editor around the highlighted lines; a
 hand-picked `show` is used only when that span does not fit (or when nothing is highlighted), is
 grown to fill the editor, and THROWS (naming the scene) when it does not fit: give it fewer, tighter
-ranges (each skipped run costs a fold row, a line over 71 columns two rows). `fold.ts` `view()` is
+ranges (each skipped run costs a fold row; a long line takes the rows `pre-wrap` gives it, wrapping at spaces). `fold.ts` `view()` is
 v1's (23 rows) and is no longer a safe `show`. Its workbench id is `ide-bench`; v1's `ide.ts`
 `ideFrame` is no longer used by any scene. No edges
 between panes. A detour (◆) that cannot fit the side pane is a full concept scene with the lab's
