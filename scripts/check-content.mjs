@@ -65,6 +65,7 @@ for (const [id, scene] of Object.entries(SCENES)) {
     const loose = tables.filter((t) => !sideEdges.some((e) => [e.from, e.to].some((end) => end.split('.')[0] === t.id)))
     if (loose.length > 1) problems.push(`scene ${id}  the side pane has ${loose.length} tables outside its diagram (${loose.map((t) => t.id).join(', ')}): at most one`)
     for (const n of side) if (n.type === 'item' && n.bullets?.length) problems.push(`scene ${id}  '${n.id}' is a bullet list: draw it, or say it in the narration`)
+    for (const n of side) if (n.type === 'note') problems.push(`scene ${id}  '${n.id}' is a note: draw it, or say it in the narration`)
     continue
   }
   if (!sideEdges.length && !side.some((n) => n.type === 'table' || n.type === 'plot'))
