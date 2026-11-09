@@ -1,6 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { linesFrom } from '../ide'
-import { ideFrame2 } from '../frame'
+import { SIDE_W, ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { view } from '../fold'
 import { mlTree } from './tree'
@@ -14,13 +14,13 @@ const scores = [...out.matchAll(/^ {2}(.+?)\s+(\d\.\d{3})$/gm)].map(([, name, rm
 const best = Math.min(...scores.filter((s) => !s.name.includes('random')).map((s) => s.rmse))
 
 export const mlEvaluate: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Test on months the model never saw',
   tree: mlTree(['shopwave/ml.py', 'explore/evaluate.py'], 'shopwave/ml.py', ['explore/evaluate.py']),
   editor: { file: 'shopwave/ml.py', code, ...view(code, 'def split(', 'F.col("base") + F.col("prediction"))'), highlight: [...linesFrom(code, 'before = F.col("reviewed_at")'), ...linesFrom(code, 'base = ratings.groupBy("product_id")', '"rating", F.col("rating") - F.col("base"))')] },
   session,
   side: [
     {
-      type: 'plot', id: 'rmse', title: 'RMSE on the test months, in stars', compact: true,
+      type: 'plot', id: 'rmse', title: 'RMSE on the test months, in stars', compact: true, w: SIDE_W - 34,
       x: { labels: scores.map((_, i) => String(i + 1)) }, y: { label: 'stars off', min: 0, max: 1.5, step: 0.25 },
       series: scores.map((s, i) => ({ kind: 'bar' as const, points: [[i, s.rmse] as [number, number]], tone: s.rmse === best ? 'store' as const : s.name.includes('random') ? 'neutral' as const : 'infra' as const })),
     },

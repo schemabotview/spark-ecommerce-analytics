@@ -16,7 +16,7 @@ const [, countries, stages, tasks, per] = out.match(/(\d+) countries · (\d+) st
 const ran = [...per.matchAll(/executor (\d+) ran (\d+)/g)].map(([, e, n]) => ({ e, n }))
 
 export const productionCluster: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Driver, master, workers',
   tree: prodTree(['cluster.sh', 'conf/cluster.conf', 'explore/on_cluster.py', 'shopwave/session.py'], 'cluster.sh', ['cluster.sh', 'conf/cluster.conf', 'explore/on_cluster.py']),
   editor: { file: 'cluster.sh', lang: 'shell', code, ...view(code, 'case "$1" in', 'echo "cluster stopped";;'), highlight: linesFrom(code, '"$daemon" start $master 1', '--work-dir "$SPARK_LOG_DIR/work" > /dev/null') },
   session,
@@ -36,13 +36,6 @@ export const productionCluster: SceneModel = ideFrame2({
     {
       type: 'table', id: 'ran', title: `Revenue by country: ${countries} rows, ${stages} stages, ${tasks} tasks`, tone: 'store', columns: ['executor', 'tasks it ran'],
       rows: ran.map((r) => ({ id: `e${r.e}`, cells: [`executor ${r.e}`, r.n] })),
-    },
-    {
-      type: 'table', id: 'vs', title: 'local[4] vs a cluster', tone: 'neutral', columns: ['', 'local[4]', 'cluster'], rows: [
-        { id: 'v-proc', cells: ['executors', 'threads in one JVM', 'their own JVMs'] },
-        { id: 'v-code', cells: ['your Python', 'already there', '--py-files / pyFiles'] },
-        { id: 'v-jars', cells: ['jars', 'spark.jars in code', 'before the JVM starts'] },
-      ],
     },
   ],
   edges: [

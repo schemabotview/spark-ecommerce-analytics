@@ -12,7 +12,7 @@ const [, files, total, each] = out.match(/(\d+) files · (\d+) MB · about (\d+)
 const sizes = [...out.matchAll(/maxPartitionBytes\s+(\w+):\s+(\d+) partitions/g)].map(([, size, parts]) => ({ size, parts }))
 
 export const scalePartitionSize: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Files are packed into partitions',
   tree: scaleTree(['explore/partition_size.py'], 'explore/partition_size.py', ['explore/partition_size.py'], { 'data/sf1/': `${files} files a table` }),
   editor: { file: 'explore/partition_size.py', code, highlight: linesFrom(code, 'for size in', 'f"{items.rdd.getNumPartitions()') },
   session,
@@ -26,13 +26,6 @@ export const scalePartitionSize: SceneModel = ideFrame2({
         { type: 'item', id: 'r-cost', title: 'each file costs 4 MB more', sub: 'openCostInBytes: opening one is not free', icon: 'file' },
         { type: 'item', id: 'r-pack', title: `${files} files × (${each} KB + 4 MB)`, sub: `packed into 128 MB partitions: ${sizes[0].parts}`, icon: 'boxes' },
         { type: 'item', id: 'r-small', title: 'a limit below one file', sub: 'one partition a file, or more', icon: 'layers' },
-      ],
-    },
-    {
-      type: 'table', id: 'aim', title: 'What to aim for', tone: 'neutral', columns: ['', 'aim'], rows: [
-        { id: 'a-size', cells: ['a partition', '~128 MB of data'] },
-        { id: 'a-count', cells: ['the tasks', 'a few per core'] },
-        { id: 'a-files', cells: ['the files', 'big: compact small ones (7.9)'] },
       ],
     },
   ],

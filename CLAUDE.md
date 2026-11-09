@@ -13,8 +13,8 @@ one chapter of the video.
 generator's planted problems, each side-pane diagram, the pinned versions, and the packaging (one
 video). Author from it; change it first, never drift from it.
 
-Engine `@graphlearning/graphl-flow` (^0.3.0), shell `@graphlearning/shell` (^1.0.2), both published
-and pinned. Sister repo: **python-expense-tracker**, whose infra (IDE template, `spine.py`, checks,
+Engine `@graphlearning/graphl-flow` 0.11.0, shell `@graphlearning/shell` 1.1.0, both published and
+pinned exactly (IDE frame v2, COURSE-PLAN Decision 8); no `overrides`. Sister repo: **python-expense-tracker**, whose infra (IDE template, `spine.py`, checks,
 registry, shots) was ported here. Port from it; do not reinvent it.
 
 ## Status
@@ -35,6 +35,10 @@ registry, shots) was ported here. Port from it; do not reinvent it.
 
 Narrated and recorded 2026-10-27: all 82 wavs in, every course captured at 3840x2160, and
 combined into the single YouTube film (`npm run film` -> 1 h 41 min).
+
+**2026-11-09: ported to IDE frame v2** (COURSE-PLAN Decision 8). All 68 IDE sections are on v2;
+the 14 concept scenes are unchanged. No narration changed, so the 82 wavs stand; every course is
+re-recorded, because the frame changed. The recordings and the film above are v1.
 
 The owner reviews everything at the end (2026-10-26: "do course by course till end").
 
@@ -107,13 +111,25 @@ replayed by `scripts/spine.py` exactly as in python-expense-tracker (`first` / `
   status store returns Scala `Seq`s: index them, they do not iterate in Python.
 - **ALS needs the average (10.4)**: ALS alone scores worse than each product's average (no bias
   terms; regularization pulls toward 0 stars); `ml.fit` trains it on what the average misses.
-- **The terminal holds 13 rows at 80 columns**, wrapped lines counted. Spark tables are wide and
+- **The terminal is 72 columns** on frame v2 and takes its transcript's rows (wrapped lines
+  counted; at most 18, the editor keeps 8). The 80-column sessions wrap at draw time. Spark tables are wide and
   tracebacks long: `show(3)`, `java -version 2>&1 | head -1`, errors caught and printed by condition.
 
 ## Frames
 
-python-expense-tracker's IDE template, unchanged: explorer | editor (80 × 23) over terminal (13) |
-fixed side pane. Every IDE side pane carries a diagram and fills ≥ 2/3 of its height. No edges
+**IDE frame v2** (`src/scenes/frame.ts` `ideFrame2`, ported from python-expense-tracker's): one
+1344 × 756 grid, one fit. Compact explorer 175 (no notes: v1's asides are dropped) | editor over a
+72-column terminal, sharing 26 rows (the terminal takes its transcript's rows, the editor the rest)
+| side pane 434, TITLED with the section's mental model (`model`). The side pane holds ONE diagram
+(edges or a plot) and at most one table outside it; no bullets, no notes (check-content), filled
+≥ 1/2 (check-render). A plot there is `compact` with `w: SIDE_W - 34`, and its x labels must fit
+(~8 characters for five bars). A table there fits ~36 monospace characters a row: shorten cells,
+never let the pane overflow. `ideFrame2` windows the editor around the highlighted lines; a
+hand-picked `show` is used only when that span does not fit (or when nothing is highlighted), is
+grown to fill the editor, and THROWS (naming the scene) when it does not fit: give it fewer, tighter
+ranges (each skipped run costs a fold row, a line over 71 columns two rows). `fold.ts` `view()` is
+v1's (23 rows) and is no longer a safe `show`. Its workbench id is `ide-bench`; v1's `ide.ts`
+`ideFrame` is no longer used by any scene. No edges
 between panes. A detour (◆) that cannot fit the side pane is a full concept scene with the lab's
 real output inside it. **The Spark UI is never screenshotted**: stages, tasks and memory are drawn
 from the run's own numbers (2.3 asks `statusTracker`). A full scene's widest node sets the zoom:

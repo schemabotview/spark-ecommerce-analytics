@@ -11,23 +11,18 @@ import session from '../../../spine/ml/01-ratings/session.txt?raw'
 const out = outputOf(session, 'python -m explore.ratings')
 const [, ratings, users, items] = out.match(/(\d+) ratings · (\d+) customers × (\d+) products/)!
 const [, cells, filled] = out.match(/the matrix: (\d+) cells, ([\d.]+%) filled/)!
-const stars = [...out.matchAll(/(\d)★ (\d+)/g)].map(([, s, n]) => [+s, +n] as [number, number])
 const [, who, theirs] = out.match(/customer (\d+), (\d+) ratings:/)!
 const taste = [...out.matchAll(/^\s+(\w+)\s+([\d.]+)★ over (\d+)$/gm)].map(([, c, s, n]) => ({ c, s, n }))
 
 export const mlRatings: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'A sparse matrix to fill in',
   tree: mlTree(['shopwave/schemas.py', 'shopwave/ml.py', 'explore/ratings.py'], 'explore/ratings.py', ['shopwave/ml.py', 'explore/ratings.py', 'data/raw/reviews/']),
   editor: { file: 'explore/ratings.py', code, ...view(code, 'spark = spark_session()'), highlight: linesFrom(code, 'theirs = (ratings.filter', '.agg(F.count("*")') },
   session,
   side: [
     {
-      type: 'plot', id: 'stars', title: `${ratings} ratings, by stars`, compact: true, x: { labels: stars.map(([s]) => `${s}★`) }, y: { label: 'ratings', min: 0 },
-      series: [{ kind: 'bar', points: stars.map(([, n], i) => [i, n] as [number, number]), tone: 'store' }],
-    },
-    {
       type: 'group', id: 'matrix', title: `${users} customers × ${items} products`, icon: 'table', tone: 'ingest', children: [
-        { type: 'item', id: 'x-cells', title: `${cells} cells, ${filled} filled`, sub: 'the rest: never rated, not zero', icon: 'layers' },
+        { type: 'item', id: 'x-cells', title: `${cells} cells, ${filled} filled`, sub: `${ratings} ratings; the rest never rated, not zero`, icon: 'layers' },
         { type: 'item', id: 'x-goal', title: 'fill in the blanks', sub: 'what would each customer rate the rest?', icon: 'search', tone: 'store' },
       ],
     },

@@ -12,7 +12,7 @@ const published = outputOf(session, 'python -m shopwave.tracker 2026-10-01').mat
 const offsets = [...session.matchAll(/^clicks:(\d+):(\d+)$/gm)].map(([, p, n]) => ({ p, n }))
 
 export const streamKafka: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'A topic: partitioned, ordered logs',
   tree: streamTree(['compose.yaml', 'shopwave/tracker.py'], 'shopwave/tracker.py', ['shopwave/tracker.py']),
   editor: { file: 'shopwave/tracker.py', code, ...view(code, 'def main('), highlight: [...linesFrom(code, 'visitor = F.coalesce', 'records = lines.select'), ...linesFrom(code, '(records.write.format("kafka")', '.option("topic", TOPIC).save())')] },
   session,

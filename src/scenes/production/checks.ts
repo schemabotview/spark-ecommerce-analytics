@@ -10,11 +10,9 @@ import session from '../../../spine/production/03-checks/session.txt?raw'
 // §3 — data quality as code. Every check's mark and bad-row count are the session's.
 const out = outputOf(session, 'python -m shopwave.checks; echo "exit code $?"')
 const checks = [...out.matchAll(/^([✓✗!]) (.+?)\s+(\d+) bad rows$/gm)].map(([, mark, what, bad]) => ({ mark, what, bad }))
-const strict = outputOf(session, 'SHOPWAVE_STRICT=1 python -m shopwave.checks 2>&1 | tail -1; echo "exit code ${PIPESTATUS[0]}"')
-const codes = [out, strict].map((o) => o.match(/exit code (\d+)/)![1])
 
 export const productionChecks: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Checks after gold stop a bad night',
   tree: prodTree(['shopwave/checks.py', 'shopwave/jobs.py'], 'shopwave/checks.py', ['shopwave/checks.py']),
   editor: { file: 'shopwave/checks.py', code, ...view(code, 'ROWS = [', 'LEFT ANTI JOIN dim_product p'), highlight: linesFrom(code, 'ROWS = [', '("error", "dim_product"') },
   session,
@@ -22,12 +20,6 @@ export const productionChecks: SceneModel = ideFrame2({
     {
       type: 'table', id: 'checks', title: 'After gold: every check', tone: 'store', columns: ['', 'check', 'bad rows'],
       rows: checks.map((c, i) => ({ id: `c${i}`, cells: [c.mark, c.what, c.bad], tone: c.mark === '✓' ? undefined : 'consume' as const })),
-    },
-    {
-      type: 'table', id: 'levels', title: 'Two levels', tone: 'neutral', columns: ['level', 'when it fails', 'exit'], rows: [
-        { id: 'l-warn', cells: ['warn', 'reported, the night goes on', codes[0]] },
-        { id: 'l-err', cells: ['error (or STRICT=1)', 'the night stops here', codes[1]], tone: 'consume' },
-      ],
     },
     {
       type: 'group', id: 'night', title: 'In the nightly run', icon: 'workflow', tone: 'ingest', children: [

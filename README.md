@@ -46,7 +46,7 @@ and scale factor, same bytes.
 ```
 src/content/<course>/    one file per section + the course index
 src/scenes/<course>/     declarative scenes (never x/y)
-src/scenes/ide.ts        the one IDE frame every IDE section uses
+src/scenes/frame.ts      IDE frame v2, the one frame every IDE section uses (ide.ts: lineOf, trim)
 src/scenes/lab.ts        a lab command's real output, for concept scenes
 spine/<course>/<step>/   the platform as real files, one cumulative snapshot per step
 shopwave_gen/            the seeded data generator and its `verify`

@@ -13,13 +13,13 @@ const runs = [...out.matchAll(/^(\w+)\s+tasks (\d+) · spilled\s+(\d+) MB in mem
 const squeezed = runs.find((r) => r.label === 'squeezed')!
 
 export const scaleSpill: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Out of memory: spill, then merge',
   tree: scaleTree(['shopwave/scale.py', 'shopwave/metrics.py', 'explore/spill.py'], 'explore/spill.py', ['explore/spill.py']),
   editor: { file: 'explore/spill.py', code, highlight: [...linesFrom(code, 'conf = {"spark.shuffle', 'if limit else {}'), ...linesFrom(code, 'ordered = sales.sortWithinPartitions')] },
   session,
   side: [
     {
-      type: 'table', id: 'runs', title: 'The sort stage, twice', tone: 'store', columns: ['memory', 'tasks', 'spilled (memory)', 'spilled (disk)'],
+      type: 'table', id: 'runs', title: 'The sort stage, twice', tone: 'store', columns: ['memory', 'tasks', 'spilled', 'on disk'],
       rows: runs.map((r) => ({ id: `r-${r.label}`, cells: [r.label, r.tasks, `${r.mem} MB`, `${r.disk} MB`], tone: r.label === 'squeezed' ? 'consume' as const : undefined })),
     },
     {
@@ -27,13 +27,6 @@ export const scaleSpill: SceneModel = ideFrame2({
         { type: 'item', id: 's-fill', title: 'rows sorted in execution memory', sub: 'until the task’s share is full', icon: 'memory' },
         { type: 'item', id: 's-spill', title: 'a sorted run written to disk', sub: `${squeezed.mem} MB as rows → ${squeezed.disk} MB serialized`, icon: 'disk', tone: 'consume' },
         { type: 'item', id: 's-merge', title: 'the runs merged at the end', sub: 'the same result, read back from disk', icon: 'layers' },
-      ],
-    },
-    {
-      type: 'table', id: 'fix', title: 'A stage that spills: the fixes', tone: 'neutral', columns: ['fix', 'setting'], rows: [
-        { id: 'x-parts', cells: ['fewer rows per task', 'shuffle.partitions ↑'] },
-        { id: 'x-mem', cells: ['more memory per task', 'executor.memory ↑'] },
-        { id: 'x-less', cells: ['less data to sort', 'filter, select first'] },
       ],
     },
   ],

@@ -9,11 +9,11 @@ import session from '../../../spine/stream/09-abandonment/session.txt?raw'
 
 // §9 — cart abandonment with session windows. The alerts and the open visits are the session's.
 const out = outputOf(session, 'python -m explore.abandonment')
-const [, batches, alerts, open] = out.match(/batches: (\d+) · alerts: (\d+) · visits still open in state: (\d+)/)!
+const [, batches, alerts] = out.match(/batches: (\d+) · alerts: (\d+) · visits still open in state: (\d+)/)!
 const first = [...out.matchAll(/^\s+(\S+)\s+(\d\d:\d\d)–(\d\d:\d\d)\s+(\d+) events/gm)].map(([, who, from, to, n]) => ({ who, from, to, n }))
 
 export const streamAbandonment: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'A session window per visitor',
   tree: streamTree(['shopwave/stream.py', 'explore/abandonment.py'], 'shopwave/stream.py', ['explore/abandonment.py']),
   editor: { file: 'shopwave/stream.py', code, ...view(code, 'def abandoned_carts('), highlight: linesFrom(code, 'visits = events.groupBy(visitor.alias("visitor")', 'return visits.filter("carted AND NOT bought")') },
   session,
@@ -28,13 +28,6 @@ export const streamAbandonment: SceneModel = ideFrame2({
     {
       type: 'table', id: 'alerts', title: `${alerts} alerts from one day, ${batches} batches`, tone: 'consume', columns: ['visitor', 'visit', 'events'],
       rows: first.map((a, i) => ({ id: `a${i}`, cells: [a.who, `${a.from}–${a.to}`, a.n] })),
-    },
-    {
-      type: 'table', id: 'kinds', title: 'Three kinds of window', tone: 'neutral', columns: ['window', 'its edges'], rows: [
-        { id: 'k-tumble', cells: ['tumbling (§5)', 'fixed, no overlap'] },
-        { id: 'k-slide', cells: ['sliding', 'fixed, overlapping'] },
-        { id: 'k-session', cells: ['session', 'set by gaps in activity'], tone: 'store' },
-      ],
     },
   ],
   edges: [

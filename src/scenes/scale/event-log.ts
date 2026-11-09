@@ -1,8 +1,7 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { linesFrom } from '../ide'
+import { lineOf, linesFrom } from '../ide'
 import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
-import { view } from '../fold'
 import { scaleTree } from './tree'
 import code from '../../../spine/scale/01-event-log/project/explore/event_log.py?raw'
 import session from '../../../spine/scale/01-event-log/session.txt?raw'
@@ -16,14 +15,14 @@ const role = (s: (typeof stages)[number]) =>
   +s.read > 0 ? (+s.read === Math.max(...reads) ? 'read order_items' : 'read orders, paid only') : +s.write > 0 ? 'join, then partial sums' : 'add the sums up'
 
 export const scaleEventLog: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'The event log: every stage, measured',
   tree: scaleTree(['shopwave/scale.py', 'explore/event_log.py', 'logs/events/'], 'explore/event_log.py', ['shopwave/scale.py', 'explore/event_log.py', 'logs/events/'], { 'logs/events/': 'JSON lines' }),
-  editor: { file: 'explore/event_log.py', code, ...view(code, 'os.makedirs'), highlight: [...linesFrom(code, '"spark.eventLog.enabled"', '"spark.eventLog.compress"'), ...linesFrom(code, 'if event["Event"] != "SparkListenerStageCompleted"')] },
+  editor: { file: 'explore/event_log.py', code, show: [[lineOf(code, 'spark = spark_session(**{'), lineOf(code, '})')], [lineOf(code, 'for line in open('), lineOf(code, 'stage = event[')]], highlight: [...linesFrom(code, '"spark.eventLog.enabled"', '"spark.eventLog.compress"'), ...linesFrom(code, 'if event["Event"] != "SparkListenerStageCompleted"')] },
   session,
   side: [
     {
-      type: 'table', id: 'stages', title: 'The job, stage by stage, from the event log', tone: 'store', columns: ['stage', 'tasks', 's', 'rows read', 'shuffle out', 'shuffle in'],
-      rows: stages.map((s) => ({ id: `s${s.id}`, cells: [s.id, s.tasks, s.secs, s.read, s.write, s.shuffled] })),
+      type: 'table', id: 'stages', title: 'The job, stage by stage, from the event log', tone: 'store', columns: ['stage', 'tasks', 's', 'rows read'],
+      rows: stages.map((s) => ({ id: `s${s.id}`, cells: [s.id, s.tasks, s.secs, s.read] })),
     },
     {
       type: 'group', id: 'shape', title: 'Revenue by country, a year at SF 1', icon: 'workflow', tone: 'ingest', children: stages.map((s) => ({

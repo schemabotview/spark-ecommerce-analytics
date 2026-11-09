@@ -1,6 +1,6 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
 import { linesFrom } from '../ide'
-import { ideFrame2 } from '../frame'
+import { SIDE_W, ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
 import { scaleTree } from './tree'
 import code from '../../../spine/scale/07-skipping/project/explore/skipping.py?raw'
@@ -12,13 +12,13 @@ const lines = out.match(/Black Friday lines: (\d+)/)![1]
 const [, read, total, skipped] = out.match(/files read: (\d+) of (\d+) · skipped by min\/max: (\d+)/)!
 
 export const scaleSkipping: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Min/max per file skips the rest',
   tree: scaleTree(['explore/skipping.py', 'out/sales/'], 'explore/skipping.py', ['explore/skipping.py'], { 'out/sales/': `Delta, ${total} files` }),
   editor: { file: 'explore/skipping.py', code, highlight: [...linesFrom(code, '(sales.repartitionByRange(48'), ...linesFrom(code, 'read = scan.metrics()')] },
   session,
   side: [
     {
-      type: 'plot', id: 'plot', title: `Files for one day, of ${total}`, compact: true, x: { labels: ['read', 'skipped'] }, y: { label: 'files', min: 0, max: +total },
+      type: 'plot', id: 'plot', title: `Files for one day, of ${total}`, compact: true, w: SIDE_W - 34, x: { labels: ['read', 'skipped'] }, y: { label: 'files', min: 0, max: +total },
       series: [
         { kind: 'bar', points: [[0, +read]], tone: 'store' },
         { kind: 'bar', points: [[1, +skipped]], tone: 'infra' },

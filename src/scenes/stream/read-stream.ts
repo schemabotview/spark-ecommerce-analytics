@@ -1,8 +1,7 @@
 import type { SceneModel } from '@graphlearning/graphl-flow'
-import { linesFrom } from '../ide'
+import { lineOf, linesFrom } from '../ide'
 import { ideFrame2 } from '../frame'
 import { outputOf } from '../lab'
-import { view } from '../fold'
 import { streamTree } from './tree'
 import code from '../../../spine/stream/02-read-stream/project/shopwave/stream.py?raw'
 import session from '../../../spine/stream/02-read-stream/session.txt?raw'
@@ -11,12 +10,11 @@ import session from '../../../spine/stream/02-read-stream/session.txt?raw'
 const out = outputOf(session, 'python -m explore.read_stream')
 const columns = out.match(/a record: (.+)/)![1].split(', ').map((c) => c.split(':'))
 const read = out.match(/events read: (\d+)/)![1]
-const parts = [...out.matchAll(/^\|\s+(\d+)\|\s+(\d+)\|$/gm)].map(([, p, n]) => ({ p, n }))
 
 export const streamReadStream: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'A Kafka record becomes an event',
   tree: streamTree(['shopwave/tracker.py', 'shopwave/stream.py', 'explore/read_stream.py'], 'shopwave/stream.py', ['shopwave/stream.py', 'explore/read_stream.py']),
-  editor: { file: 'shopwave/stream.py', code, ...view(code, 'def kafka(', 'e.*", "partition", "offset")'), highlight: [...linesFrom(code, 'reader = (spark.readStream'), ...linesFrom(code, 'event = F.from_json')] },
+  editor: { file: 'shopwave/stream.py', code, show: [[lineOf(code, 'reader = (spark.readStream'), lineOf(code, '.option("subscribe"')], [lineOf(code, 'def clicks('), lineOf(code, '"e.*", "partition"')]], highlight: [...linesFrom(code, 'reader = (spark.readStream'), ...linesFrom(code, 'event = F.from_json')] },
   session,
   side: [
     {
@@ -29,10 +27,6 @@ export const streamReadStream: SceneModel = ideFrame2({
         { type: 'item', id: 'p-json', title: 'from_json(…, schemas.CLICKS)', sub: 'bronze’s schema, from Course 3', icon: 'code' },
         { type: 'item', id: 'p-row', title: `${read} events, as columns`, sub: 'partition and offset kept', icon: 'table', tone: 'store' },
       ],
-    },
-    {
-      type: 'table', id: 'parts', title: 'Read per partition', tone: 'neutral', columns: ['partition', 'events'],
-      rows: parts.map((r) => ({ id: `r${r.p}`, cells: [r.p, r.n] })),
     },
   ],
   edges: [

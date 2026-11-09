@@ -335,3 +335,11 @@ Spark output is noisier than Python's, so the spine fixes these up front:
 6. Background is just-in-time (◆ detours), never a front-loaded course.
 7. Follow-up project videos (not this plan): retail bank fraud + AML (streaming, GraphFrames);
    telemetry (time series, geospatial); log analytics (sketches, HyperLogLog).
+8. IDE frame v2 (2026-11-09): every IDE section moves to graphl-flow 0.11's shared frame (1344 ×
+   756, one fit; compact explorer | editor over a 72-column terminal | side pane TITLED with the
+   section's mental model), as python-expense-tracker did (its Decision 6). The side pane holds one
+   diagram (edges or a plot) and at most one table outside it, no bullets and no notes; what a
+   removed table carried is in the terminal or the narration. The spine is unchanged: the 80-column
+   sessions are wrapped at draw time. Done 2026-11-09: all 68 IDE sections on v2, the 14 concept
+   scenes unchanged. No narration walked a removed element, so no wav changes; every course is
+   re-recorded, because the frame changed.

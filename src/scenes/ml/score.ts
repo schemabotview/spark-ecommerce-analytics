@@ -16,18 +16,14 @@ const top = [...out.matchAll(/^\s+(\d)\. (.+?)\s{2,}(\w+)\s+([\d.]+)★$/gm)].ma
 const liked = new Set(taste.slice(0, 2).map(([c]) => c))
 
 export const mlScore: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Score every pair; keep the top 5',
   tree: mlTree(['shopwave/ml.py', 'explore/one_customer.py', 'lake/gold/recommendations/'], 'shopwave/ml.py', ['explore/one_customer.py', 'lake/gold/recommendations/']),
   editor: { file: 'shopwave/ml.py', code, ...view(code, 'def recommend(', 'main()'), highlight: linesFrom(code, 'pairs = customers.select("customer_id")', '"rank", F.row_number().over(best))') },
   session,
   side: [
     {
-      type: 'table', id: 'top', title: `Customer ${who}: the top 5`, tone: 'store', columns: ['#', 'product', 'category', 'score'],
-      rows: top.map((t) => ({ id: `t${t.rank}`, cells: [t.rank, t.name, t.cat, `${t.score}★`], tone: liked.has(t.cat) ? 'store' as const : undefined })),
-    },
-    {
-      type: 'table', id: 'taste', title: `What customer ${who} rated, on average`, tone: 'ingest', columns: ['category', 'stars'],
-      rows: taste.map(([c, s]) => ({ id: `r-${c}`, cells: [c, s], tone: liked.has(c) ? 'store' as const : undefined })),
+      type: 'table', id: 'top', title: `Customer ${who}: the top 5`, tone: 'store', columns: ['product', 'category', 'score'],
+      rows: top.map((t) => ({ id: `t${t.rank}`, cells: [`${t.rank}. ${t.name}`, t.cat, `${t.score}★`], tone: liked.has(t.cat) ? 'store' as const : undefined })),
     },
     {
       type: 'group', id: 'job', title: `gold/recommendations: ${rows} rows`, icon: 'brain', tone: 'store', children: [

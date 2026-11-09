@@ -13,7 +13,7 @@ const held = out.match(/ids held in state: (\d+)/)![1]
 const late = +read - +kept - +copies
 
 export const streamDedupe: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Remember recent ids, drop the copies',
   tree: streamTree(['shopwave/stream.py', 'explore/stream_dedupe.py'], 'explore/stream_dedupe.py', ['explore/stream_dedupe.py']),
   editor: { file: 'explore/stream_dedupe.py', code, highlight: linesFrom(code, 'once = (events.withWatermark', '.dropDuplicatesWithinWatermark') },
   session,
@@ -31,13 +31,6 @@ export const streamDedupe: SceneModel = ideFrame2({
         { type: 'item', id: 's-new', title: 'a new event_id: kept, remembered', sub: 'until the watermark passes it + 1 hour', icon: 'fingerprint' },
         { type: 'item', id: 's-seen', title: 'an id it holds: dropped', sub: 'the tracker’s second copy', icon: 'filter', tone: 'store' },
         { type: 'item', id: 's-free', title: `${held} ids held at the end`, sub: 'older ones forgotten: state stays small', icon: 'disk' },
-      ],
-    },
-    {
-      type: 'table', id: 'which', title: 'Which dedupe', tone: 'neutral', columns: ['call', 'remembers'], rows: [
-        { id: 'w-batch', cells: ['dropDuplicates, batch', 'nothing: the table is all there'] },
-        { id: 'w-stream', cells: ['dropDuplicates, stream', 'every id, for ever'], tone: 'consume' },
-        { id: 'w-wm', cells: ['…WithinWatermark', 'recent ids only'], tone: 'store' },
       ],
     },
   ],

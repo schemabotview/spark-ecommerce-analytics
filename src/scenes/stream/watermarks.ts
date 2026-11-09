@@ -15,7 +15,7 @@ const dropped = out.match(/late events dropped: (\d+)/)![1]
 const open = out.match(/windows still open in state: (\d+)/)![1]
 
 export const streamWatermarks: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'The watermark decides what is final',
   tree: streamTree(['shopwave/stream.py', 'explore/watermarks.py'], 'explore/watermarks.py', ['explore/watermarks.py']),
   editor: { file: 'explore/watermarks.py', code, ...view(code, 'spark = spark_session()'), highlight: [...linesFrom(code, 'late_ok = events.withWatermark'), ...linesFrom(code, '.outputMode("append")')] },
   session,

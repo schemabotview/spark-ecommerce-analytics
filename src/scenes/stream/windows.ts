@@ -13,7 +13,7 @@ const [, batches, hours] = out.match(/batches: (\d+) · hours with sales: (\d+)/
 const top = [...out.matchAll(/(\d\d-\d\d \d\d:\d\d)–(\d\d:\d\d)\s+(\d+) orders\s+€\s+([\d.]+)/g)].map(([, from, to, orders, eur]) => ({ from, to, orders, eur }))
 
 export const streamWindows: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Event time into hourly windows',
   tree: streamTree(['shopwave/stream.py', 'explore/live_revenue.py'], 'shopwave/stream.py', ['explore/live_revenue.py']),
   editor: { file: 'shopwave/stream.py', code, ...view(code, 'def purchases(', 'F.sum("revenue").alias("revenue"))'), highlight: linesFrom(code, 'return purchases.groupBy(F.window("event_ts", width))') },
   session,
@@ -27,13 +27,6 @@ export const streamWindows: SceneModel = ideFrame2({
         { type: 'item', id: 'w-event', title: 'a purchase at 15:42', sub: 'its event time, not when it arrived', icon: 'card' },
         { type: 'item', id: 'w-bucket', title: 'lands in 15:00–16:00', sub: 'tumbling: one window each, no overlap', icon: 'layers' },
         { type: 'item', id: 'w-state', title: 'the window’s sum, kept in state', sub: 'updated by every batch that adds to it', icon: 'memory', tone: 'store' },
-      ],
-    },
-    {
-      type: 'table', id: 'modes', title: 'Output modes', tone: 'neutral', columns: ['mode', 'writes after a batch'], rows: [
-        { id: 'o-complete', cells: ['complete', 'the whole result table'], tone: 'store' },
-        { id: 'o-update', cells: ['update', 'the rows that changed'] },
-        { id: 'o-append', cells: ['append', 'final rows only, once (§6)'] },
       ],
     },
   ],

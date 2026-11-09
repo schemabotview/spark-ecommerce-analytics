@@ -9,10 +9,12 @@ import session from '../../../spine/production/02-tests/session.txt?raw'
 
 // §2 — testing Spark code. The pass count is the session's (its seconds are volatile).
 const passed = outputOf(session, 'python -m pytest -q tests | tail -1').match(/(\d+) passed/)![1]
+// A test's name, cut at a word to fit the side pane (the editor shows it whole).
+const short = (s: string) => (s.length <= 32 ? s : s.slice(0, s.lastIndexOf(' ', 31)) + ' …')
 const tests = [...code.matchAll(/^def (test_\w+)\(spark\):/gm)].map(([, t]) => t)
 
 export const productionTests: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'Small rows in, a DataFrame compared',
   tree: prodTree(['shopwave/', 'tests/conftest.py', 'tests/test_transforms.py', 'requirements.txt'], 'tests/test_transforms.py', ['tests/conftest.py', 'tests/test_transforms.py'], { 'requirements.txt': '+ pytest' }),
   editor: { file: 'tests/test_transforms.py', code, ...view(code, 'def test_revenue_is_qty', 'def test_latest_keeps'), highlight: linesFrom(code, 'got = gold.fact_sales(orders, items)', '[(1, Decimal("7.50"))]') },
   session,
@@ -26,14 +28,7 @@ export const productionTests: SceneModel = ideFrame2({
     },
     {
       type: 'table', id: 'list', title: `${passed} passed`, tone: 'store', columns: ['test'],
-      rows: tests.map((t) => ({ id: t, cells: [t.replace(/^test_/, '').replaceAll('_', ' ')] })),
-    },
-    {
-      type: 'table', id: 'where', title: 'What is tested where', tone: 'neutral', columns: ['what', 'how', 'when'], rows: [
-        { id: 'w-fn', cells: ['each transform', 'pytest, rows by hand', 'every change'], tone: 'store' },
-        { id: 'w-job', cells: ['the jobs together', 'a nightly on small data', 'before a release'] },
-        { id: 'w-data', cells: ['the data itself', 'checks.py (§3)', 'every night'] },
-      ],
+      rows: tests.map((t) => ({ id: t, cells: [short(t.replace(/^test_/, '').replaceAll('_', ' '))] })),
     },
   ],
   edges: [

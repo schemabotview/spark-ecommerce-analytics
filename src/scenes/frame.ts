@@ -145,7 +145,7 @@ export function ideFrame2({ model, tree, editor, session, side, edges = [], proj
       : windowFor(code, 1, 1, editorRows)
   } catch (e) {
     if (!editor.show) throw new Error(`"${model}": ${(e as Error).message}`)
-    try { show = grow(code, editor.show, editorRows) } catch (f) { if (model === 'TODO') return { nodes: [] } /* PORTING */; throw new Error(`"${model}": ${(f as Error).message}`) }
+    try { show = grow(code, editor.show, editorRows) } catch (f) { throw new Error(`"${model}": ${(f as Error).message}`) }
   }
   const ed: Code = {
     type: 'code', id: 'editor', filename: editor.file, lang: editor.lang ?? 'python', code, highlight: hl, wrap: true,

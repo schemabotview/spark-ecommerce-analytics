@@ -14,7 +14,7 @@ const [, rank, users, items] = out.match(/rank (\d+): (\d+) customer vectors, (\
 const rows = [...out.matchAll(/^\|\s*(\d+)\|\s*(\d+)\|\s*([\d.]+)\|\s*([\d.]+)\|$/gm)].map(([, c, p, r, g]) => ({ c, p, r, g }))
 
 export const mlPipeline: SceneModel = ideFrame2({
-  model: 'TODO',
+  model: 'A pipeline of stages, fitted at once',
   tree: mlTree(['shopwave/ml.py', 'explore/pipeline.py'], 'shopwave/ml.py', ['explore/pipeline.py']),
   editor: { file: 'shopwave/ml.py', code, ...view(code, 'def pipeline('), highlight: [...linesFrom(code, 'columns = SQLTransformer'), ...linesFrom(code, 'als = ALS(', 'return Pipeline(stages=[columns, als])')] },
   session,
@@ -29,14 +29,6 @@ export const mlPipeline: SceneModel = ideFrame2({
     {
       type: 'table', id: 'guess', title: 'Ratings it has seen, and its guesses', tone: 'store', columns: ['customer', 'product', 'rated', 'predicted'],
       rows: rows.map((r) => ({ id: `g${r.p}`, cells: [r.c, r.p, r.r, r.g] })),
-    },
-    {
-      type: 'table', id: 'params', title: 'The settings', tone: 'neutral', columns: ['param', 'here'], rows: [
-        { id: 'k-rank', cells: ['rank', `${rank}: numbers per customer`] },
-        { id: 'k-reg', cells: ['regParam', '0.1: keeps them small'] },
-        { id: 'k-cold', cells: ['coldStartStrategy', 'drop: no guess for strangers'] },
-        { id: 'k-seed', cells: ['seed', '2026: the same factors every run'] },
-      ],
     },
   ],
   edges: [
